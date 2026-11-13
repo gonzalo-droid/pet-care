@@ -26,17 +26,17 @@ fun NavGraphBuilder.cartillaGraph(
 }
 
 /** Detalle y formulario de vacuna, sobre las pestañas (sin barra inferior). */
-fun NavGraphBuilder.cartillaFlows(onBack: () -> Unit, onEditRecord: (String) -> Unit) {
+fun NavGraphBuilder.cartillaFlows(onBack: () -> Unit, onEditRecord: (String) -> Unit, onAskPermission: () -> Unit) {
     composable<VaccineDetailRoute> { entry ->
         VaccineDetailScreen(recordId = entry.toRoute<VaccineDetailRoute>().recordId, onBack = onBack, onEdit = onEditRecord)
     }
     composable<VaccineEditRoute> { entry ->
-        VaccineFormScreen(recordId = entry.toRoute<VaccineEditRoute>().recordId, onClose = onBack)
+        VaccineFormScreen(recordId = entry.toRoute<VaccineEditRoute>().recordId, onClose = onBack, onAskPermission = onAskPermission)
     }
 }
 
 val cartillaModule = module {
     viewModelOf(::CartillaViewModel)
     viewModel { (recordId: String) -> VaccineDetailViewModel(recordId, get(), get(), get(), get(), get(), get()) }
-    viewModel { (recordId: String?) -> VaccineFormViewModel(recordId, get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { (recordId: String?) -> VaccineFormViewModel(recordId, get(), get(), get(), get(), get(), get(), get(), get()) }
 }

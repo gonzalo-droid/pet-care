@@ -14,7 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bestid.core.platform.notification.rememberNotificationPermissionRequester
 import com.bestid.core.designsystem.component.AlertCard
 import com.bestid.core.designsystem.component.AvatarSize
 import com.bestid.core.designsystem.component.Badge
@@ -23,14 +25,16 @@ import com.bestid.core.designsystem.component.EmptyState
 import com.bestid.core.designsystem.component.Eyebrow
 import com.bestid.core.designsystem.component.InfoCard
 import com.bestid.core.designsystem.component.LoadingState
+import com.bestid.core.designsystem.component.PermissionCard
 import com.bestid.core.designsystem.component.PetAvatar
 import com.bestid.core.designsystem.component.PlainCard
 import com.bestid.core.designsystem.component.PrimaryButton
 import com.bestid.core.designsystem.component.StatCard
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
-import com.bestid.core.domain.schedule.NextDue
 import com.bestid.core.ui.avatar
+import com.bestid.core.ui.displayName
+import com.bestid.core.ui.formatWeight
 import com.bestid.core.ui.daysText
 import com.bestid.core.ui.formatDayMonth
 import com.bestid.core.ui.formatLong
@@ -39,6 +43,9 @@ import com.bestid.core.ui.speciesAndSex
 import com.bestid.feature.home.resources.Res
 import com.bestid.feature.home.resources.home_add_pet
 import com.bestid.feature.home.resources.home_add_vaccine
+import com.bestid.feature.home.resources.home_add_weight
+import com.bestid.feature.home.resources.home_permission_body
+import com.bestid.feature.home.resources.home_permission_title
 import com.bestid.feature.home.resources.home_days_unit
 import com.bestid.feature.home.resources.home_empty_body
 import com.bestid.feature.home.resources.home_empty_title
@@ -66,10 +73,17 @@ fun HomeScreen(
     onOpenRecord: (String) -> Unit,
     onAddRecord: () -> Unit,
     onAddPet: () -> Unit,
+    onOpenCare: (String) -> Unit,
+    onAddWeight: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val requester = rememberNotificationPermissionRequester { viewModel.refreshPermission() }
+    LifecycleResumeEffect(Unit) {
+        viewModel.refreshPermission()
+        onPauseOrDispose { }
+    }
     val pet = state.pet
     when {
         state.loading -> LoadingState(modifier = modifier.fillMaxSize())
@@ -89,7 +103,7 @@ fun HomeScreen(
                 .padding(horizontal = BestIdTheme.spacing.screen, vertical = BestIdTheme.spacing.sm),
             verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.sm),
         ) {
-            val due = state.nextDue
+            val due = state.upcoming
             val greeting = when {
                 state.vaccineCount == 0 -> Res.string.home_greeting_start
                 due != null && due.daysLeft < 0 -> Res.string.home_greeting_overdue
@@ -119,8 +133,24 @@ fun HomeScreen(
                 }
             }
 
+            if (state.remindersBlocked) {
+                PermissionCard(
+                    title = stringResource(Res.string.home_permission_title),
+                    body = stringResource(Res.string.home_permission_body),
+                    onOpenSettings = requester::openSettings,
+                )
+            }
             if (due != null) {
-                NextDueHero(due, state.types, onClick = { onOpenRecord(due.record.id) })
+                NextDueHero(
+                    due,
+                    state.types,
+                    onClick = {
+                        when (due) {
+                            is Upcoming.Vaccine -> onOpenRecord(due.record.id)
+                            is Upcoming.Care -> onOpenCare(due.task.id)
+                        }
+                    },
+                )
             } else if (state.vaccineCount > 0) {
                 PlainCard {
                     Text(stringResource(Res.string.home_no_next), style = BestIdTheme.typography.card)
@@ -137,9 +167,14 @@ fun HomeScreen(
                     onClick = last?.let { { onOpenRecord(it.id) } },
                     modifier = Modifier.weight(1f),
                 )
+                val weight = state.lastWeight
                 StatCard(
                     label = stringResource(Res.string.home_weight),
-                    value = stringResource(Res.string.home_none),
+                    value = weight?.let { formatWeight(it.grams) } ?: stringResource(Res.string.home_none),
+                    detail = weight?.date?.formatLong(),
+                    actionText = if (weight == null) stringResource(Res.string.home_add_weight) else null,
+                    onAction = if (weight == null) onAddWeight else null,
+                    onClick = weight?.let { { onAddWeight() } },
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -155,10 +190,13 @@ fun HomeScreen(
 
 /** "PRÓXIMO · 49 días · Vacuna de leucemia · 31 dic", en durazno si faltan 7 días o menos. */
 @Composable
-private fun NextDueHero(due: NextDue, types: Map<String, com.bestid.core.model.VaccineType>, onClick: () -> Unit) {
-    val name = due.record.nextDateLabel
-        ?: due.record.typeIds.firstNotNullOfOrNull { types[it]?.label }
-        ?: stringResource(Res.string.home_vaccine_fallback)
+private fun NextDueHero(due: Upcoming, types: Map<String, com.bestid.core.model.VaccineType>, onClick: () -> Unit) {
+    val name = when (due) {
+        is Upcoming.Vaccine -> due.record.nextDateLabel
+            ?: due.record.typeIds.firstNotNullOfOrNull { types[it]?.label }
+            ?: stringResource(Res.string.home_vaccine_fallback)
+        is Upcoming.Care -> due.task.displayName()
+    }
     val urgent = due.daysLeft <= 7
     val content: @Composable () -> Unit = {
         Eyebrow(stringResource(Res.string.home_next), color = if (urgent) BestIdTheme.colors.alertInk else BestIdTheme.colors.primaryInk)

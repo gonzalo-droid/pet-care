@@ -13,9 +13,19 @@ fun NavGraphBuilder.homeGraph(
     onOpenRecord: (String) -> Unit,
     onAddRecord: () -> Unit,
     onAddPet: () -> Unit,
+    onOpenCare: (String) -> Unit,
+    onAddWeight: () -> Unit,
 ) {
     navigation<HomeGraph>(startDestination = HomeRoute) {
-        composable<HomeRoute> { HomeScreen(onOpenRecord = onOpenRecord, onAddRecord = onAddRecord, onAddPet = onAddPet) }
+        composable<HomeRoute> {
+            HomeScreen(
+                onOpenRecord = onOpenRecord,
+                onAddRecord = onAddRecord,
+                onAddPet = onAddPet,
+                onOpenCare = onOpenCare,
+                onAddWeight = onAddWeight,
+            )
+        }
     }
 }
 
