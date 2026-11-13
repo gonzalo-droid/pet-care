@@ -4,6 +4,9 @@ Registro de decisiones tomadas durante el desarrollo que cambian o precisan `SYS
 
 ## 2026-11-13 · M3
 
+### D33. CI solo con Android en Linux `[Decidido por Gonzalo]`
+El CI compila el APK y corre `./gradlew allTests` (JVM y host de Android). Las pruebas en el emulador Android (procesado de fotos y avisos) y en el simulador de iOS (pruebas comunes, flujo de UI, compilación con Xcode y apertura de la app) se corren en local antes de cada hito. Los scripts siguen en `.github/scripts/`.
+
 ### D29. M3 con fotos y sin lectura automática (opción C) `[Decidido por Gonzalo]`
 Sin Firebase por ahora (D4), M3 hace todo lo que no depende de la tecnología de lectura: `ImagePicker`, `ImageProcessor`, guardado de fotos, Bienvenida (O1), fotos de la cartilla (O2), foto del sticker, foto de la mascota y visor. Quedan para cuando se elija la lectura: Leyendo (O3), Revisar lectura (O4), la cola sin internet y la hoja C4.
 - Criterio de terminado ajustado: *con las fotos de la cartilla de Lilith, se registran sus 2 vacunas a mano viendo la foto; las fotos quedan en el detalle de cada vacuna y la foto de Lilith en su carnet, en ambas plataformas y sin internet.*
@@ -23,7 +26,7 @@ Sin Firebase por ahora (D4), M3 hace todo lo que no depende de la tecnología de
 - Las fotos se guardan sin metadatos: `ImageProcessor` vuelve a codificar el JPEG, así que no queda la ubicación.
 
 ### D32. Prueba del procesado de fotos en el emulador `[Propuesta]`
-`Bitmap` y `ExifInterface` no existen en la JVM. `core/platform` tiene pruebas de dispositivo (`androidDeviceTest`) que el CI corre en el emulador antes de la prueba de avisos: rota según EXIF, reduce a 2000 px, conserva fotos chicas, quita la ubicación y rechaza lo que no es imagen. En iOS, el flujo de UI del simulador pasa fotos generadas por el `ImageProcessor` real.
+`Bitmap` y `ExifInterface` no existen en la JVM. `core/platform` tiene pruebas de dispositivo (`androidDeviceTest`) que se corren en local con un emulador o teléfono conectado (`./gradlew :core:platform:connectedAndroidDeviceTest`, ver D33): rota según EXIF, reduce a 2000 px, conserva fotos chicas, quita la ubicación y rechaza lo que no es imagen. En iOS, el flujo de UI del simulador pasa fotos generadas por el `ImageProcessor` real.
 
 ## 2026-11-13 · M2
 
@@ -45,7 +48,7 @@ La pantalla O5 se muestra una sola vez: al guardar la primera vacuna con próxim
 La última fecha y el intervalo son obligatorios solo si el aviso está activo: sin ellos no hay próxima fecha. Así se puede anotar un cuidado puntual sin aviso.
 
 ### D26. Herramienta de prueba de avisos `[Propuesta, se quita en M5]`
-Ajustes tiene "Probar aviso en 1 minuto" para comprobar el criterio de M2 (llega con la app cerrada y tras reiniciar) sin esperar días. El aviso de prueba se guarda en DataStore y pasa por `SyncReminders` como los reales, así que también se reprograma al reiniciar. En el APK de debug, `DebugTestReminderReceiver` permite programarlo desde `adb`; el CI lo usa en la prueba del emulador (job "Android (avisos en emulador)").
+Ajustes tiene "Probar aviso en 1 minuto" para comprobar el criterio de M2 (llega con la app cerrada y tras reiniciar) sin esperar días. El aviso de prueba se guarda en DataStore y pasa por `SyncReminders` como los reales, así que también se reprograma al reiniciar. En el APK de debug, `DebugTestReminderReceiver` permite programarlo desde `adb`; `.github/scripts/android-reminders-e2e.sh` lo usa para probar en un emulador local.
 
 ### D28. Alarmas exactas antes de Android 12 `[Propuesta]`
 Antes de Android 12, la ventana de una alarma no exacta es el 75 % del tiempo que falta: un aviso a 7 días podía llegar hasta 5 días tarde. En Android 8 a 11 se usa `setExactAndAllowWhileIdle`, que en esas versiones no pide permiso. Desde Android 12 sigue `setAndAllowWhileIdle` (sección 11), que el sistema entrega a lo más 1 hora después de la hora pedida.

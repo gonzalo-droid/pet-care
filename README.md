@@ -18,7 +18,7 @@ La especificación completa está en [`docs/SYSTEM_DESIGN.md`](docs/SYSTEM_DESIG
 
 ## Pantallas
 
-Capturas del prototipo de diseño ([`docs/design/`](docs/design/)), que la app sigue. Las capturas de la app real se generan en el CI: artefacto `ios-capturas` de cada ejecución, con los flujos de M1 a M3 en el simulador de iOS.
+Capturas del prototipo de diseño ([`docs/design/`](docs/design/)), que la app sigue. Las capturas de la app real se generan en local al correr `./gradlew iosSimulatorArm64Test` en un Mac (quedan en `composeApp/build/ui-screenshots/`).
 
 | Inicio | Cartilla | Detalle de vacuna | Nueva vacuna |
 |---|---|---|---|
@@ -66,7 +66,7 @@ feature/
 build-logic/         Plugins de convención de Gradle (bestid.kmp.library, .compose, .feature)
 iosApp/              Proyecto Xcode
 docs/                SYSTEM_DESIGN.md, DECISIONS.md, licencias y design/ (prototipo)
-.github/             CI: compila Android e iOS, corre las pruebas y abre la app en el simulador
+.github/             CI: compila Android y corre las pruebas de JVM; scripts para probar en emulador y simulador en local
 ```
 
 Reglas de dependencia:
@@ -82,6 +82,8 @@ Requisitos: JDK 21, Android Studio (aporta el Android SDK, que Gradle necesita i
 - **iOS:** abre `iosApp/iosApp.xcodeproj` en Xcode y corre en un simulador. La primera compilación descarga Kotlin/Native y tarda varios minutos. Para un iPhone real, completa `TEAM_ID` en `iosApp/Configuration/Config.xcconfig`.
 - **Pruebas:** `./gradlew allTests` (JVM y host de Android). En Mac, también `./gradlew iosSimulatorArm64Test`, que incluye los flujos de M1 a M3 en el simulador.
 - **Fotos en Android:** el emulador no tiene cámara real (muestra una escena virtual); para la galería, arrastra imágenes a la ventana del emulador y se guardan en Descargas.
+- **Procesado de fotos en Android** (con un emulador o teléfono conectado): `./gradlew :core:platform:connectedAndroidDeviceTest`.
+- **Avisos en Android de punta a punta** (emulador encendido): `.github/scripts/android-reminders-e2e.sh build/android-e2e`.
 - **Avisos:** Ajustes → "Probar aviso en 1 minuto" programa un aviso de prueba; cierra la app (o reinicia el teléfono) y espera.
 - **Catálogo de componentes en el teléfono:** Ajustes (engranaje arriba a la derecha) → "Ver catálogo de componentes".
 
