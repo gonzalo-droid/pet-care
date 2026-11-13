@@ -22,7 +22,10 @@ La pantalla O5 se muestra una sola vez: al guardar la primera vacuna con próxim
 La última fecha y el intervalo son obligatorios solo si el aviso está activo: sin ellos no hay próxima fecha. Así se puede anotar un cuidado puntual sin aviso.
 
 ### D26. Herramienta de prueba de avisos `[Propuesta, se quita en M5]`
-Ajustes tiene "Probar aviso en 1 minuto" para comprobar el criterio de M2 (llega con la app cerrada y tras reiniciar) sin esperar días.
+Ajustes tiene "Probar aviso en 1 minuto" para comprobar el criterio de M2 (llega con la app cerrada y tras reiniciar) sin esperar días. El aviso de prueba se guarda en DataStore y pasa por `SyncReminders` como los reales, así que también se reprograma al reiniciar. En el APK de debug, `DebugTestReminderReceiver` permite programarlo desde `adb`; el CI lo usa en la prueba del emulador (job "Android (avisos en emulador)").
+
+### D28. Alarmas exactas antes de Android 12 `[Propuesta]`
+Antes de Android 12, la ventana de una alarma no exacta es el 75 % del tiempo que falta: un aviso a 7 días podía llegar hasta 5 días tarde. En Android 8 a 11 se usa `setExactAndAllowWhileIdle`, que en esas versiones no pide permiso. Desde Android 12 sigue `setAndAllowWhileIdle` (sección 11), que el sistema entrega a lo más 1 hora después de la hora pedida.
 
 ### D27. Limitaciones conocidas de avisos `[Riesgo]`
 Android puede retrasar varios minutos las alarmas no exactas en ahorro de batería, y algunas marcas (Xiaomi, Huawei, Oppo) las cortan si la app no está exenta de optimización de batería. iOS no garantiza el horario de `BGAppRefreshTask`. Ambos casos se revisan en la beta (M5).
