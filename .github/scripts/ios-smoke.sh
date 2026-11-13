@@ -19,7 +19,8 @@ xcrun simctl install "$DEVICE" "$APP"
 xcrun simctl launch "$DEVICE" com.bestid.app
 sleep 15
 xcrun simctl io "$DEVICE" screenshot "$OUT/arranque.png"
-if xcrun simctl spawn "$DEVICE" launchctl list | grep -q "com.bestid.app"; then
+# Las apps del simulador corren como procesos del Mac.
+if pgrep -f "BestID.app/BestID" > /dev/null; then
   echo "La app sigue abierta después de 15 segundos."
 else
   echo "La app se cerró."
