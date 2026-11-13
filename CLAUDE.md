@@ -37,7 +37,7 @@ App móvil (Android e iOS) que digitaliza la cartilla de vacunación de mascotas
 /feature/*           home, cartilla, health, pet (y los que vengan): pantalla + ViewModel
 /build-logic         plugins de convención de Gradle
 /iosApp              proyecto Xcode
-/docs                SYSTEM_DESIGN.md, DECISIONS.md y licencias
+/docs                SYSTEM_DESIGN.md, DECISIONS.md, licencias y design/ (prototipo: capturas, HTML por pantalla y flujos)
 ```
 
 Un feature nunca depende de otro feature. `core/designsystem` no depende de `core/model`. `domain` nunca depende de UI ni de código de plataforma. Ver `docs/DECISIONS.md` (D1).

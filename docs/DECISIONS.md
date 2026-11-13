@@ -4,6 +4,20 @@ Registro de decisiones tomadas durante el desarrollo que cambian o precisan `SYS
 
 ## 2026-11-13 · Kickoff y M0
 
+### D16. Componentes alineados con el prototipo (`docs/design/`) `[Propuesta]`
+Gonzalo pasó el prototipo: capturas de las 15 pantallas, el HTML de cada una y el HTML de los flujos, en `docs/design/`. Los componentes se ajustaron a él:
+- Bordes de 2 dp; campos de 54 dp con etiqueta 16/800 y texto 17/700; botón principal con texto 18/800 y secundarios con 16/800.
+- ChipToggle y ChipChoice son filas con casilla o círculo visible (alto 52, radio 18), no píldoras. Los Badge son píldoras 14/800 sin ícono.
+- InfoCard con radio 28; ReviewField con ícono y "Revisa: …" en una línea; selector de mascota con avatar de 40 y nombre 18/800; botón de ícono circular con borde.
+- Íconos de pestaña de contorno en ambos estados: casa, portapapeles con check, corazón y huella. Ajustes usa deslizadores.
+- Avatar sin foto: el gato provisional del prototipo para gatos y la huella para el resto.
+
+Diferencias que se mantienen a propósito:
+- Botón principal de 58 dp (el documento) y no de 56 (el prototipo): gana el documento.
+- Bordes de campos, chips y botones secundarios en `outlineStrong`, no en `line` ni `outline` (D2: contraste de 3:1).
+- Texto no seleccionado del control segmentado en `ink` (D2).
+- Display de 32 (el documento) y no de 30 (el prototipo).
+
 ### D1. Estructura multimódulo con `androidApp` separado `[Decidido por Gonzalo]`
 El Android Gradle Plugin 9 ya no permite aplicar `com.android.application` y Kotlin Multiplatform en el mismo módulo. Se sigue la plantilla oficial de JetBrains y se separa el punto de entrada de Android. Gonzalo pidió además clean code, arquitectura multimódulo y adaptadores por plataforma.
 
