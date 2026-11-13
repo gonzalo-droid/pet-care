@@ -19,6 +19,9 @@ interface PetDao {
     @Query("SELECT * FROM pets WHERE id = :id")
     suspend fun get(id: String): PetEntity?
 
+    @Query("SELECT * FROM pets")
+    suspend fun getAll(): List<PetEntity>
+
     @Upsert
     suspend fun upsert(pet: PetEntity)
 }
@@ -60,6 +63,9 @@ interface VaccineRecordDao {
 
     @Query("SELECT * FROM vaccine_records WHERE id = :id")
     suspend fun get(id: String): VaccineRecordEntity?
+
+    @Query("SELECT * FROM vaccine_records")
+    suspend fun getAll(): List<VaccineRecordEntity>
 
     @Upsert
     suspend fun upsert(record: VaccineRecordEntity)
@@ -114,4 +120,19 @@ interface ScheduledNotificationDao {
         if (removedIds.isNotEmpty()) deleteIds(removedIds)
         if (added.isNotEmpty()) upsertAll(added)
     }
+}
+
+@Dao
+interface PhotoDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(photo: PhotoEntity)
+
+    @Query("SELECT * FROM photos WHERE id IN (:ids)")
+    suspend fun get(ids: List<String>): List<PhotoEntity>
+
+    @Query("SELECT * FROM photos")
+    suspend fun getAll(): List<PhotoEntity>
+
+    @Query("DELETE FROM photos WHERE id IN (:ids)")
+    suspend fun delete(ids: List<String>)
 }

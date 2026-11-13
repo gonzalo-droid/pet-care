@@ -34,6 +34,7 @@ class FakePetRepository : PetRepository {
     override fun observePets(): Flow<List<Pet>> = all.map { list -> list.filter { it.deletedAt == null } }
     override fun observePet(id: String): Flow<Pet?> = all.map { list -> list.firstOrNull { it.id == id && it.deletedAt == null } }
     override suspend fun get(id: String): Pet? = all.value.firstOrNull { it.id == id }
+    override suspend fun getAllIncludingDeleted(): List<Pet> = all.value
     override suspend fun upsert(pet: Pet) {
         all.value = all.value.filterNot { it.id == pet.id } + pet
     }
@@ -46,6 +47,7 @@ class FakeRecordRepository : VaccineRecordRepository {
         all.map { list -> list.filter { it.petId == petId && it.deletedAt == null }.sortedByDescending { it.applicationDate } }
     override fun observe(id: String): Flow<VaccineRecord?> = all.map { list -> list.firstOrNull { it.id == id && it.deletedAt == null } }
     override suspend fun get(id: String): VaccineRecord? = all.value.firstOrNull { it.id == id }
+    override suspend fun getAllIncludingDeleted(): List<VaccineRecord> = all.value
     override suspend fun upsert(record: VaccineRecord) {
         all.value = all.value.filterNot { it.id == record.id } + record
     }
@@ -131,5 +133,36 @@ class FakeScheduler(var permission: com.bestid.core.domain.port.NotificationPerm
     override suspend fun cancel(ids: List<String>) {
         cancelCalls += ids
         ids.forEach { scheduled.remove(it) }
+    }
+}
+
+/** "Procesa" devolviendo los mismos bytes; los que empiezan con 0 no son imagen. */
+class FakeImageProcessor : com.bestid.core.domain.port.ImageProcessor {
+    override suspend fun process(original: ByteArray) =
+        if (original.isEmpty() || original[0] == 0.toByte()) null
+        else com.bestid.core.domain.port.ProcessedImage(original, width = 2000, height = 1500)
+}
+
+class FakePhotoFileStore : com.bestid.core.domain.port.PhotoFileStore {
+    val files = mutableMapOf<String, ByteArray>()
+    override suspend fun write(relativePath: String, bytes: ByteArray) {
+        files[relativePath] = bytes
+    }
+    override suspend fun delete(relativePath: String) {
+        files.remove(relativePath)
+    }
+    override suspend fun list(): List<String> = files.keys.toList()
+    override fun absolutePath(relativePath: String) = "/app/$relativePath"
+}
+
+class FakePhotoRepository : com.bestid.core.domain.port.PhotoRepository {
+    val all = MutableStateFlow<List<com.bestid.core.model.Photo>>(emptyList())
+    override suspend fun insert(photo: com.bestid.core.model.Photo) {
+        all.value = all.value + photo
+    }
+    override suspend fun get(ids: List<String>) = all.value.filter { it.id in ids }
+    override suspend fun getAll() = all.value
+    override suspend fun delete(ids: List<String>) {
+        all.value = all.value.filterNot { it.id in ids }
     }
 }

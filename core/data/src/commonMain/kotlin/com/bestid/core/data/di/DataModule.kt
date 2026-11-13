@@ -11,6 +11,8 @@ import com.bestid.core.data.repository.RoomCareTaskRepository
 import com.bestid.core.data.repository.RoomScheduledNotificationRepository
 import com.bestid.core.data.repository.RoomWeightRepository
 import com.bestid.core.data.repository.RoomPetRepository
+import com.bestid.core.data.repository.RoomPhotoRepository
+import com.bestid.core.domain.port.PhotoRepository
 import com.bestid.core.data.repository.RoomVaccineRecordRepository
 import com.bestid.core.data.repository.RoomVaccineTypeRepository
 import com.bestid.core.data.repository.RoomVetRepository
@@ -53,6 +55,7 @@ val dataModule: Module = module {
         RoomScheduledNotificationRepository(get())
     }
     single<ReminderSettingsStore> { DataStoreReminderSettings(get()) }
+    single<PhotoRepository> { RoomPhotoRepository(get()) }
     single<AppClock> { SystemAppClock() }
     single<IdGenerator> { UuidGenerator() }
 }

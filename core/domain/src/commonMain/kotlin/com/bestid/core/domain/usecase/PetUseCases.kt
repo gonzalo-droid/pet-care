@@ -27,6 +27,8 @@ data class PetDraft(
     val distinguishingMarks: String? = null,
     val ownerName: String? = null,
     val ownerAddress: String? = null,
+    /** Ruta relativa de la foto ya importada ([ImportPhotos]); `null` = sin foto. */
+    val photoPath: String? = null,
 )
 
 sealed interface SavePetResult {
@@ -76,7 +78,7 @@ class SavePet(
             distinguishingMarks = draft.distinguishingMarks.cleaned(),
             ownerName = draft.ownerName.cleaned(),
             ownerAddress = draft.ownerAddress.cleaned(),
-            photoPath = existing?.photoPath,
+            photoPath = draft.photoPath,
             createdAt = existing?.createdAt ?: now,
             updatedAt = now,
             deletedAt = null,

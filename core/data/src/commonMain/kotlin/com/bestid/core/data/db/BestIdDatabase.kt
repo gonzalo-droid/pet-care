@@ -22,12 +22,15 @@ import kotlinx.coroutines.IO
         CareTaskEntity::class,
         WeightEntryEntity::class,
         ScheduledNotificationEntity::class,
+        PhotoEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
     autoMigrations = [
         // v2 (M2): cuidados, pesos y avisos programados. Solo agrega tablas.
         AutoMigration(from = 1, to = 2),
+        // v3 (M3): fotos. Solo agrega una tabla.
+        AutoMigration(from = 2, to = 3),
     ],
 )
 @ConstructedBy(BestIdDatabaseConstructor::class)
@@ -39,6 +42,7 @@ abstract class BestIdDatabase : RoomDatabase() {
     abstract fun careTaskDao(): CareTaskDao
     abstract fun weightEntryDao(): WeightEntryDao
     abstract fun scheduledNotificationDao(): ScheduledNotificationDao
+    abstract fun photoDao(): PhotoDao
 
     companion object {
         const val FILE_NAME = "bestid.db"

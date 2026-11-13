@@ -4,6 +4,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.bestid.core.data.db.BestIdDatabase
 import kotlinx.cinterop.ExperimentalForeignApi
+import com.bestid.core.data.repository.OkioPhotoFileStore
+import com.bestid.core.domain.port.PhotoFileStore
+import okio.FileSystem
 import org.koin.dsl.module
 import platform.Foundation.NSApplicationSupportDirectory
 import platform.Foundation.NSFileManager
@@ -28,4 +31,5 @@ internal actual fun platformDataModule() = module {
         Room.databaseBuilder<BestIdDatabase>(name = appSupportDirectory() + "/" + BestIdDatabase.FILE_NAME)
     }
     single { createPreferences(appSupportDirectory() + "/" + PREFERENCES_FILE) }
+    single<PhotoFileStore> { OkioPhotoFileStore(appSupportDirectory(), FileSystem.SYSTEM) }
 }

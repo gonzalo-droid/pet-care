@@ -16,6 +16,7 @@ kotlin {
             implementation(libs.androidx.sqlite.bundled)
             implementation(libs.androidx.datastore.preferences)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.okio)
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.core)
         }
@@ -25,6 +26,7 @@ kotlin {
         jvmTest.dependencies {
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.androidx.room.testing)
+            implementation(libs.okio.fakefilesystem)
         }
     }
 }
