@@ -44,11 +44,17 @@ echo "== 1. Aviso con la app cerrada"
 seen="$(tags)"
 adb shell am broadcast -n "$PKG/.DebugTestReminderReceiver" --el seconds 60
 sleep 5
-adb shell dumpsys alarm | grep -q "bestid://reminder" && echo "Alarma programada."
+echo "Alarmas de la app: $(adb shell dumpsys alarm | grep -c "$PKG" || true)"
 adb shell input keyevent KEYCODE_HOME
+sleep 3
+# Mata el proceso como lo haría el sistema por falta de memoria. No es "forzar detención",
+# que además borraría las alarmas: aquí las alarmas deben seguir y despertar a la app.
+adb shell am kill "$PKG" || true
 sleep 2
-adb shell am kill "$PKG"
-sleep 2
+if adb shell pidof "$PKG" > /dev/null; then
+  adb shell run-as "$PKG" sh -c 'kill -9 $(pidof '"$PKG"')' || true
+  sleep 2
+fi
 if adb shell pidof "$PKG" > /dev/null; then echo "El proceso sigue vivo"; exit 1; fi
 echo "Proceso de la app terminado. Esperando el aviso..."
 if tag=$(wait_new_notification "$seen" 1800); then
