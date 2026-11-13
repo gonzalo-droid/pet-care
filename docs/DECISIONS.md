@@ -2,6 +2,24 @@
 
 Registro de decisiones tomadas durante el desarrollo que cambian o precisan `SYSTEM_DESIGN.md`. La más reciente va arriba. Cada una dice quién la tomó y en qué hito.
 
+## 2026-11-13 · M1
+
+### D17. Módulo `core/ui` `[Propuesta]`
+Los textos y formatos que comparten varios features (especie con concordancia "Gata", sexo, fechas "21 dic 2025" y dd/MM/aaaa, "1 día / 2 días", "N vacunas registradas", avatar por especie) viven en `core/ui`. Un feature no depende de otro y el design system no conoce el modelo, así que este es el único lugar común. Depende de `core/designsystem` y `core/model`.
+
+### D18. Fotos fuera de M1 `[Decidido por Gonzalo]`
+Foto de la mascota y foto del sticker se hacen junto con `ImagePicker` e `ImageProcessor` (cuando haya captura). Mientras tanto, el avatar provisional por especie. Peso y Salud quedan para M2; Inicio muestra el peso como "Sin registro".
+
+### D19. Formulario de vacuna sin hoja C4 `[Propuesta]`
+Sin escaneo (D4), "Agregar vacuna" abre directo el formulario a mano. La hoja "Escanear o a mano" (C4) vuelve cuando exista la lectura. Cada frasco del formulario tiene producto, lote, elaboración y vencimiento (el prototipo dibuja solo producto y lote; la sección 9 pide también las fechas para validar el vencimiento).
+
+### D20. Pruebas de datos en la JVM `[Propuesta]`
+`core/model`, `core/domain` y `core/data` agregan un target `jvm()` solo para pruebas: Room en memoria con el driver empaquetado corre en la JVM sin Android. `composeApp` tiene una prueba que verifica el grafo de Koin.
+
+### D21. Catálogo de vacunas en el dominio `[Propuesta]`
+Los nombres del catálogo semilla ("Calicivirus", "Tos de perreras"...) son datos de dominio, no textos de interfaz: se guardan en la base, van al PDF y al respaldo, y los valida el veterinario. Viven en `VaccineCatalog` (`core/domain`) y se insertan en la base la primera vez que se leen.
+
+
 ## 2026-11-13 · Kickoff y M0
 
 ### D16. Componentes alineados con el prototipo (`docs/design/`) `[Propuesta]`

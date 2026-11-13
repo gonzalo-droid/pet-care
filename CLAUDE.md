@@ -30,10 +30,11 @@ App móvil (Android e iOS) que digitaliza la cartilla de vacunación de mascotas
 /composeApp          raíz de la UI compartida: App(), navegación, Koin, MainViewController de iOS
 /core/model          entidades y enums (Kotlin puro)
 /core/designsystem   tokens, AppTheme, componentes con previews, íconos, fuente, catálogo
+/core/ui             presentación compartida entre features: etiquetas (especie, sexo), fechas es-PE, plurales
 /core/navigation     rutas tipadas; los features navegan solo a través de ellas
-/core/domain         (desde M1) casos de uso, ReminderEngine, validaciones y puertos de plataforma
-/core/data           (desde M1) Room, repositorios, respaldo
-/core/platform       (desde M1/M2) adaptadores Android e iOS de los puertos
+/core/domain         casos de uso, validaciones, próxima dosis, puertos de repositorio (luego ReminderEngine)
+/core/data           Room, DataStore, repositorios (luego respaldo)
+/core/platform       adaptadores Android e iOS de los puertos de plataforma (DatePicker; luego avisos, imágenes...)
 /feature/*           home, cartilla, health, pet (y los que vengan): pantalla + ViewModel
 /build-logic         plugins de convención de Gradle
 /iosApp              proyecto Xcode
@@ -57,9 +58,8 @@ Un feature nunca depende de otro feature. `core/designsystem` no depende de `cor
 ## Comandos
 
 - Compilar Android: `./gradlew :androidApp:assembleDebug`
-- Pruebas comunes en la JVM: `./gradlew testAndroidHostTest`
+- Pruebas en la JVM (dominio, Room en memoria, host de Android): `./gradlew allTests` en Linux
 - Pruebas comunes en el simulador iOS (solo en Mac): `./gradlew iosSimulatorArm64Test`
-- Todas las pruebas: `./gradlew allTests` (en Linux omite las de iOS)
 - iOS: abrir `iosApp/iosApp.xcodeproj` en Xcode, o `xcodebuild -project iosApp/iosApp.xcodeproj -target iosApp -sdk iphonesimulator ARCHS=arm64 CODE_SIGNING_ALLOWED=NO build`
 - Catálogo de componentes en el teléfono: Ajustes (ícono arriba a la derecha) → "Ver catálogo de componentes"
 
