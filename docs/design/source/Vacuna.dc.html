@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Nueva vacuna</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:inherit;text-decoration:none}
+input[type=checkbox]{width:24px;height:24px;accent-color:#2F7D68;margin:0;flex:none}
+.ibtn{width:48px;height:48px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid #EADFCB;color:#2B3A36}
+.lbl{font-size:16px;font-weight:800}
+.ck{display:flex;align-items:center;gap:10px;min-height:52px;border-radius:18px;border:2px solid #EADFCB;background:#fff;padding:0 14px;font-size:16px;font-weight:800;line-height:1.2}
+.ck.on{border-color:#2F7D68;background:#DDF1E8}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.input{min-height:54px;border-radius:18px;border:2px solid #EADFCB;background:#fff;font:700 17px 'Nunito',system-ui,sans-serif;padding:0 16px;color:#2B3A36;width:100%}
+.date{min-height:54px;border-radius:18px;border:2px solid #EADFCB;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:17px;font-weight:700}
+.opt{font-weight:600;color:#5A6B65}
+.link{min-height:48px;display:inline-flex;align-items:center;font-size:16px;font-weight:800;color:#2F7D68}
+.more{background:#fff;border:2px solid #EADFCB;border-radius:20px}
+.more summary{list-style:none;min-height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:16px;font-weight:800;cursor:pointer}
+.more summary::-webkit-details-marker{display:none}
+.btn{min-height:56px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;background:#2F7D68;color:#fff}
+</style>
+</helmet>
+<div style="width:390px;height:1040px;background:#FBF6EC;color:#2B3A36;font-family:'Nunito',system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 12px 4px">
+    <a href="Cartilla.dc.html" class="ibtn" aria-label="Cerrar sin guardar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></a>
+    <h1 style="margin:0;font-size:18px;font-weight:800">Nueva vacuna</h1>
+    <span style="width:48px"></span>
+  </div>
+
+  <div style="padding:12px 20px 0;display:flex;flex-direction:column;gap:18px;flex:1">
+    <fieldset style="border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:10px">
+      <legend class="lbl" style="padding:0;margin-bottom:10px">¿Contra qué protege? <span class="opt">Vacunas para gatos</span></legend>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+        <label for="v1" class="ck on"><input id="v1" type="checkbox" checked>Calicivirus</label>
+        <label for="v2" class="ck on"><input id="v2" type="checkbox" checked>Rinotraqueítis</label>
+        <label for="v3" class="ck on"><input id="v3" type="checkbox" checked>Panleucopenia</label>
+        <label for="v4" class="ck"><input id="v4" type="checkbox">Leucemia</label>
+        <label for="v5" class="ck"><input id="v5" type="checkbox">Rabia</label>
+        <a href="Vacuna.dc.html" class="ck" style="color:#2F7D68;justify-content:center;border-style:dashed">+ Otra</a>
+      </div>
+      <a href="Vacuna.dc.html" class="link">Ver vacunas de perro</a>
+    </fieldset>
+
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+      <div class="field"><span class="lbl" id="lf">Fecha</span><a href="Vacuna.dc.html" class="date" aria-labelledby="lf">21 dic 2025<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6B65" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></a></div>
+      <div class="field"><span class="lbl" id="lp">Próxima <span class="opt">(opc.)</span></span><a href="Vacuna.dc.html" class="date" aria-labelledby="lp" style="color:#5A6B65">Elegir<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6B65" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></a></div>
+    </div>
+
+    <details class="more" open>
+      <summary>Más detalles <span class="opt" style="font-size:15px">opcional</span></summary>
+      <div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:14px">
+        <div class="field"><label for="prod" class="lbl">Producto o marca</label><input id="prod" class="input" type="text" placeholder="Ej. Felocell 3"></div>
+        <div class="field"><label for="lote" class="lbl">Lote</label><input id="lote" class="input" type="text" placeholder="Ej. 774233A"></div>
+        <div class="field"><label for="vet" class="lbl">Veterinaria</label><input id="vet" class="input" type="text" placeholder="Escribe y elige de tus veterinarias"></div>
+        <div class="field"><label for="tel" class="lbl">Teléfono o WhatsApp de la veterinaria</label><input id="tel" class="input" type="tel" placeholder="Ej. 987 654 321"></div>
+        <a href="Vacuna.dc.html" class="ck" style="justify-content:center;border-style:dashed;color:#2F7D68">+ Foto del sticker del frasco</a>
+      </div>
+    </details>
+  </div>
+
+  <div style="padding:14px 20px 28px;border-top:2px solid #EADFCB;margin-top:14px">
+    <a href="Cartilla.dc.html" class="btn">Guardar vacuna</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1040}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
