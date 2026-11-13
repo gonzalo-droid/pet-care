@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_empty_title">Aquí verás a tu mascota</string>
+    <string name="home_empty_body">Su próximo aviso, la última vacuna y el último peso, todo en un vistazo.</string>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="health_tab_care">Cuidados</string>
+    <string name="health_tab_weight">Peso</string>
+    <string name="health_care_empty_title">Aún no hay cuidados</string>
+    <string name="health_care_empty_body">Registra desparasitaciones y otros cuidados para recibir avisos.</string>
+    <string name="health_weight_empty_title">Aún no hay pesos</string>
+    <string name="health_weight_empty_body">Registra el peso y mira su evolución en un gráfico.</string>
+</resources>

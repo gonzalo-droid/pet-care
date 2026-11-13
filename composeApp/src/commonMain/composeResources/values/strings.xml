@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Inicio</string>
+    <string name="tab_cartilla">Cartilla</string>
+    <string name="tab_health">Salud</string>
+    <string name="tab_pet">Mascota</string>
+    <string name="settings">Ajustes</string>
+    <string name="settings_coming_title">Ajustes llega en M4</string>
+    <string name="settings_coming_body">Respaldo, hora de los avisos, privacidad y acerca de.</string>
+    <string name="settings_open_catalog">Ver catálogo de componentes</string>
+    <string name="catalog_title">Componentes</string>
+    <string name="back">Volver</string>
+</resources>

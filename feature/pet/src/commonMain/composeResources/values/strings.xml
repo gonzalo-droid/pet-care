@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pet_empty_title">Aquí verás el carnet BestID</string>
+    <string name="pet_empty_body">Con la foto, los datos y las vacunas de tu mascota.</string>
+</resources>

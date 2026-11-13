@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cartilla_empty_title">Aún no hay vacunas</string>
+    <string name="cartilla_empty_body">Aquí verás el historial de vacunas junto a la foto de la cartilla.</string>
+</resources>
