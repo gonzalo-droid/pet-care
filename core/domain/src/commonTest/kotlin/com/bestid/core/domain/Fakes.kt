@@ -104,6 +104,9 @@ class FakeSettingsStore : com.bestid.core.domain.port.ReminderSettingsStore {
     override val permissionPromptShown: Flow<Boolean> = shown
     override suspend fun setReminderTime(time: kotlinx.datetime.LocalTime) { this.time.value = time }
     override suspend fun markPermissionPromptShown() { shown.value = true }
+    val test = MutableStateFlow<kotlin.time.Instant?>(null)
+    override val testReminderAt: Flow<kotlin.time.Instant?> = test
+    override suspend fun setTestReminderAt(at: kotlin.time.Instant?) { test.value = at }
 }
 
 class FakeScheduledRepository : com.bestid.core.domain.port.ScheduledNotificationRepository {

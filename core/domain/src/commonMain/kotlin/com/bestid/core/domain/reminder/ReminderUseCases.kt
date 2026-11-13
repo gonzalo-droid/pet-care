@@ -18,6 +18,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -39,9 +40,10 @@ class SyncReminders(
     private val mutex = Mutex()
 
     suspend operator fun invoke(force: Boolean = false) = mutex.withLock {
+        val activePets = pets.observePets().first()
         val desired = ReminderEngine.plan(
             ReminderInput(
-                pets = pets.observePets().first(),
+                pets = activePets,
                 records = records.observeAll().first(),
                 cares = cares.observeAll().first(),
                 types = types.getAll().associateBy { it.id },
@@ -49,7 +51,7 @@ class SyncReminders(
                 now = clock.now(),
                 timeZone = timeZone(),
             ),
-        )
+        ) + listOfNotNull(testReminder(activePets.firstOrNull()?.name))
         val current = scheduled.getAll()
         if (force) {
             scheduler.cancel(current.map { it.id })
@@ -62,6 +64,26 @@ class SyncReminders(
             added = diff.toSchedule.map { ScheduledNotification(it.id, it.refType.name, it.refId, it.fireAt) },
             removedIds = diff.toCancel,
         )
+    }
+
+    /** El aviso de prueba de Ajustes pasa por el mismo camino que los reales (y se reprograma al reiniciar). */
+    private suspend fun testReminder(petName: String?): PlannedReminder? {
+        val at = settings.testReminderAt.first()?.takeIf { it > clock.now() } ?: return null
+        return PlannedReminder(
+            id = "test:${at.toEpochMilliseconds()}",
+            refType = ReminderRefType.VACCINE,
+            refId = "",
+            petId = "",
+            petName = petName ?: TEST_PET_NAME,
+            subject = ReminderSubject.Vaccine(null),
+            kind = ReminderKind.SAME_DAY,
+            dueDate = clock.today(),
+            fireAt = at,
+        )
+    }
+
+    private companion object {
+        const val TEST_PET_NAME = "BestID"
     }
 }
 
@@ -109,32 +131,17 @@ class ObserveNotificationPermission(private val scheduler: NotificationScheduler
 }
 
 /**
- * Herramienta de desarrollo: programa un aviso de prueba en 1 minuto para comprobar que llega con
- * la app cerrada y tras reiniciar. No pasa por la tabla de programados.
+ * Herramienta de desarrollo (D26): programa un aviso de prueba dentro de [delay] para comprobar que
+ * llega con la app cerrada y tras reiniciar. Se guarda y se sincroniza como los avisos reales.
  */
 class ScheduleTestReminder(
-    private val scheduler: NotificationScheduler,
-    private val pets: PetRepository,
+    private val settings: ReminderSettingsStore,
+    private val sync: SyncReminders,
     private val clock: AppClock,
 ) {
-    suspend operator fun invoke(subjectLabel: String?) {
-        val pet = pets.observePets().first().firstOrNull()
-        val now = clock.now()
-        scheduler.schedule(
-            listOf(
-                PlannedReminder(
-                    id = "debug:test:${now.toEpochMilliseconds()}",
-                    refType = ReminderRefType.VACCINE,
-                    refId = "",
-                    petId = pet?.id.orEmpty(),
-                    petName = pet?.name ?: "BestID",
-                    subject = ReminderSubject.Vaccine(subjectLabel),
-                    kind = ReminderKind.SAME_DAY,
-                    dueDate = clock.today(),
-                    fireAt = now + 60.seconds,
-                ),
-            ),
-        )
+    suspend operator fun invoke(delay: Duration = 60.seconds) {
+        settings.setTestReminderAt(clock.now() + delay)
+        sync()
     }
 }
 

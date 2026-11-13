@@ -9,7 +9,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.bestid.app.resources.settings_test_reminder
 import com.bestid.app.resources.settings_test_reminder_done
-import com.bestid.app.resources.settings_test_reminder_subject
 import com.bestid.core.designsystem.component.InfoCard
 import com.bestid.core.designsystem.theme.BestIdTheme
 import com.bestid.core.domain.reminder.ScheduleTestReminder
@@ -63,11 +62,10 @@ private fun TestReminderButton() {
     val scheduleTest = koinInject<ScheduleTestReminder>()
     val scope = rememberCoroutineScope()
     var scheduled by remember { mutableStateOf(false) }
-    val label = stringResource(Res.string.settings_test_reminder_subject)
     val requester = rememberNotificationPermissionRequester { granted ->
         if (granted) {
             scope.launch {
-                scheduleTest(label)
+                scheduleTest()
                 scheduled = true
             }
         }

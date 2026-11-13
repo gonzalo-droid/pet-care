@@ -154,6 +154,16 @@ class SyncRemindersTest {
     }
 
     @Test
+    fun testReminderGoesThroughSyncAndSurvivesForce() = runTest {
+        com.bestid.core.domain.reminder.ScheduleTestReminder(settings, sync, clock)()
+        assertEquals(1, scheduler.scheduled.size)
+        assertTrue(scheduler.scheduled.keys.single().startsWith("test:"))
+        scheduler.scheduled.clear() // reinicio en Android
+        sync(force = true)
+        assertEquals(1, scheduler.scheduled.size)
+    }
+
+    @Test
     fun permissionPromptOnlyOnceAndOnlyIfUndetermined() = runTest {
         val ask = ShouldAskNotificationPermission(settings, scheduler)
         assertTrue(ask())

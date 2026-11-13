@@ -85,4 +85,8 @@ interface ReminderSettingsStore {
     val permissionPromptShown: Flow<Boolean>
     suspend fun setReminderTime(time: LocalTime)
     suspend fun markPermissionPromptShown()
+
+    /** Aviso de prueba (herramienta de desarrollo, D26): se guarda para sobrevivir a un reinicio. */
+    val testReminderAt: Flow<kotlin.time.Instant?>
+    suspend fun setTestReminderAt(at: kotlin.time.Instant?)
 }
