@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -173,11 +174,12 @@ fun IconAction(icon: DrawableResource, contentDescription: String, onClick: () -
  */
 @Composable
 fun FlowScaffold(
-    title: String,
+    title: String?,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     closeIcon: DrawableResource = BestIdIcons.Close,
     closeDescription: String? = null,
+    actions: @Composable RowScope.() -> Unit = {},
     bottomAction: (@Composable () -> Unit)? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     content: @Composable ColumnScope.() -> Unit,
@@ -196,10 +198,21 @@ fun FlowScaffold(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconAction(closeIcon, closeDescription ?: stringResource(Res.string.ds_close), onClose)
-                Text(
-                    title,
-                    style = BestIdTheme.typography.subtitle,
-                    modifier = Modifier.weight(1f).semantics { heading() },
+                Box(modifier = Modifier.weight(1f).padding(horizontal = BestIdTheme.spacing.sm)) {
+                    if (title != null) {
+                        Text(
+                            title,
+                            style = BestIdTheme.typography.subtitle,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth().semantics { heading() },
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.widthIn(min = BestIdTheme.sizes.minTouch),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = actions,
                 )
             }
         },

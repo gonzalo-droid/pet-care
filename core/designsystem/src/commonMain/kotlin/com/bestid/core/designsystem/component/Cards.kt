@@ -58,10 +58,11 @@ fun PlainCard(
 fun InfoCard(
     modifier: Modifier = Modifier,
     icon: DrawableResource? = BestIdIcons.Info,
+    onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = BestIdTheme.colors
-    BaseCard(colors.primarySoft, colors.primaryInk, null, modifier, null, null, BestIdTheme.shapes.cardLarge) {
+    BaseCard(colors.primarySoft, colors.primaryInk, null, modifier, onClick, null, BestIdTheme.shapes.cardLarge) {
         IconRow(icon = icon, tint = colors.primaryInk, content = content)
     }
 }
@@ -71,10 +72,11 @@ fun InfoCard(
 fun AlertCard(
     modifier: Modifier = Modifier,
     icon: DrawableResource = BestIdIcons.Warning,
+    onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = BestIdTheme.colors
-    BaseCard(colors.alert, colors.alertInk, null, modifier, null, null) {
+    BaseCard(colors.alert, colors.alertInk, null, modifier, onClick, null) {
         IconRow(icon = icon, tint = colors.alertInk, content = content)
     }
 }
@@ -85,16 +87,25 @@ fun StatCard(
     label: String,
     value: String,
     modifier: Modifier = Modifier,
+    detail: String? = null,
+    onClick: (() -> Unit)? = null,
     actionText: String? = null,
     onAction: (() -> Unit)? = null,
 ) {
-    PlainCard(modifier = modifier) {
+    PlainCard(modifier = modifier, onClick = onClick) {
         Text(label, style = BestIdTheme.typography.support, color = BestIdTheme.colors.muted)
         Text(value, style = BestIdTheme.typography.card, color = BestIdTheme.colors.ink)
+        if (detail != null) Text(detail, style = BestIdTheme.typography.support, color = BestIdTheme.colors.muted)
         if (actionText != null && onAction != null) {
             TextAction(text = actionText, onClick = onAction, icon = BestIdIcons.Add)
         }
     }
+}
+
+/** Rótulo en mayúsculas sobre una sección o tarjeta ("PRÓXIMO", "VETERINARIA"). */
+@Composable
+fun Eyebrow(text: String, modifier: Modifier = Modifier, color: Color = BestIdTheme.colors.muted) {
+    Text(text.uppercase(), style = BestIdTheme.typography.eyebrow, color = color, modifier = modifier)
 }
 
 /** Fila de dos columnas: etiqueta y valor. El valor crece en varias líneas si hace falta. */

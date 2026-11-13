@@ -19,6 +19,8 @@ import org.jetbrains.compose.resources.Font
  */
 @Immutable
 data class BestIdTypography(
+    /** 44/800, el número de días que faltan (prototipo de Inicio) */
+    val hero: TextStyle,
     /** 32/800 */
     val display: TextStyle,
     /** 26/800 */
@@ -41,6 +43,8 @@ data class BestIdTypography(
     val chip: TextStyle,
     /** 13/700, etiquetas de la barra inferior */
     val label: TextStyle,
+    /** 13/800 con espaciado, rótulos en mayúsculas ("PRÓXIMO", "STICKERS DEL FRASCO") */
+    val eyebrow: TextStyle,
 )
 
 @Composable
@@ -58,6 +62,7 @@ internal fun bestIdTypography(family: FontFamily): BestIdTypography {
         lineHeight = lineHeight.sp,
     )
     return BestIdTypography(
+        hero = style(44, FontWeight.ExtraBold, 48),
         display = style(32, FontWeight.ExtraBold, 40),
         title = style(26, FontWeight.ExtraBold, 32),
         subtitle = style(20, FontWeight.ExtraBold, 26),
@@ -69,6 +74,7 @@ internal fun bestIdTypography(family: FontFamily): BestIdTypography {
         support = style(14, FontWeight.Bold, 20),
         chip = style(14, FontWeight.ExtraBold, 20),
         label = style(13, FontWeight.Bold, 18),
+        eyebrow = style(13, FontWeight.ExtraBold, 18).copy(letterSpacing = 0.8.sp),
     )
 }
 

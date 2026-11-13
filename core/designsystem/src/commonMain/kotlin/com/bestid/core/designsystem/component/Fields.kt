@@ -203,6 +203,14 @@ fun <T> SelectField(
     }
 }
 
+/** Etiqueta de un grupo de opciones que no es un campo de texto (por ejemplo, Sexo). */
+@Composable
+fun FieldLabelText(label: String, optional: Boolean = false) = FieldLabel(label, optional)
+
+/** Mensaje de error con ícono, para grupos de opciones. */
+@Composable
+fun FieldError(text: String) = FieldSupport(helper = null, error = text)
+
 @Composable
 internal fun FieldLabel(label: String, optional: Boolean) {
     Row(horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs)) {
