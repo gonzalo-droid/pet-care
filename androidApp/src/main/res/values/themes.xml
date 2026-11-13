@@ -4,5 +4,7 @@
     <style name="Theme.BestID" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/bestid_bg</item>
         <item name="android:forceDarkAllowed">false</item>
+        <!-- Acento de los diálogos nativos (selector de fecha) con el token primary. -->
+        <item name="android:colorAccent">@color/bestid_primary</item>
     </style>
 </resources>
