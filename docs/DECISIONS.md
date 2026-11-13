@@ -2,6 +2,29 @@
 
 Registro de decisiones tomadas durante el desarrollo que cambian o precisan `SYSTEM_DESIGN.md`. La más reciente va arriba. Cada una dice quién la tomó y en qué hito.
 
+## 2026-11-13 · M3
+
+### D29. M3 con fotos y sin lectura automática (opción C) `[Decidido por Gonzalo]`
+Sin Firebase por ahora (D4), M3 hace todo lo que no depende de la tecnología de lectura: `ImagePicker`, `ImageProcessor`, guardado de fotos, Bienvenida (O1), fotos de la cartilla (O2), foto del sticker, foto de la mascota y visor. Quedan para cuando se elija la lectura: Leyendo (O3), Revisar lectura (O4), la cola sin internet y la hoja C4.
+- Criterio de terminado ajustado: *con las fotos de la cartilla de Lilith, se registran sus 2 vacunas a mano viendo la foto; las fotos quedan en el detalle de cada vacuna y la foto de Lilith en su carnet, en ambas plataformas y sin internet.*
+- `CardReader` queda declarado en el dominio, sin implementación.
+- "Empezar con su cartilla" (O1) pide primero nombre y especie (sin lectura no hay de dónde sacarlos), luego las fotos y luego el formulario de vacuna con las páginas arriba. El botón dice "Empezar con su cartilla" y no "Escanear su cartilla" porque todavía no se escanea.
+- "Agregar vacuna" abre las fotos de la cartilla, con "Prefiero llenarla a mano" para seguir sin fotos. Eso reemplaza la hoja C4 mientras no haya lectura.
+
+### D30. Almacenamiento de fotos `[Propuesta]`
+- Tabla `photos` (base v3, migración automática 2→3 probada). Una foto no se edita: se crea o se borra, por eso no lleva `updatedAt` ni `deletedAt` (excepción a la regla 8, igual que `Photo` en la sección 9).
+- Archivo `photos/<id>.jpg` en el directorio privado (Android `filesDir`, iOS Application Support) y en la base solo la ruta relativa. Las pantallas pasan esa ruta a Coil y un `Mapper` la resuelve a la absoluta, que en iOS cambia entre instalaciones.
+- La foto de la mascota también va en `photos`; `Pet.photoPath` guarda su ruta relativa.
+- Las fotos se procesan y guardan apenas se eligen. Al abrir la app, `CleanUpPhotos` borra las que nadie usa (ni una vacuna ni una mascota) con más de 24 h; las de registros o mascotas borrados se conservan para poder restaurarlos y para el respaldo.
+
+### D31. Permisos de cámara y fotos `[Propuesta]`
+- Android: la app no declara el permiso de cámara, así `TakePicture` abre la cámara del sistema sin pedirlo. La galería usa el selector de fotos del sistema, que no pide permisos.
+- iOS: la cámara pide permiso con el texto de `NSCameraUsageDescription` en español. La galería usa `PHPickerViewController`, que no pide permiso de fotos. Si se niega la cámara, la pantalla muestra una tarjeta con enlace a Ajustes y la galería sigue disponible.
+- Las fotos se guardan sin metadatos: `ImageProcessor` vuelve a codificar el JPEG, así que no queda la ubicación.
+
+### D32. Prueba del procesado de fotos en el emulador `[Propuesta]`
+`Bitmap` y `ExifInterface` no existen en la JVM. `core/platform` tiene pruebas de dispositivo (`androidDeviceTest`) que el CI corre en el emulador antes de la prueba de avisos: rota según EXIF, reduce a 2000 px, conserva fotos chicas, quita la ubicación y rechaza lo que no es imagen. En iOS, el flujo de UI del simulador pasa fotos generadas por el `ImageProcessor` real.
+
 ## 2026-11-13 · M2
 
 ### D22. Salud muestra cuidados, no vacunas `[Decidido por Gonzalo]`

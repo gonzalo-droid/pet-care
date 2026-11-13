@@ -10,14 +10,15 @@ La especificación completa está en [`docs/SYSTEM_DESIGN.md`](docs/SYSTEM_DESIG
 |---|---|---|
 | M0 | Proyecto multimódulo, design system con previews, 4 pestañas, CI Android e iOS | Hecho |
 | M1 | Mascotas (crear, editar, eliminar, varias, selector), vacunas a mano, Cartilla, Detalle, Inicio | Hecho |
-| M2 | Motor de avisos, notificaciones, Salud (cuidados y peso con gráfico) | Hecho en código; falta la prueba en teléfonos reales |
-| M3 | Lectura de la cartilla con foto | Pendiente: falta elegir la tecnología de lectura |
+| M2 | Motor de avisos, notificaciones, Salud (cuidados y peso con gráfico) | Hecho; falta la prueba en un iPhone real |
+| M3 | Fotos: bienvenida, fotos de la cartilla, sticker, foto de la mascota, visor | Hecho en código (sin lectura automática, ver D29); falta probar en teléfonos reales |
+| M3b | Lectura automática de la cartilla (Leyendo, Revisar lectura, cola sin internet) | Pendiente: falta elegir la tecnología de lectura |
 | M4 | PDF para compartir, respaldo, Ajustes | Pendiente |
 | M5 | Estados vacíos y de error, accesibilidad, textos finales, beta cerrada | Pendiente |
 
 ## Pantallas
 
-Capturas del prototipo de diseño ([`docs/design/`](docs/design/)), que la app sigue. Las capturas de la app real se generan en el CI: artefacto `ios-capturas` de cada ejecución, con los flujos de M1 y M2 en el simulador de iOS.
+Capturas del prototipo de diseño ([`docs/design/`](docs/design/)), que la app sigue. Las capturas de la app real se generan en el CI: artefacto `ios-capturas` de cada ejecución, con los flujos de M1 a M3 en el simulador de iOS.
 
 | Inicio | Cartilla | Detalle de vacuna | Nueva vacuna |
 |---|---|---|---|
@@ -51,17 +52,17 @@ composeApp/          Raíz de la UI compartida: App(), navegación, Koin, MainVi
 core/
   model/             Entidades y enums (Kotlin puro)
   domain/            Casos de uso, validaciones, próxima dosis, motor de avisos, puertos
-  data/              Room, DataStore y repositorios; esquemas en core/data/schemas/
+  data/              Room, DataStore, repositorios y archivos de fotos; esquemas en core/data/schemas/
   designsystem/      Tokens, AppTheme, componentes con previews, íconos, fuente Nunito, catálogo
   ui/                Presentación compartida entre features: especie, sexo, fechas es-PE, plurales
   navigation/        Rutas tipadas; los features navegan solo a través de ellas
-  platform/          Adaptadores Android e iOS: selector de fecha y avisos locales
+  platform/          Adaptadores Android e iOS: selector de fecha, avisos locales, cámara, galería y procesado de fotos
 feature/
   home/              Inicio
-  cartilla/          Cartilla, detalle y formulario de vacuna
+  cartilla/          Cartilla, fotos de la cartilla, detalle y formulario de vacuna
   health/            Salud (cuidados y peso)
   pet/               Carnet y formulario de mascota
-  onboarding/        Primer uso (por ahora, el permiso de avisos)
+  onboarding/        Primer uso: bienvenida y permiso de avisos
 build-logic/         Plugins de convención de Gradle (bestid.kmp.library, .compose, .feature)
 iosApp/              Proyecto Xcode
 docs/                SYSTEM_DESIGN.md, DECISIONS.md, licencias y design/ (prototipo)
@@ -79,7 +80,8 @@ Requisitos: JDK 21, Android Studio (aporta el Android SDK, que Gradle necesita i
 
 - **Android:** abre el proyecto en Android Studio y corre `androidApp`, o por terminal `./gradlew :androidApp:assembleDebug`.
 - **iOS:** abre `iosApp/iosApp.xcodeproj` en Xcode y corre en un simulador. La primera compilación descarga Kotlin/Native y tarda varios minutos. Para un iPhone real, completa `TEAM_ID` en `iosApp/Configuration/Config.xcconfig`.
-- **Pruebas:** `./gradlew allTests` (JVM y host de Android). En Mac, también `./gradlew iosSimulatorArm64Test`, que incluye los flujos de M1 y M2 en el simulador.
+- **Pruebas:** `./gradlew allTests` (JVM y host de Android). En Mac, también `./gradlew iosSimulatorArm64Test`, que incluye los flujos de M1 a M3 en el simulador.
+- **Fotos en Android:** el emulador no tiene cámara real (muestra una escena virtual); para la galería, arrastra imágenes a la ventana del emulador y se guardan en Descargas.
 - **Avisos:** Ajustes → "Probar aviso en 1 minuto" programa un aviso de prueba; cierra la app (o reinicia el teléfono) y espera.
 - **Catálogo de componentes en el teléfono:** Ajustes (engranaje arriba a la derecha) → "Ver catálogo de componentes".
 

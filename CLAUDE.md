@@ -34,7 +34,7 @@ App móvil (Android e iOS) que digitaliza la cartilla de vacunación de mascotas
 /core/navigation     rutas tipadas; los features navegan solo a través de ellas
 /core/domain         casos de uso, validaciones, próxima dosis, ReminderEngine y puertos (repositorios, avisos)
 /core/data           Room, DataStore, repositorios (luego respaldo)
-/core/platform       adaptadores Android e iOS de los puertos de plataforma (DatePicker, avisos; luego imágenes...)
+/core/platform       adaptadores Android e iOS de los puertos de plataforma (DatePicker, avisos, cámara, galería y procesado de fotos)
 /feature/*           home, cartilla, health, pet, onboarding: pantalla + ViewModel
 /build-logic         plugins de convención de Gradle
 /iosApp              proyecto Xcode
