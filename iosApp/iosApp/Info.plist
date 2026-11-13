@@ -24,6 +24,8 @@
 	<string>0.1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>NSCameraUsageDescription</key>
+	<string>BestID usa la cámara para tomar fotos de la cartilla de vacunación, del sticker de la vacuna y de tu mascota. Las fotos se guardan solo en tu teléfono.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
