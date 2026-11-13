@@ -27,3 +27,12 @@ sealed interface Route
 
 /** Contenedor de las 4 pestañas (barra superior con selector + barra inferior). */
 @Serializable data object MainRoute : Route
+
+/** Agregar (petId = null) o editar mascota (M2). */
+@Serializable data class PetEditRoute(val petId: String? = null) : Route
+
+/** Detalle de vacuna (C2). */
+@Serializable data class VaccineDetailRoute(val recordId: String) : Route
+
+/** Agregar (recordId = null) o editar vacuna a mano (C3). */
+@Serializable data class VaccineEditRoute(val recordId: String? = null) : Route
