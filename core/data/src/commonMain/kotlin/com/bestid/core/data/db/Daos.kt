@@ -1,6 +1,7 @@
 package com.bestid.core.data.db
 
 import androidx.room.Dao
+import androidx.room.Transaction
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -48,6 +49,9 @@ interface VaccineTypeDao {
 
 @Dao
 interface VaccineRecordDao {
+    @Query("SELECT * FROM vaccine_records WHERE deletedAt IS NULL")
+    fun observeAll(): Flow<List<VaccineRecordEntity>>
+
     @Query("SELECT * FROM vaccine_records WHERE petId = :petId AND deletedAt IS NULL ORDER BY applicationDate DESC, createdAt DESC")
     fun observeForPet(petId: String): Flow<List<VaccineRecordEntity>>
 
@@ -59,4 +63,55 @@ interface VaccineRecordDao {
 
     @Upsert
     suspend fun upsert(record: VaccineRecordEntity)
+}
+
+@Dao
+interface CareTaskDao {
+    @Query("SELECT * FROM care_tasks WHERE petId = :petId AND deletedAt IS NULL ORDER BY nextDate IS NULL, nextDate, createdAt")
+    fun observeForPet(petId: String): Flow<List<CareTaskEntity>>
+
+    @Query("SELECT * FROM care_tasks WHERE deletedAt IS NULL")
+    fun observeAll(): Flow<List<CareTaskEntity>>
+
+    @Query("SELECT * FROM care_tasks WHERE id = :id AND deletedAt IS NULL")
+    fun observe(id: String): Flow<CareTaskEntity?>
+
+    @Query("SELECT * FROM care_tasks WHERE id = :id")
+    suspend fun get(id: String): CareTaskEntity?
+
+    @Upsert
+    suspend fun upsert(task: CareTaskEntity)
+}
+
+@Dao
+interface WeightEntryDao {
+    @Query("SELECT * FROM weight_entries WHERE petId = :petId AND deletedAt IS NULL ORDER BY date, createdAt")
+    fun observeForPet(petId: String): Flow<List<WeightEntryEntity>>
+
+    @Query("SELECT * FROM weight_entries WHERE id = :id")
+    suspend fun get(id: String): WeightEntryEntity?
+
+    @Upsert
+    suspend fun upsert(entry: WeightEntryEntity)
+}
+
+@Dao
+interface ScheduledNotificationDao {
+    @Query("SELECT * FROM scheduled_notifications")
+    suspend fun getAll(): List<ScheduledNotificationEntity>
+
+    @Upsert
+    suspend fun upsertAll(items: List<ScheduledNotificationEntity>)
+
+    @Query("DELETE FROM scheduled_notifications WHERE id IN (:ids)")
+    suspend fun deleteIds(ids: List<String>)
+
+    @Query("DELETE FROM scheduled_notifications")
+    suspend fun clear()
+
+    @Transaction
+    suspend fun replace(added: List<ScheduledNotificationEntity>, removedIds: List<String>) {
+        if (removedIds.isNotEmpty()) deleteIds(removedIds)
+        if (added.isNotEmpty()) upsertAll(added)
+    }
 }

@@ -5,7 +5,11 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import com.bestid.core.data.db.BestIdDatabase
 import com.bestid.core.data.db.configured
+import com.bestid.core.data.repository.DataStoreReminderSettings
 import com.bestid.core.data.repository.DataStoreSelectedPetStore
+import com.bestid.core.data.repository.RoomCareTaskRepository
+import com.bestid.core.data.repository.RoomScheduledNotificationRepository
+import com.bestid.core.data.repository.RoomWeightRepository
 import com.bestid.core.data.repository.RoomPetRepository
 import com.bestid.core.data.repository.RoomVaccineRecordRepository
 import com.bestid.core.data.repository.RoomVaccineTypeRepository
@@ -13,6 +17,10 @@ import com.bestid.core.data.repository.RoomVetRepository
 import com.bestid.core.data.repository.SystemAppClock
 import com.bestid.core.data.repository.UuidGenerator
 import com.bestid.core.domain.port.AppClock
+import com.bestid.core.domain.port.CareTaskRepository
+import com.bestid.core.domain.port.ReminderSettingsStore
+import com.bestid.core.domain.port.ScheduledNotificationRepository
+import com.bestid.core.domain.port.WeightRepository
 import com.bestid.core.domain.port.IdGenerator
 import com.bestid.core.domain.port.PetRepository
 import com.bestid.core.domain.port.SelectedPetStore
@@ -39,6 +47,12 @@ val dataModule: Module = module {
     single<VaccineTypeRepository> { RoomVaccineTypeRepository(get()) }
     single<VaccineRecordRepository> { RoomVaccineRecordRepository(get()) }
     single<SelectedPetStore> { DataStoreSelectedPetStore(get()) }
+    single<CareTaskRepository> { RoomCareTaskRepository(get()) }
+    single<WeightRepository> { RoomWeightRepository(get()) }
+    single<ScheduledNotificationRepository> {
+        RoomScheduledNotificationRepository(get())
+    }
+    single<ReminderSettingsStore> { DataStoreReminderSettings(get()) }
     single<AppClock> { SystemAppClock() }
     single<IdGenerator> { UuidGenerator() }
 }

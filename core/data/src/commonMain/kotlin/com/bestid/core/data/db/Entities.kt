@@ -72,3 +72,39 @@ data class VaccineRecordEntity(
     val updatedAt: Long,
     val deletedAt: Long?,
 )
+
+@Entity(tableName = "care_tasks", indices = [Index("petId")])
+data class CareTaskEntity(
+    @PrimaryKey val id: String,
+    val petId: String,
+    val kind: String,
+    val title: String?,
+    val lastDate: String?,
+    val intervalValue: Int?,
+    val intervalUnit: String?,
+    val nextDate: String?,
+    val reminderEnabled: Boolean,
+    val createdAt: Long,
+    val updatedAt: Long,
+    val deletedAt: Long?,
+)
+
+@Entity(tableName = "weight_entries", indices = [Index("petId")])
+data class WeightEntryEntity(
+    @PrimaryKey val id: String,
+    val petId: String,
+    val date: String,
+    val grams: Int,
+    val createdAt: Long,
+    val updatedAt: Long,
+    val deletedAt: Long?,
+)
+
+/** Avisos programados en el sistema operativo (no van al respaldo: se recalculan). */
+@Entity(tableName = "scheduled_notifications")
+data class ScheduledNotificationEntity(
+    @PrimaryKey val id: String,
+    val refType: String,
+    val refId: String,
+    val fireAt: Long,
+)
