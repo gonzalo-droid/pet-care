@@ -4,14 +4,14 @@ import com.bestid.core.designsystem.resources.Res
 import com.bestid.core.designsystem.resources.*
 import org.jetbrains.compose.resources.DrawableResource
 
-/** Material Symbols Rounded (peso 400, 24 dp) importados como vectores en Compose Resources. */
+/**
+ * Material Symbols Rounded (peso 400, 24 dp) importados como vectores en Compose Resources.
+ * Elegidos para parecerse a los del prototipo (docs/design): casa, portapapeles con check, corazón, huella.
+ */
 object BestIdIcons {
     val Home: DrawableResource get() = Res.drawable.ic_home
-    val HomeFilled: DrawableResource get() = Res.drawable.ic_home_filled
     val Vaccines: DrawableResource get() = Res.drawable.ic_vaccines
-    val VaccinesFilled: DrawableResource get() = Res.drawable.ic_vaccines_filled
     val Health: DrawableResource get() = Res.drawable.ic_health
-    val HealthFilled: DrawableResource get() = Res.drawable.ic_health_filled
     val Pets: DrawableResource get() = Res.drawable.ic_pets
     val PetsFilled: DrawableResource get() = Res.drawable.ic_pets_filled
     val Add: DrawableResource get() = Res.drawable.ic_add
@@ -35,4 +35,7 @@ object BestIdIcons {
     val Edit: DrawableResource get() = Res.drawable.ic_edit
     val Undo: DrawableResource get() = Res.drawable.ic_undo
     val Celebration: DrawableResource get() = Res.drawable.ic_celebration
+
+    /** Ilustración provisional de gato para el avatar sin foto. */
+    val CatIllustration: DrawableResource get() = Res.drawable.illustration_cat
 }

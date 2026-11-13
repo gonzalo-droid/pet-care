@@ -96,7 +96,7 @@ fun FormField(
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = BestIdTheme.sizes.minTouch)
+                .heightIn(min = BestIdTheme.sizes.field)
                 .semantics {
                     contentDescription = label
                     if (error != null) error(error)
@@ -206,11 +206,11 @@ fun <T> SelectField(
 @Composable
 internal fun FieldLabel(label: String, optional: Boolean) {
     Row(horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs)) {
-        Text(label, style = BestIdTheme.typography.support, color = BestIdTheme.colors.ink)
+        Text(label, style = BestIdTheme.typography.bodyStrong, color = BestIdTheme.colors.ink)
         if (optional) {
             Text(
                 stringResource(Res.string.ds_optional),
-                style = BestIdTheme.typography.support,
+                style = BestIdTheme.typography.body,
                 color = BestIdTheme.colors.muted,
             )
         }
@@ -256,7 +256,7 @@ private fun ReadOnlyBox(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = BestIdTheme.sizes.primaryButton)
+            .heightIn(min = BestIdTheme.sizes.field)
             .background(if (enabled) colors.surface else colors.track, BestIdTheme.shapes.field)
             .border(BorderStroke(BestIdTheme.sizes.border, borderColor), BestIdTheme.shapes.field)
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)

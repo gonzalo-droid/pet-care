@@ -61,7 +61,7 @@ fun InfoCard(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = BestIdTheme.colors
-    BaseCard(colors.primarySoft, colors.primaryInk, null, modifier, null, null) {
+    BaseCard(colors.primarySoft, colors.primaryInk, null, modifier, null, null, BestIdTheme.shapes.cardLarge) {
         IconRow(icon = icon, tint = colors.primaryInk, content = content)
     }
 }
@@ -90,7 +90,7 @@ fun StatCard(
 ) {
     PlainCard(modifier = modifier) {
         Text(label, style = BestIdTheme.typography.support, color = BestIdTheme.colors.muted)
-        Text(value, style = BestIdTheme.typography.subtitle, color = BestIdTheme.colors.ink)
+        Text(value, style = BestIdTheme.typography.card, color = BestIdTheme.colors.ink)
         if (actionText != null && onAction != null) {
             TextAction(text = actionText, onClick = onAction, icon = BestIdIcons.Add)
         }
@@ -104,10 +104,10 @@ fun ListRow(label: String, value: String, modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth().padding(vertical = BestIdTheme.spacing.xxs),
         horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.sm),
     ) {
-        Text(label, style = BestIdTheme.typography.support, color = BestIdTheme.colors.muted, modifier = Modifier.weight(1f))
+        Text(label, style = BestIdTheme.typography.body, color = BestIdTheme.colors.muted, modifier = Modifier.weight(1f))
         Text(
             value,
-            style = BestIdTheme.typography.body,
+            style = BestIdTheme.typography.bodyStrong,
             color = BestIdTheme.colors.ink,
             textAlign = TextAlign.End,
             modifier = Modifier.weight(1.4f),
@@ -122,10 +122,10 @@ enum class BadgeTone { OK, ALERT, NEUTRAL }
 @Composable
 fun Badge(text: String, tone: BadgeTone, modifier: Modifier = Modifier) {
     val colors = BestIdTheme.colors
-    val (container, content, icon) = when (tone) {
-        BadgeTone.OK -> Triple(colors.primarySoft, colors.primaryInk, BestIdIcons.CheckCircle)
-        BadgeTone.ALERT -> Triple(colors.alert, colors.alertInk, BestIdIcons.Warning)
-        BadgeTone.NEUTRAL -> Triple(colors.track, colors.ink, null)
+    val (container, content) = when (tone) {
+        BadgeTone.OK -> colors.primarySoft to colors.primaryInk
+        BadgeTone.ALERT -> colors.alert to colors.alertInk
+        BadgeTone.NEUTRAL -> colors.surface to colors.primaryInk
     }
     Row(
         modifier = modifier
@@ -134,10 +134,7 @@ fun Badge(text: String, tone: BadgeTone, modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xxs),
     ) {
-        if (icon != null) {
-            Icon(painterResource(icon), contentDescription = null, tint = content, modifier = Modifier.size(BestIdTheme.sizes.iconSmall))
-        }
-        Text(text, style = BestIdTheme.typography.label, color = content)
+        Text(text, style = BestIdTheme.typography.chip, color = content)
     }
 }
 
@@ -160,9 +157,9 @@ internal fun BaseCard(
     modifier: Modifier,
     onClick: (() -> Unit)?,
     onClickLabel: String?,
+    shape: androidx.compose.ui.graphics.Shape = BestIdTheme.shapes.card,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val shape = BestIdTheme.shapes.card
     Column(
         modifier = modifier
             .fillMaxWidth()

@@ -23,7 +23,7 @@ import com.bestid.core.designsystem.preview.PreviewData
 import com.bestid.core.designsystem.preview.PreviewSurface
 import com.bestid.core.designsystem.resources.Res
 import com.bestid.core.designsystem.resources.ds_include
-import com.bestid.core.designsystem.resources.ds_review
+import com.bestid.core.designsystem.resources.ds_review_reason
 import com.bestid.core.designsystem.theme.BestIdTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -46,14 +46,14 @@ fun VaccineRecordCard(
     val colors = BestIdTheme.colors
     PlainCard(modifier = modifier, onClick = onClick) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(date, style = BestIdTheme.typography.card, color = colors.ink, modifier = Modifier.weight(1f))
+            Text(date, style = BestIdTheme.typography.subtitle, color = colors.ink, modifier = Modifier.weight(1f))
             Icon(painterResource(BestIdIcons.ChevronRight), contentDescription = null, tint = colors.muted)
         }
         if (types.isNotEmpty()) {
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xxs),
                 verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xxs),
-            ) { types.forEach { Badge(it, BadgeTone.NEUTRAL) } }
+            ) { types.forEach { Badge(it, BadgeTone.OK) } }
         }
         if (products != null) Text(products, style = BestIdTheme.typography.support, color = colors.muted)
         if (vet != null) Text(vet, style = BestIdTheme.typography.support, color = colors.muted)
@@ -76,18 +76,20 @@ fun ReviewField(
         modifier = modifier
             .fillMaxWidth()
             .background(colors.alert, BestIdTheme.shapes.field)
-            .padding(BestIdTheme.spacing.md),
+            .padding(horizontal = BestIdTheme.spacing.md, vertical = BestIdTheme.spacing.sm),
         verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs),
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs),
             verticalAlignment = Alignment.Top,
         ) {
-            Icon(painterResource(BestIdIcons.Warning), contentDescription = null, tint = colors.alertInk)
-            Column(modifier = Modifier.weight(1f)) {
-                Text(stringResource(Res.string.ds_review), style = BestIdTheme.typography.body, color = colors.alertInk)
-                Text(reason, style = BestIdTheme.typography.support, color = colors.alertInk)
-            }
+            Icon(painterResource(BestIdIcons.Error), contentDescription = null, tint = colors.alertInk)
+            Text(
+                text = stringResource(Res.string.ds_review_reason, reason),
+                style = BestIdTheme.typography.bodyStrong,
+                color = colors.alertInk,
+                modifier = Modifier.weight(1f),
+            )
         }
         content()
     }

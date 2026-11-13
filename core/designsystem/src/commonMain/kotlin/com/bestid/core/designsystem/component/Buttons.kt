@@ -57,7 +57,7 @@ fun PrimaryButton(
         ),
         contentPadding = buttonPadding(),
     ) {
-        ButtonContent(text = text, icon = icon, loading = loading, progressColor = colors.muted)
+        ButtonContent(text, icon, loading, colors.muted, BestIdTheme.typography.button)
     }
 }
 
@@ -89,7 +89,7 @@ fun SecondaryButton(
         ),
         contentPadding = buttonPadding(),
     ) {
-        ButtonContent(text = text, icon = icon, loading = loading, progressColor = colors.muted)
+        ButtonContent(text, icon, loading, colors.muted, BestIdTheme.typography.bodyStrong)
     }
 }
 
@@ -132,11 +132,11 @@ fun DashedButton(
         ),
         contentPadding = buttonPadding(),
     ) {
-        ButtonContent(text = text, icon = icon, loading = loading, progressColor = colors.muted)
+        ButtonContent(text, icon, loading, colors.muted, BestIdTheme.typography.bodyStrong)
     }
 }
 
-/** Acción de texto, sin fondo. Mantiene el alto táctil de 48. */
+/** Acción de texto, sin fondo. Mantiene el alto táctil de 48. [destructive] la pinta en `error` (eliminar). */
 @Composable
 fun TextAction(
     text: String,
@@ -145,6 +145,7 @@ fun TextAction(
     icon: DrawableResource? = null,
     enabled: Boolean = true,
     loading: Boolean = false,
+    destructive: Boolean = false,
 ) {
     val colors = BestIdTheme.colors
     TextButton(
@@ -153,11 +154,11 @@ fun TextAction(
         modifier = modifier.heightIn(min = BestIdTheme.sizes.minTouch),
         shape = BestIdTheme.shapes.button,
         colors = ButtonDefaults.textButtonColors(
-            contentColor = colors.primary,
+            contentColor = if (destructive) colors.error else colors.primary,
             disabledContentColor = colors.muted,
         ),
     ) {
-        ButtonContent(text = text, icon = icon, loading = loading, progressColor = colors.muted)
+        ButtonContent(text, icon, loading, colors.muted, BestIdTheme.typography.bodyStrong)
     }
 }
 
@@ -173,6 +174,7 @@ private fun RowScope.ButtonContent(
     icon: DrawableResource?,
     loading: Boolean,
     progressColor: Color,
+    style: androidx.compose.ui.text.TextStyle,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs, Alignment.CenterHorizontally),
@@ -190,7 +192,7 @@ private fun RowScope.ButtonContent(
                 modifier = Modifier.size(BestIdTheme.sizes.icon),
             )
         }
-        Text(text = text, style = BestIdTheme.typography.body, textAlign = TextAlign.Center)
+        Text(text = text, style = style, textAlign = TextAlign.Center)
     }
 }
 
@@ -201,6 +203,7 @@ private fun ButtonsPreview() = PreviewSurface {
     SecondaryButton(PreviewData.BUTTON_SECONDARY, onClick = {}, icon = BestIdIcons.Image)
     DashedButton(PreviewData.BUTTON_DASHED, onClick = {})
     TextAction(PreviewData.TEXT_ACTION, onClick = {})
+    TextAction(PreviewData.CONFIRM_ACTION, onClick = {}, icon = BestIdIcons.Delete, destructive = true)
 }
 
 @Preview

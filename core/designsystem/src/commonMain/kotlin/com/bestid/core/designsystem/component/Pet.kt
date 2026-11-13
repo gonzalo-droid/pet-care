@@ -1,6 +1,7 @@
 package com.bestid.core.designsystem.component
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -62,8 +63,8 @@ enum class AvatarSpecies { DOG, CAT, OTHER }
 enum class AvatarSize { SMALL, MEDIUM, LARGE }
 
 /**
- * Foto de la mascota o, si no hay, un placeholder por especie.
- * `[Pendiente]` ilustraciones propias: por ahora el placeholder usa el ícono de huella.
+ * Foto de la mascota o, si no hay, un placeholder por especie: el gato provisional del prototipo
+ * para gatos y la huella para el resto. `[Pendiente]` ilustraciones propias (sección 20).
  */
 @Composable
 fun PetAvatar(
@@ -85,7 +86,7 @@ fun PetAvatar(
         modifier = modifier
             .size(dp)
             .clip(shape)
-            .background(if (species == AvatarSpecies.CAT) colors.alert else colors.primarySoft, shape)
+            .background(colors.primarySoft, shape)
             .border(BorderStroke(BestIdTheme.sizes.border, colors.surface), shape)
             .semantics { contentDescription = description },
         contentAlignment = Alignment.Center,
@@ -97,11 +98,13 @@ fun PetAvatar(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(dp),
             )
+        } else if (species == AvatarSpecies.CAT) {
+            Image(painterResource(BestIdIcons.CatIllustration), contentDescription = null, modifier = Modifier.size(dp))
         } else {
             Icon(
                 painterResource(BestIdIcons.PetsFilled),
                 contentDescription = null,
-                tint = if (species == AvatarSpecies.CAT) colors.alertInk else colors.primaryInk,
+                tint = colors.primaryInk,
                 modifier = Modifier.size(dp / 2),
             )
         }
@@ -141,7 +144,7 @@ fun PetSelector(
 
     Row(
         modifier = modifier
-            .heightIn(min = BestIdTheme.sizes.minTouch)
+            .heightIn(min = BestIdTheme.sizes.secondaryButton)
             .clip(BestIdTheme.shapes.pill)
             .background(colors.surface, BestIdTheme.shapes.pill)
             .border(BorderStroke(BestIdTheme.sizes.border, colors.line), BestIdTheme.shapes.pill)
@@ -154,7 +157,7 @@ fun PetSelector(
         PetAvatar(selected.photo, selected.species, selected.name, size = AvatarSize.SMALL)
         Text(
             selected.name,
-            style = BestIdTheme.typography.body,
+            style = BestIdTheme.typography.card,
             color = colors.ink,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,

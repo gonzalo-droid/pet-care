@@ -1,6 +1,7 @@
 package com.bestid.core.designsystem.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,12 +53,11 @@ import org.jetbrains.compose.resources.stringResource
 data class BottomBarItem(
     val label: String,
     val icon: DrawableResource,
-    val selectedIcon: DrawableResource,
 )
 
 /**
- * Barra inferior de 4 pestañas (Inicio, Cartilla, Salud, Mascota). La pestaña activa cambia
- * de ícono (relleno), de peso y de fondo: nunca solo de color. Con texto grande la barra crece.
+ * Barra inferior de 4 pestañas (Inicio, Cartilla, Salud, Mascota). La pestaña activa lleva
+ * fondo detrás del ícono y texto en negrita: nunca solo color. Con texto grande la barra crece.
  */
 @Composable
 fun BottomBar(
@@ -68,7 +68,7 @@ fun BottomBar(
 ) {
     val colors = BestIdTheme.colors
     Column(modifier = modifier.fillMaxWidth().background(colors.surface)) {
-        HorizontalDivider(color = colors.line)
+        HorizontalDivider(color = colors.line, thickness = BestIdTheme.sizes.border)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -89,19 +89,21 @@ fun BottomBar(
                     Box(
                         modifier = Modifier
                             .background(if (selected) colors.primarySoft else colors.surface, BestIdTheme.shapes.pill)
-                            .padding(horizontal = BestIdTheme.spacing.md, vertical = BestIdTheme.spacing.xxs),
+                            .padding(horizontal = BestIdTheme.spacing.lg, vertical = BestIdTheme.spacing.xxs),
                     ) {
                         Icon(
-                            painterResource(if (selected) item.selectedIcon else item.icon),
+                            painterResource(item.icon),
                             contentDescription = null,
                             tint = if (selected) colors.primaryInk else colors.muted,
                         )
                     }
                     Text(
                         item.label,
-                        style = if (selected) BestIdTheme.typography.label.copy(
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold,
-                        ) else BestIdTheme.typography.label,
+                        style = if (selected) {
+                            BestIdTheme.typography.label.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold)
+                        } else {
+                            BestIdTheme.typography.label
+                        },
                         color = if (selected) colors.primaryInk else colors.muted,
                         textAlign = TextAlign.Center,
                     )
@@ -153,8 +155,15 @@ fun MainScaffold(
 /** Botón de ícono con alto táctil de 48 y descripción obligatoria. */
 @Composable
 fun IconAction(icon: DrawableResource, contentDescription: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    IconButton(onClick = onClick, modifier = modifier.size(BestIdTheme.sizes.minTouch)) {
-        Icon(painterResource(icon), contentDescription = contentDescription, tint = BestIdTheme.colors.ink)
+    val colors = BestIdTheme.colors
+    IconButton(
+        onClick = onClick,
+        modifier = modifier
+            .size(BestIdTheme.sizes.minTouch)
+            .background(colors.surface, BestIdTheme.shapes.pill)
+            .border(androidx.compose.foundation.BorderStroke(BestIdTheme.sizes.border, colors.line), BestIdTheme.shapes.pill),
+    ) {
+        Icon(painterResource(icon), contentDescription = contentDescription, tint = colors.ink)
     }
 }
 
@@ -221,13 +230,8 @@ fun FlowScaffold(
 }
 
 private val previewTabs = PreviewData.TABS.zip(
-    listOf(
-        BestIdIcons.Home to BestIdIcons.HomeFilled,
-        BestIdIcons.Vaccines to BestIdIcons.VaccinesFilled,
-        BestIdIcons.Health to BestIdIcons.HealthFilled,
-        BestIdIcons.Pets to BestIdIcons.PetsFilled,
-    ),
-) { label, (icon, selected) -> BottomBarItem(label, icon, selected) }
+    listOf(BestIdIcons.Home, BestIdIcons.Vaccines, BestIdIcons.Health, BestIdIcons.PetsFilled),
+) { label, icon -> BottomBarItem(label, icon) }
 
 @Preview
 @Composable

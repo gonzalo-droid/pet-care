@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -82,13 +81,13 @@ fun WeightChart(
             lineTo(x(0), top + plotHeight)
             close()
         }
-        drawPath(area, Brush.verticalGradient(listOf(colors.primarySoft, colors.surface), startY = top, endY = top + plotHeight))
-        drawPath(line, colors.primary, style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
+        drawPath(area, colors.primarySoft)
+        drawPath(line, colors.primary, style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
 
         // Último punto destacado
         val last = Offset(x(points.lastIndex), y(points.last().kg))
-        drawCircle(colors.surface, radius = 7.dp.toPx(), center = last)
-        drawCircle(colors.primary, radius = 5.dp.toPx(), center = last)
+        drawCircle(colors.surface, radius = 8.5.dp.toPx(), center = last)
+        drawCircle(colors.primary, radius = 7.dp.toPx(), center = last)
 
         // Rótulos de meses
         points.forEachIndexed { i, p ->

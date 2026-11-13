@@ -23,13 +23,15 @@ data class BestIdSpacing(
 data class BestIdSizes(
     val minTouch: Dp = 48.dp,
     val primaryButton: Dp = 58.dp,
+    /** Alto de campos y opciones de selección (prototipo: 52 a 54). */
+    val field: Dp = 54.dp,
     val secondaryButton: Dp = 52.dp,
     val icon: Dp = 24.dp,
     val iconSmall: Dp = 18.dp,
-    val avatarSmall: Dp = 32.dp,
+    val avatarSmall: Dp = 40.dp,
     val avatarMedium: Dp = 56.dp,
     val avatarLarge: Dp = 96.dp,
     val thumb: Dp = 72.dp,
-    val border: Dp = 1.5.dp,
+    val border: Dp = 2.dp,
     val chartHeight: Dp = 200.dp,
 )

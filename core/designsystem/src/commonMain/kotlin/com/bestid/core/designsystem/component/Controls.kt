@@ -17,7 +17,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -46,7 +50,10 @@ import com.bestid.core.designsystem.theme.BestIdTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
-/** Chip de multiselección (tipos de vacuna). Seleccionado muestra un check, no solo color. */
+/**
+ * Opción de multiselección (tipos de vacuna): fila con casilla visible. Seleccionada lleva
+ * casilla marcada, borde primary y fondo primarySoft: nunca solo color.
+ */
 @Composable
 fun ChipToggle(
     label: String,
@@ -55,7 +62,7 @@ fun ChipToggle(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
-    Chip(
+    OptionRow(
         label = label,
         selected = selected,
         enabled = enabled,
@@ -65,10 +72,12 @@ fun ChipToggle(
             role = Role.Checkbox,
             onValueChange = onToggle,
         ),
-    )
+    ) {
+        Checkbox(checked = selected, onCheckedChange = null, enabled = enabled, colors = optionCheckboxColors())
+    }
 }
 
-/** Chip de selección única (sexo). Se agrupa con `Modifier.selectableGroup()`. */
+/** Opción de selección única (sexo, respuestas de "Revisar lectura"). Se agrupa con `Modifier.selectableGroup()`. */
 @Composable
 fun ChipChoice(
     label: String,
@@ -77,7 +86,7 @@ fun ChipChoice(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
-    Chip(
+    OptionRow(
         label = label,
         selected = selected,
         enabled = enabled,
@@ -87,13 +96,40 @@ fun ChipChoice(
             role = Role.RadioButton,
             onClick = onSelect,
         ),
-    )
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = null,
+            enabled = enabled,
+            colors = RadioButtonDefaults.colors(
+                selectedColor = BestIdTheme.colors.primary,
+                unselectedColor = BestIdTheme.colors.outlineStrong,
+                disabledSelectedColor = BestIdTheme.colors.muted,
+                disabledUnselectedColor = BestIdTheme.colors.line,
+            ),
+        )
+    }
 }
 
 @Composable
-private fun Chip(label: String, selected: Boolean, enabled: Boolean, modifier: Modifier) {
+private fun optionCheckboxColors() = CheckboxDefaults.colors(
+    checkedColor = BestIdTheme.colors.primary,
+    uncheckedColor = BestIdTheme.colors.outlineStrong,
+    checkmarkColor = BestIdTheme.colors.onPrimary,
+    disabledCheckedColor = BestIdTheme.colors.muted,
+    disabledUncheckedColor = BestIdTheme.colors.line,
+)
+
+@Composable
+private fun OptionRow(
+    label: String,
+    selected: Boolean,
+    enabled: Boolean,
+    modifier: Modifier,
+    control: @Composable () -> Unit,
+) {
     val colors = BestIdTheme.colors
-    val shape = BestIdTheme.shapes.pill
+    val shape = BestIdTheme.shapes.field
     val container = when {
         !enabled -> colors.track
         selected -> colors.primarySoft
@@ -104,31 +140,18 @@ private fun Chip(label: String, selected: Boolean, enabled: Boolean, modifier: M
         selected -> colors.primary
         else -> colors.outlineStrong
     }
-    val content = when {
-        !enabled -> colors.muted
-        selected -> colors.primaryInk
-        else -> colors.ink
-    }
     Row(
         modifier = Modifier
-            .heightIn(min = BestIdTheme.sizes.minTouch)
+            .heightIn(min = BestIdTheme.sizes.secondaryButton)
             .clip(shape)
             .background(container, shape)
             .border(BorderStroke(BestIdTheme.sizes.border, border), shape)
             .then(modifier)
-            .padding(horizontal = BestIdTheme.spacing.md, vertical = BestIdTheme.spacing.xs),
+            .padding(start = BestIdTheme.spacing.xxs, end = BestIdTheme.spacing.md),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xxs),
     ) {
-        if (selected) {
-            Icon(
-                painterResource(BestIdIcons.Check),
-                contentDescription = null,
-                tint = content,
-                modifier = Modifier.size(BestIdTheme.sizes.iconSmall),
-            )
-        }
-        Text(label, style = BestIdTheme.typography.support, color = content)
+        control()
+        Text(label, style = BestIdTheme.typography.bodyStrong, color = if (enabled) colors.ink else colors.muted)
     }
 }
 
@@ -154,9 +177,7 @@ fun SegmentedControl(
             val selected = index == selectedIndex
             Text(
                 text = option,
-                style = if (selected) BestIdTheme.typography.body.copy(
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold,
-                ) else BestIdTheme.typography.body,
+                style = if (selected) BestIdTheme.typography.bodyStrong else BestIdTheme.typography.body,
                 // Texto `ink` en ambos estados: muted sobre track quedaba en 4,54:1.
                 color = colors.ink,
                 textAlign = TextAlign.Center,
@@ -226,25 +247,33 @@ fun ExpandableSection(
     var expanded by rememberSaveable { mutableStateOf(initiallyExpanded) }
     val colors = BestIdTheme.colors
     val state = stringResource(if (expanded) Res.string.ds_expanded_state else Res.string.ds_collapsed_state)
-    Column(modifier = modifier.fillMaxWidth()) {
+    val shape = BestIdTheme.shapes.field
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(colors.surface, shape)
+            .border(BorderStroke(BestIdTheme.sizes.border, colors.line), shape),
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = BestIdTheme.sizes.minTouch)
+                .heightIn(min = BestIdTheme.sizes.field)
                 .toggleable(value = expanded, role = Role.Button, onValueChange = { expanded = it })
-                .semantics { stateDescription = state },
+                .semantics { stateDescription = state }
+                .padding(horizontal = BestIdTheme.spacing.md),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(title, style = BestIdTheme.typography.body, color = colors.primary, modifier = Modifier.weight(1f))
+            Text(title, style = BestIdTheme.typography.bodyStrong, color = colors.ink, modifier = Modifier.weight(1f))
             Icon(
                 painterResource(if (expanded) BestIdIcons.ExpandLess else BestIdIcons.ExpandMore),
                 contentDescription = null,
-                tint = colors.primary,
+                tint = colors.ink,
             )
         }
         AnimatedVisibility(visible = expanded) {
             Column(
-                modifier = Modifier.padding(top = BestIdTheme.spacing.xs),
+                modifier = Modifier.padding(start = BestIdTheme.spacing.md, end = BestIdTheme.spacing.md, bottom = BestIdTheme.spacing.md),
                 verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.md),
                 content = content,
             )

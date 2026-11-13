@@ -62,7 +62,7 @@ private fun MainTabs(onOpenSettings: () -> Unit) {
 
     MainScaffold(
         tabs = TopLevelDestination.entries.map {
-            BottomBarItem(stringResource(it.label), it.icon, it.selectedIcon)
+            BottomBarItem(stringResource(it.label), it.icon)
         },
         selectedTab = selected,
         onSelectTab = { index ->

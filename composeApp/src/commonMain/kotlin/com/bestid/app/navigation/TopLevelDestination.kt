@@ -21,10 +21,9 @@ enum class TopLevelDestination(
     val graphClass: KClass<out Route>,
     val label: StringResource,
     val icon: DrawableResource,
-    val selectedIcon: DrawableResource,
 ) {
-    HOME(HomeGraph, HomeGraph::class, Res.string.tab_home, BestIdIcons.Home, BestIdIcons.HomeFilled),
-    CARTILLA(CartillaGraph, CartillaGraph::class, Res.string.tab_cartilla, BestIdIcons.Vaccines, BestIdIcons.VaccinesFilled),
-    HEALTH(HealthGraph, HealthGraph::class, Res.string.tab_health, BestIdIcons.Health, BestIdIcons.HealthFilled),
-    PET(PetGraph, PetGraph::class, Res.string.tab_pet, BestIdIcons.Pets, BestIdIcons.PetsFilled),
+    HOME(HomeGraph, HomeGraph::class, Res.string.tab_home, BestIdIcons.Home),
+    CARTILLA(CartillaGraph, CartillaGraph::class, Res.string.tab_cartilla, BestIdIcons.Vaccines),
+    HEALTH(HealthGraph, HealthGraph::class, Res.string.tab_health, BestIdIcons.Health),
+    PET(PetGraph, PetGraph::class, Res.string.tab_pet, BestIdIcons.PetsFilled),
 }

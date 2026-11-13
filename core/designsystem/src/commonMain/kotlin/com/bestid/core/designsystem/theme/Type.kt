@@ -29,10 +29,16 @@ data class BestIdTypography(
     val card: TextStyle,
     /** 16/700 */
     val body: TextStyle,
-    /** 16/500, para el texto que escribe la persona en un campo */
+    /** 16/800: etiquetas de campo, opciones y botones secundarios */
+    val bodyStrong: TextStyle,
+    /** 17/700, texto que escribe la persona en un campo (prototipo) */
     val input: TextStyle,
+    /** 18/800, botón principal */
+    val button: TextStyle,
     /** 14/700 */
     val support: TextStyle,
+    /** 14/800, chips y badges */
+    val chip: TextStyle,
     /** 13/700, etiquetas de la barra inferior */
     val label: TextStyle,
 )
@@ -57,8 +63,11 @@ internal fun bestIdTypography(family: FontFamily): BestIdTypography {
         subtitle = style(20, FontWeight.ExtraBold, 26),
         card = style(18, FontWeight.ExtraBold, 24),
         body = style(16, FontWeight.Bold, 22),
-        input = style(16, FontWeight.Medium, 22),
+        bodyStrong = style(16, FontWeight.ExtraBold, 22),
+        input = style(17, FontWeight.Bold, 24),
+        button = style(18, FontWeight.ExtraBold, 24),
         support = style(14, FontWeight.Bold, 20),
+        chip = style(14, FontWeight.ExtraBold, 20),
         label = style(13, FontWeight.Bold, 18),
     )
 }

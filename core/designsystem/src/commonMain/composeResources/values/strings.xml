@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Textos propios de los componentes del design system (es-PE) -->
-    <string name="ds_review">Revisa</string>
+    <string name="ds_review_reason">Revisa: %1$s</string>
     <string name="ds_undo">Deshacer</string>
     <string name="ds_retry">Reintentar</string>
     <string name="ds_loading">Cargando…</string>
