@@ -1,6 +1,7 @@
 # System Design: BestID, cartilla digital de mascotas (MVP)
 
-Versión 1.2 · 12 nov 2026 · Producto: Gonzalo · Diseño técnico: Claude
+Versión 1.3 · 13 nov 2026 · Producto: Gonzalo · Diseño técnico: Claude
+Cambios de la 1.3 (kickoff): token `outlineStrong`, `CareTask` con intervalo en días o meses, `ScanStatus`, estructura multimódulo, sin analítica por ahora. Detalle en `docs/DECISIONS.md`.
 Estado: decisiones de producto y arquitectura cerradas para iniciar desarrollo. Las preguntas que quedan (sección 20) no bloquean el inicio y tienen un valor por defecto.
 
 Enlaces:
@@ -168,7 +169,8 @@ Lo que el prototipo no muestra y se construye con los mismos componentes:
 | muted | #5A6B65 | Texto secundario |
 | line | #EADFCB | Bordes |
 | track | #EFE6D3 | Fondo del control segmentado |
-| outline | #CDBF9F | Borde de botón secundario y punteado |
+| outline | #CDBF9F | Separadores decorativos (1,82:1 sobre surface, no delimita controles) |
+| outlineStrong | #A48C55 | Borde de controles: botón secundario y punteado, campos, chips (3,25:1 sobre surface) |
 | primary | #2F7D68 | Acciones, elemento activo |
 | onPrimary | #FFFFFF | Texto sobre primary |
 | primarySoft | #DDF1E8 | Estado correcto, selección |
@@ -177,7 +179,7 @@ Lo que el prototipo no muestra y se construye con los mismos componentes:
 | alertInk | #7A3B1B | Texto sobre alert |
 | error | #B3261E | Errores de formulario |
 
-Contraste calculado a mano (verificar con herramienta antes de lanzar): onPrimary sobre primary 4,9:1; muted sobre bg 5,2:1; primary sobre bg 4,6:1. El color nunca es la única señal: los avisos llevan texto y los estados llevan etiqueta.
+Contraste verificado con la fórmula WCAG (prueba `ContrastTest`): onPrimary sobre primary 4,94:1; muted sobre bg 5,23:1; primary sobre bg 4,58:1; outlineStrong sobre surface 3,25:1. El texto no seleccionado del control segmentado usa ink. El color nunca es la única señal: los avisos llevan texto y los estados llevan etiqueta.
 
 Tema oscuro: fuera del MVP. La app fuerza tema claro en ambas plataformas `[Decidido]`.
 
@@ -239,14 +241,14 @@ Criterio de terminado de M0: cada componente tiene preview en estados normal, de
 
 | Necesidad | Librería |
 |---|---|
-| Lenguaje y build | Kotlin 2.x, Gradle con version catalog, plantilla oficial de KMP con Compose Multiplatform |
+| Lenguaje y build | Kotlin 2.x, Gradle con version catalog y plugins de convención (`build-logic`), plantilla oficial de KMP con Compose Multiplatform (AGP 9: módulo `androidApp` separado) |
 | UI compartida | Compose Multiplatform + Material 3 + Compose Resources (fuente, textos, imágenes) |
 | Navegación | Navigation Compose multiplataforma de JetBrains con rutas tipadas |
 | Estado | ViewModel y Lifecycle multiplataforma, StateFlow, flujo unidireccional |
 | Inyección | Koin (Hilt no soporta KMP) |
 | Base de datos | Room KMP con el driver SQLite empaquetado |
 | Preferencias | DataStore KMP |
-| Red | Ktor client (motor OkHttp en Android, Darwin en iOS) + kotlinx.serialization |
+| Red | Ktor client (motor OkHttp en Android, Darwin en iOS) + kotlinx.serialization, para la alternativa de servicio propio |
 | Fechas | kotlinx-datetime |
 | Imágenes | Coil 3 |
 | Errores | Sentry Kotlin Multiplatform |
@@ -281,7 +283,7 @@ Toda la lógica (qué avisos existen, cuándo, con qué texto) vive en código c
 /backend/scan      solo si se cambia a un servicio propio (sección 10)
 ```
 
-Se puede empezar con menos módulos (todo en `composeApp` por paquetes) y separar `core` cuando crezca. Lo obligatorio es que `domain` no dependa de UI ni de plataforma.
+Estructura vigente: ver `docs/DECISIONS.md` (D1). Multimódulo desde M0 (`androidApp`, `composeApp`, `core/*`, `feature/*`); `core/domain`, `core/data` y `core/platform` se crean en el hito que los necesita. Las interfaces de plataforma son puertos en `domain` con adaptadores Android e iOS en `core/platform`. Lo obligatorio es que `domain` no dependa de UI ni de plataforma.
 
 ### Capas
 
@@ -301,6 +303,8 @@ enum class Sex { FEMALE, MALE }
 enum class DatePrecision { EXACT, MONTH, YEAR }
 enum class RecordSource { SCAN, MANUAL }
 enum class CareKind { DEWORM_INTERNAL, DEWORM_EXTERNAL, OTHER }
+enum class IntervalUnit { DAY, MONTH }
+enum class ScanStatus { PENDING, READING, DONE, FAILED, CANCELLED }   // [Propuesta], se revisa en M3
 
 data class Pet(
   val id: String, val name: String, val species: Species,
@@ -345,7 +349,9 @@ data class VaccineItem(                       // un sticker de frasco
 
 data class CareTask(
   val id: String, val petId: String, val kind: CareKind, val title: String?,
-  val lastDate: LocalDate?, val intervalDays: Int?, val nextDate: LocalDate?,
+  val lastDate: LocalDate?,
+  val intervalValue: Int?, val intervalUnit: IntervalUnit?,   // DAY o MONTH (meses de calendario)
+  val nextDate: LocalDate?,
   val reminderEnabled: Boolean,
   val createdAt: Instant, val updatedAt: Instant, val deletedAt: Instant?
 )
@@ -450,7 +456,7 @@ ML Kit Text Recognition (Android e iOS) y Apple Vision leen texto sin internet y
 Función pura que, a partir de las vacunas con `nextDateConfirmed`, los cuidados con aviso activo y la hora preferida, produce la lista de avisos futuros:
 - 7 días antes, 1 día antes y el mismo día, a la hora preferida (9:00 por defecto) `[Propuesta]`.
 - Texto: "A {nombre} le toca su {vacuna o cuidado} en {n} días", "Mañana le toca su {…} a {nombre}", "Hoy le toca su {…} a {nombre}".
-- Cuidados: `nextDate = lastDate + intervalDays`. La app no sugiere intervalos; los pone el dueño `[Decidido]`.
+- Cuidados: `nextDate = lastDate + intervalValue` en días o en meses de calendario según `intervalUnit`. La app no sugiere intervalos; los pone el dueño `[Decidido]`.
 - Pasada la fecha sin registrar nada: un aviso "¿Ya le pusiste su {…} a {nombre}?" a los 3 días, que abre el registro para marcarlo hecho `[Propuesta]`.
 
 ### Programación por plataforma
@@ -497,7 +503,7 @@ Función pura que, a partir de las vacunas con `nextDateConfirmed`, los cuidados
 
 ## 16. Métricas
 
-Con datos solo en el teléfono, la analítica es mínima y anónima `[Propuesta]`: eventos enviados con un ID de instalación aleatorio a una herramienta que soporte KMP (PostHog tiene SDK para KMP) o al mismo backend.
+`[Decidido]` Sin analítica por ahora (13 nov 2026). Cuando se retome: mínima y anónima, eventos con un ID de instalación aleatorio a una herramienta que soporte KMP (PostHog tiene SDK para KMP). No hay backend al que enviarlos.
 
 Eventos: `onboarding_started`, `scan_started`, `scan_completed` (páginas, registros detectados), `scan_fields_corrected` (cantidad), `vaccine_saved` (origen), `reminder_permission` (sí o no), `reminder_opened`, `care_saved`, `weight_saved`, `pdf_shared`, `backup_exported`. Nunca nombres, fechas ni fotos.
 
@@ -571,10 +577,10 @@ Las fotos originales las tiene Gonzalo; pedírselas para el conjunto de pruebas.
 
 | # | Pregunta | Valor por defecto mientras tanto |
 |---|---|---|
-| 1 | Revisión de marca de BestID en INDECOPI, dominio y redes | "BestID: cartilla de tu mascota" y `pe.<dominio>.bestid` |
+| 1 | Revisión de marca de BestID en INDECOPI, dominio y redes | "BestID: cartilla de tu mascota". ID de la app: `com.bestid.app` `[Decidido]` |
 | 2 | Confirmar Firebase AI Logic con Gemini y presupuesto mensual de lectura | Firebase AI Logic; decidir el modelo tras la prueba con 10 cartillas |
 | 3 | A nombre de quién van las cuentas de Google Play, Apple y Firebase | Gonzalo |
-| 4 | Herramienta de analítica | PostHog con eventos anónimos |
+| 4 | Herramienta de analítica | Sin analítica por ahora `[Decidido]` |
 | 5 | Ilustraciones propias (avatar, estados vacíos, bienvenida) | Placeholders simples con los tokens |
 | 6 | Disponibilidad semanal de Gonzalo para poner fechas a los hitos | Plan por hitos sin fechas |
 | 7 | Lanzamiento solo en Perú o en más países | Solo Perú en ambas tiendas |
@@ -583,7 +589,7 @@ Las fotos originales las tiene Gonzalo; pedírselas para el conjunto de pruebas.
 
 - Compose Multiplatform estable en iOS desde 1.8.0: https://blog.jetbrains.com/kotlin/2025/05/compose-multiplatform-1-8-0-released-compose-multiplatform-for-ios-is-stable-and-production-ready/
 - Room para Kotlin Multiplatform: https://developer.android.com/kotlin/multiplatform/room
-- Firebase no tiene SDK oficial de KMP (pedido abierto): https://firebase.uservoice.com/forums/948424-general/suggestions/46591717-support-kotlin-multiplatform ; por eso el MVP no depende de Firebase en el cliente.
+- Firebase no tiene SDK oficial de KMP (pedido abierto): https://firebase.uservoice.com/forums/948424-general/suggestions/46591717-support-kotlin-multiplatform ; por eso Firebase AI Logic se usa con los SDK nativos detrás de `CardReader` y no en código común. Los datos de la app no pasan por Firebase.
 - Firebase AI Logic, precios y obligación de App Check desde el 2 de noviembre de 2026: https://firebase.google.com/docs/ai-logic/pricing
 - Librería KMP experimental de la comunidad para Firebase AI Logic: https://github.com/SeanChinJunKai/firebase-ai-kmp
 - Sentry para Compose Multiplatform: https://docs.sentry.io/platforms/kotlin/guides/compose-multiplatform

@@ -20,18 +20,27 @@ App móvil (Android e iOS) que digitaliza la cartilla de vacunación de mascotas
 - Room KMP con el driver SQLite empaquetado. DataStore KMP para preferencias.
 - kotlinx-datetime, kotlinx.serialization, Coil 3, Sentry Kotlin Multiplatform.
 - Lectura de cartilla: Firebase AI Logic (Gemini) con los SDK nativos de cada plataforma detrás de la interfaz `CardReader`. App Check obligatorio (Play Integrity / App Attest).
+- Ktor client (para la alternativa de servicio propio de la sección 10).
 - Sin backend propio, sin login y sin sincronización en el MVP. Todo se guarda en el teléfono.
 
 ## Estructura
 
 ```
-/composeApp   UI compartida (designsystem, navigation, feature/*) + androidMain + iosMain
-/core         model, domain (100 % común y puro), data (Room, repositorios, respaldo)
-/iosApp       proyecto Xcode
-/docs         SYSTEM_DESIGN.md y decisiones
+/androidApp          punto de entrada Android (AGP 9 no permite app + KMP en un mismo módulo)
+/composeApp          raíz de la UI compartida: App(), navegación, Koin, MainViewController de iOS
+/core/model          entidades y enums (Kotlin puro)
+/core/designsystem   tokens, AppTheme, componentes con previews, íconos, fuente, catálogo
+/core/navigation     rutas tipadas; los features navegan solo a través de ellas
+/core/domain         (desde M1) casos de uso, ReminderEngine, validaciones y puertos de plataforma
+/core/data           (desde M1) Room, repositorios, respaldo
+/core/platform       (desde M1/M2) adaptadores Android e iOS de los puertos
+/feature/*           home, cartilla, health, pet (y los que vengan): pantalla + ViewModel
+/build-logic         plugins de convención de Gradle
+/iosApp              proyecto Xcode
+/docs                SYSTEM_DESIGN.md, DECISIONS.md y licencias
 ```
 
-Se puede empezar con todo en `composeApp` por paquetes. `domain` nunca depende de UI ni de código de plataforma.
+Un feature nunca depende de otro feature. `core/designsystem` no depende de `core/model`. `domain` nunca depende de UI ni de código de plataforma. Ver `docs/DECISIONS.md` (D1).
 
 ## Reglas que no se rompen
 
@@ -47,10 +56,12 @@ Se puede empezar con todo en `composeApp` por paquetes. `domain` nunca depende d
 
 ## Comandos
 
-Actualiza esta sección cuando el proyecto exista:
-- Compilar Android: `./gradlew :composeApp:assembleDebug`
-- Pruebas comunes: `./gradlew allTests`
-- iOS: abrir `iosApp/iosApp.xcodeproj` en Xcode o compilar con `xcodebuild`.
+- Compilar Android: `./gradlew :androidApp:assembleDebug`
+- Pruebas comunes en la JVM: `./gradlew testAndroidHostTest`
+- Pruebas comunes en el simulador iOS (solo en Mac): `./gradlew iosSimulatorArm64Test`
+- Todas las pruebas: `./gradlew allTests` (en Linux omite las de iOS)
+- iOS: abrir `iosApp/iosApp.xcodeproj` en Xcode, o `xcodebuild -project iosApp/iosApp.xcodeproj -target iosApp -sdk iphonesimulator ARCHS=arm64 CODE_SIGNING_ALLOWED=NO build`
+- Catálogo de componentes en el teléfono: Ajustes (ícono arriba a la derecha) → "Ver catálogo de componentes"
 
 ## Fuera del MVP (no implementar)
 
