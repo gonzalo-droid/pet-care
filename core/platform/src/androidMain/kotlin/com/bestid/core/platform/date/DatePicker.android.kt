@@ -14,7 +14,7 @@ import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 
 @Composable
-actual fun rememberDatePickerLauncher(onPicked: (LocalDate) -> Unit): DatePickerLauncher {
+internal actual fun rememberPlatformDatePickerLauncher(onPicked: (LocalDate) -> Unit): DatePickerLauncher {
     val context = LocalContext.current
     val callback by rememberUpdatedState(onPicked)
     return remember(context) {

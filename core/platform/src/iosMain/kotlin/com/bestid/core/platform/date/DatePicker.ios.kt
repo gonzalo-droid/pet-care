@@ -33,7 +33,7 @@ import platform.UIKit.sheetPresentationController
 import platform.UIKit.systemBackgroundColor
 
 @Composable
-actual fun rememberDatePickerLauncher(onPicked: (LocalDate) -> Unit): DatePickerLauncher {
+internal actual fun rememberPlatformDatePickerLauncher(onPicked: (LocalDate) -> Unit): DatePickerLauncher {
     val callback by rememberUpdatedState(onPicked)
     return remember {
         object : DatePickerLauncher {
