@@ -1,5 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pet_empty_title">Aquí verás el carnet BestID</string>
-    <string name="pet_empty_body">Con la foto, los datos y las vacunas de tu mascota.</string>
+    <string name="pet_empty_body">Agrega a tu mascota para ver su carnet con sus datos y vacunas.</string>
+    <string name="pet_add">Agregar mascota</string>
+    <string name="pet_add_another">Agregar otra mascota</string>
+    <string name="pet_complete_data">Completar datos</string>
+    <string name="pet_row_species">Especie</string>
+    <string name="pet_row_sex">Sexo</string>
+    <string name="pet_row_breed">Raza</string>
+    <string name="pet_row_birth">Nacimiento</string>
+    <string name="pet_row_birth_approx">%1$s (aprox.)</string>
+    <string name="pet_row_marks">Señas</string>
+    <string name="pet_row_owner">Tutor</string>
+    <string name="pet_next_none">Sin fecha</string>
+    <string name="pet_form_new_title">Nueva mascota</string>
+    <string name="pet_form_edit_title">Editar mascota</string>
+    <string name="pet_form_name">Nombre</string>
+    <string name="pet_form_name_placeholder">Ej. Lilith</string>
+    <string name="pet_form_species">Especie</string>
+    <string name="pet_form_more">Más detalles</string>
+    <string name="pet_form_breed">Raza</string>
+    <string name="pet_form_breed_placeholder">Ej. Mestiza</string>
+    <string name="pet_form_sex">Sexo</string>
+    <string name="pet_form_birth">Fecha de nacimiento</string>
+    <string name="pet_form_marks">Señas particulares</string>
+    <string name="pet_form_marks_placeholder">Ej. Mancha blanca en la cola</string>
+    <string name="pet_form_owner">Nombre del tutor</string>
+    <string name="pet_form_address">Dirección</string>
+    <string name="pet_form_address_helper">No se comparte salvo que lo elijas.</string>
+    <string name="pet_form_save">Guardar mascota</string>
+    <string name="pet_form_delete">Eliminar mascota</string>
+    <string name="pet_error_name_empty">Escribe el nombre de tu mascota</string>
+    <string name="pet_error_species">Elige la especie</string>
+    <string name="pet_error_name_long">El nombre puede tener hasta 40 caracteres</string>
+    <string name="pet_delete_title">¿Eliminar a %1$s?</string>
+    <string name="pet_delete_body">Se borran sus datos y vacunas de este teléfono. Podrás deshacerlo durante unos segundos.</string>
+    <string name="pet_delete_confirm">Eliminar</string>
+    <string name="pet_deleted">Se eliminó a %1$s</string>
+    <string name="pet_undo">Deshacer</string>
+    <string name="pet_close">Cerrar</string>
 </resources>
