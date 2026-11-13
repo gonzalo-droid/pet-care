@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="home_empty_title">Aquí verás a tu mascota</string>
-    <string name="home_empty_body">Su próximo aviso, la última vacuna y el último peso, todo en un vistazo.</string>
+    <string name="home_empty_title">Empieza con tu mascota</string>
+    <string name="home_empty_body">Agrégala y registra sus vacunas. Te mostraremos aquí cuándo le toca la próxima.</string>
+    <string name="home_add_pet">Agregar mascota</string>
+    <string name="home_greeting_ok">¡Hola! %1$s está al día</string>
+    <string name="home_greeting_due">¡Hola! A %1$s le toca pronto</string>
+    <string name="home_greeting_overdue">¡Hola! %1$s tiene una vacuna pendiente</string>
+    <string name="home_greeting_start">¡Hola! Registra las vacunas de %1$s</string>
+    <string name="home_next">Próximo</string>
+    <plurals name="home_days_unit">
+        <item quantity="one">día</item>
+        <item quantity="other">días</item>
+    </plurals>
+    <string name="home_today">Hoy</string>
+    <string name="home_overdue_days">Atrasada hace %1$s</string>
+    <string name="home_next_line">%1$s · %2$s</string>
+    <string name="home_no_next">Sin próximas vacunas registradas</string>
+    <string name="home_no_next_body">Al registrar una vacuna con su próxima fecha, verás aquí cuántos días faltan.</string>
+    <string name="home_last_vaccine">Última vacuna</string>
+    <string name="home_none">Sin registro</string>
+    <string name="home_weight">Peso</string>
+    <string name="home_add_vaccine">Agregar vacuna</string>
+    <string name="home_vaccine_fallback">Vacuna</string>
 </resources>
