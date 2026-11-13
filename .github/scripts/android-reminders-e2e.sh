@@ -51,8 +51,10 @@ sleep 3
 # que además borraría las alarmas: aquí las alarmas deben seguir y despertar a la app.
 adb shell am kill "$PKG" || true
 sleep 2
-if adb shell pidof "$PKG" > /dev/null; then
-  adb shell run-as "$PKG" sh -c 'kill -9 $(pidof '"$PKG"')' || true
+PID="$(adb shell pidof "$PKG" | tr -d '\r' || true)"
+if [ -n "$PID" ]; then
+  # La app es debuggable: run-as corre con su mismo usuario y puede matar su proceso.
+  adb shell run-as "$PKG" kill -9 "$PID" || true
   sleep 2
 fi
 if adb shell pidof "$PKG" > /dev/null; then echo "El proceso sigue vivo"; exit 1; fi
