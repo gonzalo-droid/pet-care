@@ -14,6 +14,9 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.core.model)
+            implementation(projects.core.domain)
+            implementation(projects.core.data)
+            implementation(projects.core.ui)
             implementation(projects.core.designsystem)
             implementation(projects.core.navigation)
             implementation(projects.feature.home)
@@ -31,6 +34,11 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.koin.test)
+        }
+        getByName("androidHostTest").dependencies {
+            implementation(libs.koin.test)
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.datastore.preferences)
         }
     }
 }

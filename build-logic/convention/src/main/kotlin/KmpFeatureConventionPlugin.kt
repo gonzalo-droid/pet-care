@@ -16,8 +16,11 @@ class KmpFeatureConventionPlugin : Plugin<Project> {
         extensions.configure<KotlinMultiplatformExtension> {
             sourceSets.getByName("commonMain").dependencies {
                 implementation(project(":core:designsystem"))
+                implementation(project(":core:ui"))
                 implementation(project(":core:navigation"))
                 implementation(project(":core:model"))
+                implementation(project(":core:domain"))
+                implementation(project(":core:platform"))
                 implementation(libs.library("androidx-navigation-compose"))
                 implementation(libs.library("androidx-lifecycle-viewmodel-compose"))
                 implementation(libs.library("androidx-lifecycle-runtime-compose"))
