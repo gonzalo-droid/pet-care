@@ -40,7 +40,7 @@ Enlaces:
 | Plataformas | Android e iOS desde el lanzamiento | [Decidido] |
 | Tecnología | Kotlin Multiplatform con interfaz compartida en Compose Multiplatform | [Decidido] |
 | Datos | Solo en el teléfono. Sin cuenta, sin login, sin sincronización en el MVP | [Decidido] |
-| Backend | Sin servidor propio. La lectura usa Firebase AI Logic (Gemini) con los SDK nativos de Android e iOS, protegida con App Check. Si la exactitud no alcanza en la prueba de 10 cartillas, se cambia a un servicio propio sin estado (sección 10) | [Propuesta] |
+| Backend | Sin servidor propio. **Por ahora sin Firebase** (13 nov 2026): datos solo en el teléfono. La forma de leer la cartilla (Firebase AI Logic, servicio propio sin estado u otra) se decide antes de M3; ver sección 10 y `docs/DECISIONS.md` D4 | [Decidido, lectura pendiente] |
 | Equipo | Gonzalo desarrolla | [Decidido] |
 | Nombre | BestID ("bestie" + ID: la identidad de tu mascota). En tienda va con complemento: "BestID: cartilla de tu mascota". Riesgos: en español puede leerse "vestid"; existen "bestID Attendance" (app de asistencia, otra categoría) y un desarrollador "VestID" en Google Play. Revisar marca en INDECOPI antes de publicar (sección 20) | [Decidido, con riesgo] |
 | Catálogo de vacunas por especie | Lo valida un veterinario antes del lanzamiento | [Decidido] |

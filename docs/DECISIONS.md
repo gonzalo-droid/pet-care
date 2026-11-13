@@ -51,8 +51,8 @@ Puertos y adaptadores: las interfaces de la sección 8 (`ImagePicker`, `Notifica
 ### D3. Ktor incluido `[Decidido por Gonzalo]`
 Ktor queda en el catálogo de versiones (OkHttp en Android, Darwin en iOS) para la alternativa de servicio propio de la sección 10. En M0 no lo usa ningún módulo.
 
-### D4. Datos solo locales; Firebase solo para leer la cartilla `[Decidido por Gonzalo, interpretación a confirmar]`
-"Solo local" se interpreta como: los datos viven solo en el teléfono, y la lectura de la cartilla usa Firebase AI Logic desde la app (sección 10). La línea de la sección 21 que decía lo contrario se corrigió.
+### D4. Solo datos locales y sin Firebase por ahora `[Decidido por Gonzalo]`
+Los datos viven solo en el teléfono y la app no usa Firebase por ahora: ni Firebase AI Logic ni App Check. Antes de M3 hay que decidir cómo se lee la cartilla (o si el escaneo se pospone); hasta entonces la app funciona con registro a mano. `CardReader` sigue siendo la interfaz que aísla esa decisión.
 
 ### D5. Analítica: no por ahora `[Decidido por Gonzalo]`
 La sección 16 queda en pausa. No se agrega PostHog ni otra herramienta.
@@ -79,10 +79,10 @@ Android `applicationId` y `BUNDLE_ID` de iOS. Reemplaza el valor por defecto `pe
 Se agrega cuando Gonzalo tenga el DSN. Se leerá de `local.properties` o de un secreto de CI y quedará apagado si falta.
 
 ### D13. Versiones `[Propuesta]`
-Últimas estables al 13/11/2026: Kotlin 2.4.21, Compose Multiplatform 1.12.2, Material 3 1.9.0 (la que fija el plugin de Compose 1.12.2), AGP 9.5.1, Gradle 9.9.1, Navigation 2.10.0, Lifecycle 2.11.0, Koin 4.2.2, Coroutines 1.11.0, Serialization 1.13.0, kotlinx-datetime 0.8.0, Ktor 3.6.1, Coil 3.6.3, Turbine 1.2.1, Room 2.8.5 (`androidx.room`, no `room3`), DataStore 1.3.0. `compileSdk` y `targetSdk` 37, `minSdk` 26 `[Propuesta: Android 8.0, cubre casi todos los teléfonos en uso en Perú]`. iOS 15.3 como mínimo (igual que la plantilla oficial).
+Últimas estables al 13/11/2026: Kotlin 2.4.21, Compose Multiplatform 1.12.2, Material 3 1.9.0 (la que fija el plugin de Compose 1.12.2), AGP 9.5.1, Gradle 9.9.1, Navigation 2.10.0, Lifecycle 2.11.0, Koin 4.2.2, Coroutines 1.11.0, Serialization 1.13.0, kotlinx-datetime 0.8.0, Ktor 3.6.1, Coil 3.6.3, Turbine 1.2.1, Room 2.8.5 (`androidx.room`, no `room3`), DataStore 1.3.0. `compileSdk` y `targetSdk` 37, `minSdk` 26 (Android 8.0) e iOS 15.3 como mínimo `[Decidido por Gonzalo]`.
 
-### D14. `DateField` sin selector todavía `[Pendiente para M1]`
-La sección 7 pide el selector **nativo** de fecha, pero no está entre las interfaces de plataforma de la sección 8. En M0 `DateField` es un campo de solo lectura con `onClick`; la pantalla abre el selector. Propuesta para M1: puerto `DatePicker` con adaptadores nativos (`DatePickerDialog` en Android, `UIDatePicker` en iOS).
+### D14. Selector de fecha nativo detrás de un puerto `[Decidido por Gonzalo]`
+La sección 7 pide el selector **nativo** de fecha. Se agrega a las interfaces de plataforma: `DatePicker` con adaptadores `DatePickerDialog` (Android) y `UIDatePicker` (iOS), en M1. `DateField` sigue siendo de solo lectura con `onClick`.
 
 ### D15. Datos de ejemplo en previews y catálogo `[Propuesta]`
 Las previews y el catálogo de componentes (herramienta de desarrollo, se abre desde Ajustes) usan datos de ejemplo de `PreviewData`. No son textos de la app: las pantallas reales leen todo de Compose Resources.
