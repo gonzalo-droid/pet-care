@@ -21,6 +21,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.bestid.app.di.appModules
 import com.bestid.core.data.db.BestIdDatabase
+import com.bestid.core.domain.port.NotificationPermission
+import com.bestid.core.domain.port.NotificationScheduler
+import com.bestid.core.domain.reminder.PlannedReminder
+import com.bestid.core.domain.reminder.ReminderSubject
 import com.bestid.core.platform.date.DatePickerOverride
 import com.bestid.core.platform.date.LocalDatePickerOverride
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -45,13 +49,22 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 /**
- * Criterio de M1 en el simulador de iOS, tocando la app real (App() con Room y navegación):
- * registrar a Lilith con sus 2 vacunas a mano, agregar a Toby y cambiar entre las dos.
+ * Flujos principales en el simulador de iOS, tocando la app real (App() con Room y navegación).
+ * M1: registrar a Lilith con sus 2 vacunas a mano, agregar a Toby y cambiar entre las dos.
+ * M2: agregar un cuidado con aviso (pantalla de permiso y avisos programados) y un peso.
  * El selector de fecha nativo se reemplaza por fechas fijas (no se puede tocar desde Compose).
  */
 @OptIn(ExperimentalTestApi::class, ExperimentalForeignApi::class)
-class M1FlowUiTest {
+class AppFlowUiTest {
     private val dates = ArrayDeque<LocalDate>()
+
+    /** UNUserNotificationCenter no funciona fuera de una app instalada: se usa un programador falso. */
+    private val scheduler = object : NotificationScheduler {
+        val scheduled = mutableMapOf<String, PlannedReminder>()
+        override suspend fun permission() = NotificationPermission.NOT_DETERMINED
+        override suspend fun schedule(reminders: List<PlannedReminder>) = reminders.forEach { scheduled[it.id] = it }
+        override suspend fun cancel(ids: List<String>) = ids.forEach { scheduled.remove(it) }
+    }
 
     @BeforeTest
     fun startApp() {
@@ -63,6 +76,7 @@ class M1FlowUiTest {
                 appModules + module {
                     single<RoomDatabase.Builder<BestIdDatabase>> { Room.inMemoryDatabaseBuilder<BestIdDatabase>() }
                     single { PreferenceDataStoreFactory.createWithPath { "$dir/prefs.preferences_pb".toPath() } }
+                    single<NotificationScheduler> { scheduler }
                 },
             )
         }
@@ -72,7 +86,7 @@ class M1FlowUiTest {
     fun stop() = stopKoin()
 
     @Test
-    fun registersLilithWithTwoVaccinesAndSwitchesBetweenTwoPets() = runComposeUiTest {
+    fun petsVaccinesCaresAndWeight() = runComposeUiTest {
         setContent {
             CompositionLocalProvider(LocalDatePickerOverride provides DatePickerOverride { dates.removeFirstOrNull() }) {
                 App()
@@ -119,6 +133,31 @@ class M1FlowUiTest {
         onNodeWithText("Mascota").performClick()
         waitForText("Completar datos")
         screenshot("06-carnet-lilith")
+
+        // M2: un cuidado con aviso (primer logro → pantalla de permiso) y un peso
+        onNodeWithText("Salud").performClick()
+        waitForText("Aún no hay cuidados")
+        onNodeWithText("Agregar cuidado").performScrollTo().performClick()
+        waitForText("Nuevo cuidado")
+        dates.addLast(LocalDate(2026, 10, 1))
+        onNode(hasContentDescription("Última vez", substring = true)).performScrollTo().performClick()
+        onNode(hasSetTextAction() and hasContentDescription("Cada cuánto")).performTextInput("3")
+        screenshot("07-nuevo-cuidado")
+        onNodeWithText("Guardar cuidado").performClick()
+        waitForText("¿Te avisamos cuando le toque?")
+        screenshot("08-permiso-avisos")
+        onNodeWithText("Ahora no").performClick()
+        waitForText("Desparasitación interna")
+        waitUntil(timeoutMillis = 10_000) { scheduler.scheduled.values.any { it.subject is ReminderSubject.Care } }
+        screenshot("09-salud-cuidados")
+
+        onNodeWithText("Peso").performClick()
+        onNodeWithText("Agregar peso de hoy").performScrollTo().performClick()
+        waitForText("Peso en kg")
+        onNode(hasSetTextAction() and hasContentDescription("Peso en kg")).performTextInput("3,8")
+        onNodeWithText("Guardar peso").performClick()
+        waitForText("3,8 kg")
+        screenshot("10-salud-peso")
     }
 
     private fun ComposeUiTest.addPet(name: String, species: String) {

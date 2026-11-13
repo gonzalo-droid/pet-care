@@ -36,6 +36,7 @@ kotlin {
 
 dependencies {
     implementation(projects.composeApp)
+    implementation(projects.core.platform)
     implementation(libs.androidx.activity.compose)
     implementation(libs.compose.ui)
     implementation(platform(libs.koin.bom))
