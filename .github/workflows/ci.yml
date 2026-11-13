@@ -39,7 +39,7 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v5
-      - name: Pruebas de commonTest (simulador iOS)
+      - name: Pruebas en el simulador iOS (comunes y flujo de UI de M1)
         run: ./gradlew iosSimulatorArm64Test
       - name: Compilar la app para el simulador
         run: |
@@ -50,3 +50,18 @@ jobs:
             ARCHS=arm64 \
             CODE_SIGNING_ALLOWED=NO \
             build
+      - name: Abrir la app en el simulador
+        run: .github/scripts/ios-smoke.sh build/ios-smoke
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-capturas
+          path: |
+            composeApp/build/ui-screenshots/
+            build/ios-smoke/
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: ios-reportes-de-pruebas
+          path: '**/build/reports/tests/'
