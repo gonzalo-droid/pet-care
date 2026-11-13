@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="permission_celebration_vaccines">
+        <item quantity="one">%1$s y su vacuna guardada</item>
+        <item quantity="other">%1$s y sus %2$d vacunas guardadas</item>
+    </plurals>
+    <string name="permission_celebration_care">Listo, guardamos el cuidado de %1$s</string>
+    <string name="permission_title">¿Te avisamos cuando le toque?</string>
+    <string name="permission_body">Te escribimos una semana antes, un día antes y el mismo día. Funciona sin internet.</string>
+    <string name="permission_example_title">Vacuna de %1$s</string>
+    <string name="permission_example_body">A %1$s le toca su próxima vacuna en 7 días</string>
+    <string name="permission_accept">Sí, avísame</string>
+    <string name="permission_later">Ahora no</string>
+    <string name="permission_footnote">Puedes cambiarlo cuando quieras en los ajustes del teléfono.</string>
+    <string name="permission_pet_fallback">tu mascota</string>
+</resources>
