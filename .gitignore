@@ -15,3 +15,6 @@ local.properties
 iosApp/Pods/
 *.xcuserstate
 xcuserdata/
+
+# Kotlin
+.kotlin/
