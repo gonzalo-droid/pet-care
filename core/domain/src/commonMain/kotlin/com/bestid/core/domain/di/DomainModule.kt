@@ -15,7 +15,24 @@ import com.bestid.core.domain.usecase.RestoreVaccineRecord
 import com.bestid.core.domain.usecase.SavePet
 import com.bestid.core.domain.usecase.SaveVaccineRecord
 import com.bestid.core.domain.usecase.SelectPet
+import com.bestid.core.domain.reminder.MarkNotificationPromptShown
+import com.bestid.core.domain.reminder.ObserveNotificationPermission
+import com.bestid.core.domain.reminder.ReminderCoordinator
+import com.bestid.core.domain.reminder.ScheduleTestReminder
+import com.bestid.core.domain.reminder.ShouldAskNotificationPermission
+import com.bestid.core.domain.reminder.SyncReminders
+import com.bestid.core.domain.usecase.DeleteCareTask
+import com.bestid.core.domain.usecase.DeleteWeight
+import com.bestid.core.domain.usecase.ObserveCareTask
+import com.bestid.core.domain.usecase.ObserveCareTasks
+import com.bestid.core.domain.usecase.ObserveWeights
+import com.bestid.core.domain.usecase.RestoreCareTask
+import com.bestid.core.domain.usecase.RestoreWeight
+import com.bestid.core.domain.usecase.SaveCareTask
+import com.bestid.core.domain.usecase.SaveWeight
+import com.bestid.core.domain.usecase.SetCareReminder
 import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 /** Casos de uso. Dependen solo de los puertos, que aporta `core/data`. */
@@ -35,4 +52,23 @@ val domainModule = module {
     factoryOf(::SaveVaccineRecord)
     factoryOf(::DeleteVaccineRecord)
     factoryOf(::RestoreVaccineRecord)
+
+    factoryOf(::ObserveCareTasks)
+    factoryOf(::ObserveCareTask)
+    factoryOf(::SaveCareTask)
+    factoryOf(::SetCareReminder)
+    factoryOf(::DeleteCareTask)
+    factoryOf(::RestoreCareTask)
+    factoryOf(::ObserveWeights)
+    factoryOf(::SaveWeight)
+    factoryOf(::DeleteWeight)
+    factoryOf(::RestoreWeight)
+
+    // Avisos: una sola instancia para que su Mutex evite sincronizaciones simultáneas.
+    single { SyncReminders(get(), get(), get(), get(), get(), get(), get(), get()) }
+    singleOf(::ReminderCoordinator)
+    factoryOf(::ShouldAskNotificationPermission)
+    factoryOf(::MarkNotificationPromptShown)
+    factoryOf(::ObserveNotificationPermission)
+    factoryOf(::ScheduleTestReminder)
 }

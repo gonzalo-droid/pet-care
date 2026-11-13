@@ -1,9 +1,13 @@
 package com.bestid.core.domain.port
 
+import com.bestid.core.model.CareTask
 import com.bestid.core.model.Pet
+import com.bestid.core.model.ScheduledNotification
 import com.bestid.core.model.VaccineRecord
 import com.bestid.core.model.VaccineType
 import com.bestid.core.model.Vet
+import com.bestid.core.model.WeightEntry
+import kotlinx.datetime.LocalTime
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -20,6 +24,8 @@ interface PetRepository {
 }
 
 interface VaccineRecordRepository {
+    /** Todos los registros activos (para el motor de avisos). */
+    fun observeAll(): Flow<List<VaccineRecord>>
     /** Registros activos de una mascota, del más reciente al más antiguo. */
     fun observeForPet(petId: String): Flow<List<VaccineRecord>>
     fun observe(id: String): Flow<VaccineRecord?>
@@ -45,4 +51,38 @@ interface VetRepository {
 interface SelectedPetStore {
     val selectedPetId: Flow<String?>
     suspend fun select(petId: String?)
+}
+
+interface CareTaskRepository {
+    /** Cuidados activos de una mascota, por próxima fecha. */
+    fun observeForPet(petId: String): Flow<List<CareTask>>
+    /** Todos los cuidados activos (para el motor de avisos). */
+    fun observeAll(): Flow<List<CareTask>>
+    fun observe(id: String): Flow<CareTask?>
+    suspend fun get(id: String): CareTask?
+    suspend fun upsert(task: CareTask)
+}
+
+interface WeightRepository {
+    /** Pesos activos de una mascota, del más antiguo al más reciente. */
+    fun observeForPet(petId: String): Flow<List<WeightEntry>>
+    suspend fun get(id: String): WeightEntry?
+    suspend fun upsert(entry: WeightEntry)
+}
+
+/** Lo que está programado en el sistema operativo, para sincronizar solo la diferencia. */
+interface ScheduledNotificationRepository {
+    suspend fun getAll(): List<ScheduledNotification>
+    suspend fun replace(added: List<ScheduledNotification>, removedIds: List<String>)
+    suspend fun clear()
+}
+
+/** Preferencias de avisos (DataStore). */
+interface ReminderSettingsStore {
+    /** Hora preferida de los avisos (9:00 por defecto). */
+    val reminderTime: Flow<LocalTime>
+    /** Si ya se mostró la pantalla de permiso de avisos (O5). */
+    val permissionPromptShown: Flow<Boolean>
+    suspend fun setReminderTime(time: LocalTime)
+    suspend fun markPermissionPromptShown()
 }
