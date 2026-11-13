@@ -1,0 +1,38 @@
+package com.bestid.core.designsystem.icon
+
+import com.bestid.core.designsystem.resources.Res
+import com.bestid.core.designsystem.resources.*
+import org.jetbrains.compose.resources.DrawableResource
+
+/** Material Symbols Rounded (peso 400, 24 dp) importados como vectores en Compose Resources. */
+object BestIdIcons {
+    val Home: DrawableResource get() = Res.drawable.ic_home
+    val HomeFilled: DrawableResource get() = Res.drawable.ic_home_filled
+    val Vaccines: DrawableResource get() = Res.drawable.ic_vaccines
+    val VaccinesFilled: DrawableResource get() = Res.drawable.ic_vaccines_filled
+    val Health: DrawableResource get() = Res.drawable.ic_health
+    val HealthFilled: DrawableResource get() = Res.drawable.ic_health_filled
+    val Pets: DrawableResource get() = Res.drawable.ic_pets
+    val PetsFilled: DrawableResource get() = Res.drawable.ic_pets_filled
+    val Add: DrawableResource get() = Res.drawable.ic_add
+    val Close: DrawableResource get() = Res.drawable.ic_close
+    val ArrowBack: DrawableResource get() = Res.drawable.ic_arrow_back
+    val ChevronRight: DrawableResource get() = Res.drawable.ic_chevron_right
+    val ExpandMore: DrawableResource get() = Res.drawable.ic_expand_more
+    val ExpandLess: DrawableResource get() = Res.drawable.ic_expand_less
+    val Calendar: DrawableResource get() = Res.drawable.ic_calendar
+    val Check: DrawableResource get() = Res.drawable.ic_check
+    val CheckCircle: DrawableResource get() = Res.drawable.ic_check_circle
+    val Error: DrawableResource get() = Res.drawable.ic_error
+    val Info: DrawableResource get() = Res.drawable.ic_info
+    val Warning: DrawableResource get() = Res.drawable.ic_warning
+    val Notifications: DrawableResource get() = Res.drawable.ic_notifications
+    val PhotoCamera: DrawableResource get() = Res.drawable.ic_photo_camera
+    val Image: DrawableResource get() = Res.drawable.ic_image
+    val Share: DrawableResource get() = Res.drawable.ic_share
+    val Settings: DrawableResource get() = Res.drawable.ic_settings
+    val Delete: DrawableResource get() = Res.drawable.ic_delete
+    val Edit: DrawableResource get() = Res.drawable.ic_edit
+    val Undo: DrawableResource get() = Res.drawable.ic_undo
+    val Celebration: DrawableResource get() = Res.drawable.ic_celebration
+}
