@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Solo para la ventana y el ícono, antes de que cargue Compose. Mismos valores que los tokens bg y primary. -->
+    <color name="bestid_bg">#FBF6EC</color>
+    <color name="bestid_primary">#2F7D68</color>
+    <color name="bestid_on_primary">#FFFFFF</color>
+</resources>

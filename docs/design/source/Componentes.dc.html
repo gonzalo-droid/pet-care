@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Componentes de BestID</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+input[type=checkbox],input[type=radio]{width:24px;height:24px;accent-color:#2F7D68;margin:0;flex:none}
+.sec{display:flex;flex-direction:column;gap:10px;min-width:0}
+.eb{font-size:14px;font-weight:800;color:#2F7D68;letter-spacing:.06em;text-transform:uppercase}
+.sw{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.sw div{height:44px;border-radius:14px}
+.sw span{color:#5A6B65}
+.btn{min-height:56px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;background:#2F7D68;color:#fff}
+.btn2{min-height:52px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;background:#fff;border:2px solid #CDBF9F}
+.dash{min-height:52px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#2F7D68;border:2px dashed #CDBF9F}
+.ck{display:flex;align-items:center;gap:10px;min-height:52px;border-radius:18px;border:2px solid #EADFCB;background:#fff;padding:0 14px;font-size:16px;font-weight:800}
+.ck.on{border-color:#2F7D68;background:#DDF1E8}
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));background:#EFE6D3;border-radius:999px;padding:4px;gap:4px}
+.seg span{min-height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#4F5E58}
+.seg span.on{background:#fff;color:#2B3A36;font-weight:800}
+.input{min-height:54px;border-radius:18px;border:2px solid #EADFCB;background:#fff;font:700 17px 'Nunito',system-ui,sans-serif;padding:0 16px;color:#2B3A36;width:100%}
+.chip{display:inline-flex;align-items:center;font-size:14px;font-weight:800;padding:4px 12px;border-radius:999px;background:#DDF1E8;color:#1F5E4D}
+.chip.w{background:#FFE0CC;color:#7A3B1B}
+.nav{display:flex;justify-content:space-around;background:#fff;border:2px solid #EADFCB;border-radius:20px;padding:6px 8px 10px}
+.nav span{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:72px;color:#5A6B65;font-weight:700;font-size:13px}
+.pill{width:60px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center}
+.nav span.on{color:#1F5E4D;font-weight:800}
+.nav span.on .pill{background:#DDF1E8}
+.rule{display:flex;gap:10px;font-size:15px;line-height:1.4}
+.rule b{flex:none;width:22px;height:22px;border-radius:999px;background:#DDF1E8;color:#1F5E4D;font-size:13px;display:flex;align-items:center;justify-content:center}
+</style>
+</helmet>
+<div style="width:780px;height:1440px;background:#FBF6EC;color:#2B3A36;font-family:'Nunito',system-ui,sans-serif;padding:36px;display:flex;flex-direction:column;gap:28px;overflow:hidden">
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="display:flex;align-items:center;gap:6px;font-size:32px;font-weight:800">Best<span style="background:#2F7D68;color:#fff;border-radius:12px;padding:0 9px">ID</span><span style="margin-left:10px">· componentes</span></div>
+    <span style="font-size:16px;color:#5A6B65">Cada pantalla se arma solo con estas piezas. Los nombres coinciden con el documento de System Design.</span>
+  </div>
+
+  <div class="sec">
+    <span class="eb">Colores</span>
+    <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px">
+      <div class="sw"><div style="background:#FBF6EC;border:2px solid #EADFCB"></div><b>bg</b><span>#FBF6EC</span></div>
+      <div class="sw"><div style="background:#2B3A36"></div><b>ink</b><span>#2B3A36</span></div>
+      <div class="sw"><div style="background:#5A6B65"></div><b>muted</b><span>#5A6B65</span></div>
+      <div class="sw"><div style="background:#EADFCB"></div><b>line</b><span>#EADFCB</span></div>
+      <div class="sw"><div style="background:#EFE6D3"></div><b>track</b><span>#EFE6D3</span></div>
+      <div class="sw"><div style="background:#2F7D68"></div><b>primary</b><span>#2F7D68</span></div>
+      <div class="sw"><div style="background:#DDF1E8"></div><b>primarySoft</b><span>#DDF1E8</span></div>
+      <div class="sw"><div style="background:#FFE0CC"></div><b>alert</b><span>#FFE0CC</span></div>
+      <div class="sw"><div style="background:#7A3B1B"></div><b>alertInk</b><span>#7A3B1B</span></div>
+      <div class="sw"><div style="background:#B3261E"></div><b>error</b><span>#B3261E</span></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="eb">Tipografía · Nunito</span>
+    <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:baseline">
+      <span style="font-size:30px;font-weight:800">Display 30</span><span style="font-size:26px;font-weight:800">Título 26</span><span style="font-size:20px;font-weight:800">Subtítulo 20</span><span style="font-size:16px;font-weight:700">Cuerpo 16</span><span style="font-size:14px;font-weight:700;color:#5A6B65">Apoyo 14</span><span style="font-size:13px;font-weight:700;color:#5A6B65">Barra 13</span>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px">
+    <div class="sec">
+      <span class="eb">Navegación</span>
+      <div style="display:flex;align-items:center;gap:8px;min-height:52px;padding:4px 14px 4px 4px;border-radius:999px;background:#fff;border:2px solid #EADFCB;font-weight:800;font-size:17px;align-self:flex-start"><span style="width:40px;height:40px;border-radius:999px;background:#DDF1E8"></span>PetSelector ▾</div>
+      <div class="nav">
+        <span class="on"><span class="pill"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg></span>Inicio</span>
+        <span><span class="pill"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="3"/><path d="M9 4h6M9 13l2 2 4-4"/></svg></span>Cartilla</span>
+        <span><span class="pill"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg></span>Salud</span>
+        <span><span class="pill"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><ellipse cx="6" cy="10" rx="1.8" ry="2.3"/><ellipse cx="10" cy="6.5" rx="1.8" ry="2.4"/><ellipse cx="14.5" cy="6.5" rx="1.8" ry="2.4"/><ellipse cx="18.5" cy="10" rx="1.8" ry="2.3"/><path d="M12 11.5c-2.6 0-5 2.7-5 5 0 1.5 1.2 2.3 2.6 2.1 1-.1 1.6-.5 2.4-.5s1.4.4 2.4.5c1.4.2 2.6-.6 2.6-2.1 0-2.3-2.4-5-5-5z"/></svg></span>Mascota</span>
+      </div>
+      <div class="seg"><span class="on">SegmentedControl</span><span>Opción</span></div>
+    </div>
+    <div class="sec">
+      <span class="eb">Botones</span>
+      <div class="btn">PrimaryButton</div>
+      <div class="btn2">SecondaryButton</div>
+      <div class="dash">+ DashedButton</div>
+      <span style="min-height:44px;display:flex;align-items:center;font-size:16px;font-weight:800;color:#2F7D68">TextAction</span>
+      <span style="min-height:44px;display:flex;align-items:center;font-size:16px;font-weight:800;color:#B3261E">DestructiveAction</span>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px">
+    <div class="sec">
+      <span class="eb">Selección</span>
+      <label for="a1" class="ck on"><input id="a1" type="checkbox" checked>ChipToggle activo</label>
+      <label for="a2" class="ck"><input id="a2" type="checkbox">ChipToggle inactivo</label>
+      <label for="a3" class="ck"><input id="a3" type="radio">ChipChoice</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip">Badge ok</span><span class="chip w">Badge aviso</span></div>
+    </div>
+    <div class="sec">
+      <span class="eb">Campos</span>
+      <div style="display:flex;flex-direction:column;gap:6px"><label for="f1" style="font-size:16px;font-weight:800">FormField</label><input id="f1" class="input" type="text" placeholder="Texto de ayuda en el campo"></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><label for="f2" style="font-size:16px;font-weight:800">Con error</label><input id="f2" class="input" type="text" value="" style="border-color:#B3261E" aria-describedby="e2"><span id="e2" style="font-size:14px;font-weight:700;color:#B3261E">Escribe el nombre de tu mascota</span></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px">
+    <div class="sec">
+      <span class="eb">Tarjetas</span>
+      <div style="background:#DDF1E8;border-radius:28px;padding:14px 16px;font-size:16px;font-weight:800">InfoCard</div>
+      <div style="background:#FFE0CC;border-radius:24px;padding:14px 16px;font-size:16px;font-weight:800">AlertCard</div>
+      <div style="background:#fff;border:2px solid #EADFCB;border-radius:24px;padding:14px 16px;font-size:16px;font-weight:800">PlainCard</div>
+      <div style="background:#FFE0CC;border-radius:18px;padding:12px 14px;display:flex;gap:8px;font-size:15px;font-weight:800;color:#7A3B1B"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>ReviewField: ícono + "Revisa:" + texto</div>
+    </div>
+    <div class="sec">
+      <span class="eb">Accesibilidad</span>
+      <div class="rule"><b>1</b>Toques de 48 px o más; botón principal de 56.</div>
+      <div class="rule"><b>2</b>Ningún estado solo por color: la pestaña activa lleva fondo y negrita, y los datos dudosos llevan ícono y la palabra "Revisa".</div>
+      <div class="rule"><b>3</b>Texto mínimo de 13 y contraste de 4,5:1 o más.</div>
+      <div class="rule"><b>4</b>Todo campo con etiqueta visible; los botones de solo ícono con nombre para lector de pantalla.</div>
+      <div class="rule"><b>5</b>Texto hasta 200 % sin cortes; las tarjetas crecen.</div>
+      <div class="rule"><b>6</b>Sin animaciones si el sistema pide reducir movimiento.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":780,"height":1440}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

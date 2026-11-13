@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Salud: cuidados</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:inherit;text-decoration:none}
+input[type=checkbox]{width:24px;height:24px;accent-color:#2F7D68;margin:0;flex:none}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 16px 4px}
+.petsel{display:flex;align-items:center;gap:8px;min-height:52px;padding:4px 14px 4px 4px;border-radius:999px;background:#fff;border:2px solid #EADFCB;font-weight:800;font-size:17px}
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));background:#EFE6D3;border-radius:999px;padding:4px;gap:4px}
+.seg a{min-height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#4F5E58}
+.seg a.on{background:#fff;color:#2B3A36;font-weight:800;box-shadow:0 1px 0 #EADFCB}
+.care{background:#fff;border:2px solid #EADFCB;border-radius:24px;padding:14px 16px;display:flex;gap:12px;align-items:center}
+.care .txt{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.care b{font-size:17px}
+.care span{font-size:15px;color:#5A6B65}
+.tog{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:13px;font-weight:800;color:#5A6B65;min-width:56px;min-height:48px;justify-content:center}
+.dash{min-height:52px;border-radius:24px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:16px;font-weight:800;color:#2F7D68;border:2px dashed #CDBF9F}
+.nav{display:flex;justify-content:space-around;background:#fff;border-top:2px solid #EADFCB;padding:6px 8px 18px}
+.nav a{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:72px;min-height:56px;color:#5A6B65;font-weight:700;font-size:13px}
+.pill{width:60px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center}
+.nav a.on{color:#1F5E4D;font-weight:800}
+.nav a.on .pill{background:#DDF1E8}
+</style>
+</helmet>
+<div style="width:390px;height:844px;background:#FBF6EC;color:#2B3A36;font-family:'Nunito',system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <div class="top">
+    <a href="Salud.dc.html" class="petsel" aria-label="Mascota: Lilith. Cambiar o agregar mascota"><svg width="40" height="40" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="48" fill="#DDF1E8"/><path d="M22 40 L26 16 L42 28 Z M74 40 L70 16 L54 28 Z" fill="#8F8AA3"/><ellipse cx="48" cy="52" rx="28" ry="25" fill="#A9A4BD"/><circle cx="38" cy="50" r="3.5" fill="#2B3A36"/><circle cx="58" cy="50" r="3.5" fill="#2B3A36"/><circle cx="48" cy="57" r="2" fill="#E58E8E"/></svg>Lilith<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
+  </div>
+
+  <div style="padding:10px 20px 16px;display:flex;flex-direction:column;gap:14px;flex:1">
+    <h1 style="margin:0;font-size:26px;font-weight:800">Salud</h1>
+    <nav class="seg" aria-label="Secciones de salud"><a href="Salud.dc.html" class="on" aria-current="page">Cuidados</a><a href="SaludPeso.dc.html">Peso</a></nav>
+
+    <div class="care">
+      <div class="txt"><b>Vacuna de leucemia</b><span>31 dic · año por confirmar</span></div>
+      <label for="c1" class="tog"><input id="c1" type="checkbox" checked>Aviso</label>
+    </div>
+    <div class="care">
+      <div class="txt"><b>Desparasitación interna</b><span>Última: sin registrar</span><a href="Salud.dc.html" style="font-size:15px;font-weight:800;color:#2F7D68;min-height:32px;display:flex;align-items:center">Agregar fecha</a></div>
+      <label for="c2" class="tog"><input id="c2" type="checkbox">Aviso</label>
+    </div>
+    <div class="care">
+      <div class="txt"><b>Desparasitación externa</b><span>Última: sin registrar</span><a href="Salud.dc.html" style="font-size:15px;font-weight:800;color:#2F7D68;min-height:32px;display:flex;align-items:center">Agregar fecha</a></div>
+      <label for="c3" class="tog"><input id="c3" type="checkbox">Aviso</label>
+    </div>
+
+    <a href="Salud.dc.html" class="dash">+ Agregar cuidado</a>
+
+    <div style="background:#DDF1E8;border-radius:22px;padding:12px 16px;display:flex;gap:12px;align-items:center;margin-top:auto">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1F5E4D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>
+      <span style="font-size:15px;font-weight:700;color:#1F5E4D">Los avisos suenan aunque no tengas internet.</span>
+    </div>
+  </div>
+
+  <nav class="nav" aria-label="Secciones">
+    <a href="Main.dc.html"><span class="pill"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg></span>Inicio</a>
+    <a href="Cartilla.dc.html"><span class="pill"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="3"/><path d="M9 4h6M9 13l2 2 4-4"/></svg></span>Cartilla</a>
+    <a href="Salud.dc.html" class="on" aria-current="page"><span class="pill"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg></span>Salud</a>
+    <a href="MascotaCarnet.dc.html"><span class="pill"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><ellipse cx="6" cy="10" rx="1.8" ry="2.3"/><ellipse cx="10" cy="6.5" rx="1.8" ry="2.4"/><ellipse cx="14.5" cy="6.5" rx="1.8" ry="2.4"/><ellipse cx="18.5" cy="10" rx="1.8" ry="2.3"/><path d="M12 11.5c-2.6 0-5 2.7-5 5 0 1.5 1.2 2.3 2.6 2.1 1-.1 1.6-.5 2.4-.5s1.4.4 2.4.5c1.4.2 2.6-.6 2.6-2.1 0-2.3-2.4-5-5-5z"/></svg></span>Mascota</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Fotos de la cartilla</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:inherit;text-decoration:none}
+.ibtn{width:48px;height:48px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid #EADFCB;color:#2B3A36}
+.btn{min-height:56px;border-radius:24px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:18px;font-weight:800;background:#2F7D68;color:#fff}
+.btn2{min-height:52px;border-radius:24px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:16px;font-weight:800;background:#fff;color:#2B3A36;border:2px solid #CDBF9F}
+.link{min-height:48px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#2F7D68}
+.tip{display:flex;gap:12px;align-items:flex-start;font-size:16px;line-height:1.35}
+.tip svg{flex:none;margin-top:1px}
+</style>
+</helmet>
+<div style="width:390px;height:844px;background:#FBF6EC;color:#2B3A36;font-family:'Nunito',system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 12px 4px">
+    <a href="Bienvenida.dc.html" class="ibtn" aria-label="Cerrar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></a>
+    <h1 style="margin:0;font-size:18px;font-weight:800">Fotos de la cartilla</h1>
+    <span style="width:48px"></span>
+  </div>
+
+  <div style="padding:12px 20px 20px;display:flex;flex-direction:column;gap:16px;flex:1">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <h2 style="margin:0;font-size:24px;font-weight:800;line-height:1.2">Una foto por cada página con vacunas</h2>
+      <p style="margin:0;font-size:16px;color:#5A6B65">Puedes agregar hasta 4 páginas.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+      <div style="aspect-ratio:3/4;border-radius:18px;background:#E7DEC9;display:flex;flex-direction:column;justify-content:flex-end;padding:8px;font-size:14px;font-weight:800;position:relative">
+        <span style="background:#fff;border-radius:999px;padding:2px 8px;align-self:flex-start">Pág. 1</span>
+      </div>
+      <div style="aspect-ratio:3/4;border-radius:18px;background:#E7DEC9;display:flex;flex-direction:column;justify-content:flex-end;padding:8px;font-size:14px;font-weight:800">
+        <span style="background:#fff;border-radius:999px;padding:2px 8px;align-self:flex-start">Pág. 2</span>
+      </div>
+      <a href="Captura.dc.html" aria-label="Agregar otra página" style="aspect-ratio:3/4;border-radius:18px;border:2px dashed #CDBF9F;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#2F7D68;font-size:14px;font-weight:800">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Otra página
+      </a>
+    </div>
+
+    <div style="background:#fff;border:2px solid #EADFCB;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:12px">
+      <span style="font-size:16px;font-weight:800">Para que se lea mejor</span>
+      <div class="tip"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2F7D68" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Buena luz y sin sombras encima</div>
+      <div class="tip"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2F7D68" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Que se vean las fechas y los stickers</div>
+      <div class="tip"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2F7D68" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>La hoja completa dentro de la foto</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:auto">
+      <a href="Leyendo.dc.html" class="btn">Leer cartilla (2 fotos)</a>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+        <a href="Captura.dc.html" class="btn2">Tomar foto</a>
+        <a href="Captura.dc.html" class="btn2">Galería</a>
+      </div>
+      <a href="Vacuna.dc.html" class="link">Prefiero llenarla a mano</a>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

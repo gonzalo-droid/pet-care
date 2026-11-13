@@ -1,0 +1,167 @@
+package com.bestid.app
+
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.asSkiaBitmap
+import androidx.compose.ui.test.ComposeUiTest
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.runComposeUiTest
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import com.bestid.app.di.appModules
+import com.bestid.core.data.db.BestIdDatabase
+import com.bestid.core.platform.date.DatePickerOverride
+import com.bestid.core.platform.date.LocalDatePickerOverride
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.usePinned
+import kotlinx.datetime.LocalDate
+import okio.Path.Companion.toPath
+import org.jetbrains.skia.EncodedImageFormat
+import org.jetbrains.skia.Image
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.dsl.module
+import platform.Foundation.NSFileManager
+import platform.Foundation.NSProcessInfo
+import platform.Foundation.NSTemporaryDirectory
+import platform.Foundation.NSUUID
+import platform.posix.fclose
+import platform.posix.fopen
+import platform.posix.fwrite
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+
+/**
+ * Criterio de M1 en el simulador de iOS, tocando la app real (App() con Room y navegación):
+ * registrar a Lilith con sus 2 vacunas a mano, agregar a Toby y cambiar entre las dos.
+ * El selector de fecha nativo se reemplaza por fechas fijas (no se puede tocar desde Compose).
+ */
+@OptIn(ExperimentalTestApi::class, ExperimentalForeignApi::class)
+class M1FlowUiTest {
+    private val dates = ArrayDeque<LocalDate>()
+
+    @BeforeTest
+    fun startApp() {
+        val dir = NSTemporaryDirectory() + NSUUID().UUIDString
+        NSFileManager.defaultManager.createDirectoryAtPath(dir, true, null, null)
+        startKoin {
+            allowOverride(true)
+            modules(
+                appModules + module {
+                    single<RoomDatabase.Builder<BestIdDatabase>> { Room.inMemoryDatabaseBuilder<BestIdDatabase>() }
+                    single { PreferenceDataStoreFactory.createWithPath { "$dir/prefs.preferences_pb".toPath() } }
+                },
+            )
+        }
+    }
+
+    @AfterTest
+    fun stop() = stopKoin()
+
+    @Test
+    fun registersLilithWithTwoVaccinesAndSwitchesBetweenTwoPets() = runComposeUiTest {
+        setContent {
+            CompositionLocalProvider(LocalDatePickerOverride provides DatePickerOverride { dates.removeFirstOrNull() }) {
+                App()
+            }
+        }
+
+        // Sin mascotas: estado vacío
+        waitForText("Empieza con tu mascota")
+        screenshot("01-inicio-vacio")
+
+        // Lilith
+        addPet(name = "Lilith", species = "Gato")
+        waitForText("¡Hola! Registra las vacunas de Lilith")
+
+        // Vacuna 1: 29/06/2024, triple felina
+        addVaccine(LocalDate(2024, 6, 29), listOf("Calicivirus", "Rinotraqueítis", "Panleucopenia"))
+        // Vacuna 2: 21/12/2025, triple felina + rabia, con su frasco
+        addVaccine(LocalDate(2025, 12, 21), listOf("Calicivirus", "Rinotraqueítis", "Panleucopenia", "Rabia"))
+        waitForText("2 vacunas registradas")
+        screenshot("02-inicio-lilith")
+
+        // Cartilla
+        onNodeWithText("Cartilla").performClick()
+        waitForText("21 dic 2025")
+        onNodeWithText("29 jun 2024").assertExistsSafely()
+        screenshot("03-cartilla-lilith")
+
+        // Segunda mascota desde el selector
+        onNode(hasContentDescription("Cambiar de mascota. Seleccionada: Lilith")).performClick()
+        waitForText("Tus mascotas")
+        onAllNodesWithText("Agregar mascota")[0].performClick()
+        fillPetForm(name = "Toby", species = "Perro")
+        waitForText("Aún no hay vacunas")
+        screenshot("04-cartilla-toby")
+
+        // Volver a Lilith
+        onNode(hasContentDescription("Cambiar de mascota. Seleccionada: Toby")).performClick()
+        waitForText("Tus mascotas")
+        onAllNodesWithText("Lilith")[0].performClick()
+        waitForText("21 dic 2025")
+        screenshot("05-cartilla-lilith-de-nuevo")
+
+        // Carnet
+        onNodeWithText("Mascota").performClick()
+        waitForText("Completar datos")
+        screenshot("06-carnet-lilith")
+    }
+
+    private fun ComposeUiTest.addPet(name: String, species: String) {
+        onAllNodesWithText("Agregar mascota")[0].performClick()
+        fillPetForm(name, species)
+    }
+
+    private fun ComposeUiTest.fillPetForm(name: String, species: String) {
+        waitForText("Nueva mascota")
+        onNode(hasSetTextAction() and hasContentDescription("Nombre")).performTextInput(name)
+        onNodeWithText(species).performScrollTo().performClick()
+        onNodeWithText("Guardar mascota").performClick()
+    }
+
+    private fun ComposeUiTest.addVaccine(date: LocalDate, types: List<String>) {
+        onNodeWithText("Agregar vacuna").performScrollTo().performClick()
+        waitForText("Nueva vacuna")
+        if ("Rabia" in types) waitForText("Rabia")
+        types.forEach { onNodeWithText(it).performScrollTo().performClick() }
+        dates.addLast(date)
+        onNode(hasContentDescription("Fecha", substring = true)).performScrollTo().performClick()
+        screenshot("vacuna-${date}")
+        onNodeWithText("Guardar vacuna").performClick()
+        waitForText("Agregar vacuna")
+    }
+
+    private fun ComposeUiTest.waitForText(text: String) {
+        waitUntil(timeoutMillis = 10_000) { onAllNodes(hasText(text, substring = true)).fetchSemanticsNodes().isNotEmpty() }
+    }
+
+    private fun SemanticsNodeInteraction.assertExistsSafely() {
+        fetchSemanticsNode()
+    }
+
+    @OptIn(ExperimentalForeignApi::class)
+    private fun ComposeUiTest.screenshot(name: String) {
+        val dir = NSProcessInfo.processInfo.environment["BESTID_SCREENSHOTS"] as? String ?: return
+        NSFileManager.defaultManager.createDirectoryAtPath(dir, true, null, null)
+        waitForIdle()
+        val bitmap = onRoot().captureToImage().asSkiaBitmap()
+        val png = Image.makeFromBitmap(bitmap).encodeToData(EncodedImageFormat.PNG)?.bytes ?: return
+        val file = fopen("$dir/$name.png", "wb") ?: return
+        png.usePinned { fwrite(it.addressOf(0), 1u, png.size.toULong(), file) }
+        fclose(file)
+    }
+}

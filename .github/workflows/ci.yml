@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android (compila y pruebas comunes)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v5
+      - name: Compilar APK de debug
+        run: ./gradlew :androidApp:assembleDebug
+      - name: Pruebas (JVM y host de Android)
+        run: ./gradlew allTests
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bestid-debug-apk
+          path: androidApp/build/outputs/apk/debug/*.apk
+
+  ios:
+    name: iOS (compila y pruebas comunes)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v5
+      - name: Pruebas en el simulador iOS (comunes y flujo de UI de M1)
+        run: ./gradlew iosSimulatorArm64Test
+      - name: Compilar la app para el simulador
+        run: |
+          xcodebuild -project iosApp/iosApp.xcodeproj \
+            -target iosApp \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            ARCHS=arm64 \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+      - name: Abrir la app en el simulador
+        run: .github/scripts/ios-smoke.sh build/ios-smoke
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-capturas
+          path: |
+            composeApp/build/ui-screenshots/
+            build/ios-smoke/
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: ios-reportes-de-pruebas
+          path: '**/build/reports/tests/'
