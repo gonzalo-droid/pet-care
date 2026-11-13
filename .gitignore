@@ -1,0 +1,17 @@
+# Firebase
+google-services.json
+GoogleService-Info.plist
+
+# Datos de prueba privados
+testdata/private/
+
+# Build
+.gradle/
+build/
+*.iml
+.idea/
+local.properties
+.DS_Store
+iosApp/Pods/
+*.xcuserstate
+xcuserdata/
