@@ -40,8 +40,8 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v5
-      - name: Compilar APK de debug
-        run: ./gradlew :androidApp:assembleDebug
+      - name: Compilar APK de debug y pruebas de dispositivo
+        run: ./gradlew :androidApp:assembleDebug :core:platform:assembleAndroidDeviceTest
       - name: Liberar espacio en el runner (el emulador necesita disco para sus datos)
         run: |
           sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost /usr/local/.ghcup "$AGENT_TOOLSDIRECTORY/CodeQL"
@@ -51,7 +51,7 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Avisos con la app cerrada y tras reiniciar
+      - name: Procesado de fotos, y avisos con la app cerrada y tras reiniciar
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -61,12 +61,16 @@ jobs:
           disk-size: 4096M
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
-          script: .github/scripts/android-reminders-e2e.sh build/android-e2e
+          script: |
+            ./gradlew :core:platform:connectedAndroidDeviceTest
+            .github/scripts/android-reminders-e2e.sh build/android-e2e
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: android-avisos-capturas
-          path: build/android-e2e/
+          path: |
+            build/android-e2e/
+            core/platform/build/reports/androidTests/
           if-no-files-found: warn
 
   ios:
@@ -79,7 +83,7 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v5
-      - name: Pruebas en el simulador iOS (comunes y flujo de UI de M1)
+      - name: Pruebas en el simulador iOS (comunes y flujo de UI de M1 a M3)
         run: ./gradlew iosSimulatorArm64Test
       - name: Compilar la app para el simulador
         run: |
