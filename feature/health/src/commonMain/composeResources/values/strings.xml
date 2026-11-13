@@ -1,9 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="health_title">Salud</string>
     <string name="health_tab_care">Cuidados</string>
     <string name="health_tab_weight">Peso</string>
+    <string name="health_no_pet_title">Primero agrega a tu mascota</string>
+    <string name="health_no_pet_body">Aquí registrarás sus desparasitaciones, otros cuidados y su peso.</string>
+    <string name="health_add_pet">Agregar mascota</string>
+
     <string name="health_care_empty_title">Aún no hay cuidados</string>
     <string name="health_care_empty_body">Registra desparasitaciones y otros cuidados para recibir avisos.</string>
+    <string name="health_add_care">Agregar cuidado</string>
+    <string name="health_care_next">Próxima: %1$s · %2$s</string>
+    <string name="health_care_in_days">en %1$s</string>
+    <string name="health_care_today">hoy</string>
+    <string name="health_care_overdue">atrasada %1$s</string>
+    <string name="health_care_last">Última: %1$s</string>
+    <string name="health_care_no_date">Última: sin registrar</string>
+    <string name="health_care_reminder">Aviso</string>
+    <string name="health_offline_note">Los avisos llegan aunque no tengas internet.</string>
+    <string name="health_permission_title">Los avisos están desactivados</string>
+    <string name="health_permission_body">Actívalos en los ajustes del teléfono para saber cuándo toca el próximo cuidado.</string>
+
     <string name="health_weight_empty_title">Aún no hay pesos</string>
     <string name="health_weight_empty_body">Registra el peso y mira su evolución en un gráfico.</string>
+    <string name="health_add_weight">Agregar peso de hoy</string>
+    <string name="health_last_weight">Último peso · %1$s</string>
+    <string name="health_weight_same">Igual que la vez anterior</string>
+    <string name="health_weight_up">+%1$s desde el %2$s</string>
+    <string name="health_weight_down">−%1$s desde el %2$s</string>
+    <string name="health_weight_chart">Peso de %1$s: %2$s</string>
+    <string name="health_weight_delete_title">¿Eliminar este peso?</string>
+    <string name="health_weight_delete_body">%1$s del %2$s. Podrás deshacerlo durante unos segundos.</string>
+    <string name="health_delete">Eliminar</string>
+    <string name="health_weight_deleted">Peso eliminado</string>
+    <string name="health_undo">Deshacer</string>
+    <string name="health_weight_row">%1$s: %2$s. Toca para eliminar</string>
+
+    <string name="care_form_new">Nuevo cuidado</string>
+    <string name="care_form_edit">Editar cuidado</string>
+    <string name="care_form_close">Cerrar</string>
+    <string name="care_form_kind">Tipo</string>
+    <string name="care_form_title">Nombre del cuidado</string>
+    <string name="care_form_title_placeholder">Ej. Baño medicado</string>
+    <string name="care_form_last_date">Última vez</string>
+    <string name="care_form_interval">Cada cuánto</string>
+    <string name="care_form_interval_placeholder">Ej. 3</string>
+    <string name="care_form_interval_help">Lo que te indicó tu veterinaria. La app no sugiere intervalos.</string>
+    <string name="care_form_days">Días</string>
+    <string name="care_form_months">Meses</string>
+    <string name="care_form_reminder">Avisarme</string>
+    <string name="care_form_reminder_help">7 días antes, 1 día antes y el mismo día</string>
+    <string name="care_form_next">Próxima fecha: %1$s</string>
+    <string name="care_form_save">Guardar cuidado</string>
+    <string name="care_form_delete">Eliminar cuidado</string>
+    <string name="care_delete_title">¿Eliminar este cuidado?</string>
+    <string name="care_delete_body">Se borra con sus avisos. Podrás deshacerlo durante unos segundos.</string>
+    <string name="care_deleted">Cuidado eliminado</string>
+    <string name="care_error_title">Escribe el nombre del cuidado</string>
+    <string name="care_error_last_date">Para avisarte necesitamos la última fecha</string>
+    <string name="care_error_future">La fecha no puede ser futura</string>
+    <string name="care_error_interval">Escribe cada cuánto se repite</string>
+
+    <string name="weight_form_title">Agregar peso</string>
+    <string name="weight_form_close">Cerrar</string>
+    <string name="weight_form_date">Fecha</string>
+    <string name="weight_form_kg">Peso en kg</string>
+    <string name="weight_form_kg_placeholder">Ej. 4,2</string>
+    <string name="weight_form_save">Guardar peso</string>
+    <string name="weight_error_required">Escribe el peso, por ejemplo 4,2</string>
+    <string name="weight_error_range">El peso debe estar entre 0,05 y 150 kg</string>
+    <string name="weight_error_future">La fecha no puede ser futura</string>
 </resources>
