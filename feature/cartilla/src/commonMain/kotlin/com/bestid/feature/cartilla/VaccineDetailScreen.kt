@@ -1,6 +1,7 @@
 package com.bestid.feature.cartilla
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,7 @@ import com.bestid.core.designsystem.component.FlowScaffold
 import com.bestid.core.designsystem.component.InfoCard
 import com.bestid.core.designsystem.component.LoadingState
 import com.bestid.core.designsystem.component.LocalUndoController
+import com.bestid.core.designsystem.component.PhotoThumb
 import com.bestid.core.designsystem.component.PlainCard
 import com.bestid.core.designsystem.component.SecondaryButton
 import com.bestid.core.designsystem.component.TextAction
@@ -57,7 +59,13 @@ import com.bestid.feature.cartilla.resources.detail_next_missing_body
 import com.bestid.feature.cartilla.resources.detail_not_found
 import com.bestid.feature.cartilla.resources.detail_not_registered
 import com.bestid.feature.cartilla.resources.detail_product_unknown
+import com.bestid.feature.cartilla.resources.detail_add_sticker_photo
+import com.bestid.feature.cartilla.resources.detail_photos
 import com.bestid.feature.cartilla.resources.detail_sticker_expires
+import com.bestid.feature.cartilla.resources.photo_page
+import com.bestid.feature.cartilla.resources.photo_page_description
+import com.bestid.feature.cartilla.resources.photo_sticker
+import com.bestid.feature.cartilla.resources.photo_sticker_description
 import com.bestid.feature.cartilla.resources.detail_sticker_line
 import com.bestid.feature.cartilla.resources.detail_sticker_made
 import com.bestid.feature.cartilla.resources.detail_stickers
@@ -76,6 +84,7 @@ fun VaccineDetailScreen(
     recordId: String,
     onBack: () -> Unit,
     onEdit: (String) -> Unit,
+    onOpenPhoto: (String) -> Unit,
     viewModel: VaccineDetailViewModel = koinViewModel(key = "vaccine-detail-$recordId") { parametersOf(recordId) },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -172,6 +181,28 @@ fun VaccineDetailScreen(
                     }
                 }
 
+                // Foto original siempre visible (sección 2): páginas de la cartilla y sticker.
+                val sticker = state.stickerPhoto
+                if (state.pages.isNotEmpty() || sticker != null) {
+                    PlainCard {
+                        Eyebrow(stringResource(Res.string.detail_photos))
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs),
+                            verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs),
+                        ) {
+                            state.pages.forEachIndexed { index, page ->
+                                LabeledThumb(page.path, stringResource(Res.string.photo_page, index + 1), stringResource(Res.string.photo_page_description, index + 1), onOpenPhoto)
+                            }
+                            if (sticker != null) {
+                                LabeledThumb(sticker.path, stringResource(Res.string.photo_sticker), stringResource(Res.string.photo_sticker_description), onOpenPhoto)
+                            }
+                        }
+                        if (sticker == null) {
+                            TextAction(stringResource(Res.string.detail_add_sticker_photo), onClick = { onEdit(record.id) }, icon = BestIdIcons.PhotoCamera)
+                        }
+                    }
+                }
+
                 PlainCard {
                     Eyebrow(stringResource(Res.string.detail_vet))
                     val vet = state.vet
@@ -214,5 +245,13 @@ fun VaccineDetailScreen(
             },
             onDismiss = { confirmDelete = false },
         )
+    }
+}
+
+@Composable
+private fun LabeledThumb(path: String, label: String, description: String, onOpen: (String) -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xxs)) {
+        PhotoThumb(image = path, onClick = { onOpen(path) }, contentDescription = description)
+        Text(label, style = BestIdTheme.typography.support, color = BestIdTheme.colors.muted)
     }
 }

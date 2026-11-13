@@ -6,6 +6,7 @@ import com.bestid.core.domain.port.AppClock
 import com.bestid.core.domain.schedule.NextDue
 import com.bestid.core.domain.schedule.NextDueCalculator
 import com.bestid.core.domain.usecase.DeleteVaccineRecord
+import com.bestid.core.domain.usecase.GetPhotos
 import com.bestid.core.domain.usecase.GetVet
 import com.bestid.core.domain.usecase.ObservePet
 import com.bestid.core.domain.usecase.ObserveSelectedPet
@@ -13,6 +14,7 @@ import com.bestid.core.domain.usecase.ObserveVaccineRecord
 import com.bestid.core.domain.usecase.ObserveVaccineRecords
 import com.bestid.core.domain.usecase.ObserveVaccineTypes
 import com.bestid.core.model.Pet
+import com.bestid.core.model.Photo
 import com.bestid.core.model.VaccineRecord
 import com.bestid.core.model.VaccineType
 import com.bestid.core.model.Vet
@@ -74,6 +76,8 @@ data class DetailState(
     val vet: Vet? = null,
     val types: Map<String, VaccineType> = emptyMap(),
     val daysLeft: Int? = null,
+    val pages: List<Photo> = emptyList(),
+    val stickerPhoto: Photo? = null,
     /** Se eliminó: la pantalla se cierra y ofrece "Deshacer". */
     val deletedId: String? = null,
 )
@@ -88,27 +92,32 @@ class VaccineDetailViewModel(
     getVet: GetVet,
     clock: AppClock,
     private val deleteRecord: DeleteVaccineRecord,
+    getPhotos: GetPhotos,
 ) : ViewModel() {
     private val deleted = MutableStateFlow<String?>(null)
 
     val state: StateFlow<DetailState> = combine(
         observeRecord(recordId).flatMapLatest { record ->
             if (record == null) {
-                flowOf(Triple<VaccineRecord?, Pet?, Vet?>(null, null, null))
+                flowOf(DetailParts(null, null, null, emptyList()))
             } else {
-                combine(observePet(record.petId), flow { emit(record.vetId?.let { getVet(it) }) }) { pet, vet ->
-                    Triple(record, pet, vet)
-                }
+                combine(
+                    observePet(record.petId),
+                    flow { emit(record.vetId?.let { getVet(it) }) },
+                    flow { emit(getPhotos(record.sourcePhotoIds + listOfNotNull(record.stickerPhotoId))) },
+                ) { pet, vet, photos -> DetailParts(record, pet, vet, photos) }
             }
         },
         observeTypes(),
         deleted,
-    ) { (record, pet, vet), types, deletedId ->
+    ) { (record, pet, vet, photos), types, deletedId ->
         DetailState(
             loading = false,
             record = record,
             pet = pet,
             vet = vet,
+            pages = photos.filter { it.id != record?.stickerPhotoId },
+            stickerPhoto = photos.firstOrNull { it.id == record?.stickerPhotoId },
             types = types.associateBy { it.id },
             daysLeft = record?.nextDate?.let { clock.today().daysUntilDate(it) },
             deletedId = deletedId,
@@ -122,6 +131,8 @@ class VaccineDetailViewModel(
         }
     }
 }
+
+private data class DetailParts(val record: VaccineRecord?, val pet: Pet?, val vet: Vet?, val photos: List<Photo>)
 
 private fun kotlinx.datetime.LocalDate.daysUntilDate(other: kotlinx.datetime.LocalDate): Int =
     (other.toEpochDays() - toEpochDays()).toInt()

@@ -2,6 +2,8 @@ package com.bestid.feature.cartilla
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.Text
@@ -25,6 +27,7 @@ import com.bestid.core.designsystem.component.FieldLabelText
 import com.bestid.core.designsystem.component.FlowScaffold
 import com.bestid.core.designsystem.component.FormField
 import com.bestid.core.designsystem.component.LoadingState
+import com.bestid.core.designsystem.component.PhotoThumb
 import com.bestid.core.designsystem.component.PrimaryButton
 import com.bestid.core.designsystem.component.SecondaryButton
 import com.bestid.core.designsystem.component.SectionTitle
@@ -33,11 +36,23 @@ import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
 import com.bestid.core.domain.validation.VaccineError
 import com.bestid.core.platform.date.rememberDatePickerLauncher
+import com.bestid.core.platform.image.MAX_CARD_PAGES
+import com.bestid.core.platform.image.rememberImagePickerLauncher
+import com.bestid.core.platform.image.rememberOpenAppSettings
+import com.bestid.core.ui.CameraDeniedCard
+import com.bestid.core.ui.PhotoFailedCard
 import com.bestid.core.ui.formatLong
 import kotlinx.datetime.LocalDate
 import com.bestid.core.ui.label
 import com.bestid.feature.cartilla.resources.Res
+import com.bestid.feature.cartilla.resources.form_add_page
 import com.bestid.feature.cartilla.resources.form_add_sticker
+import com.bestid.feature.cartilla.resources.form_add_sticker_photo
+import com.bestid.feature.cartilla.resources.form_pages_hint
+import com.bestid.feature.cartilla.resources.form_pages_title
+import com.bestid.feature.cartilla.resources.form_sticker_photo
+import com.bestid.feature.cartilla.resources.photo_page_description
+import com.bestid.feature.cartilla.resources.photo_sticker_description
 import com.bestid.feature.cartilla.resources.form_close
 import com.bestid.feature.cartilla.resources.form_date
 import com.bestid.feature.cartilla.resources.form_edit_title
@@ -81,12 +96,17 @@ import org.koin.core.parameter.parametersOf
  * Agregar o editar vacuna a mano (C3). Obligatorio: al menos un tipo y la fecha de aplicación.
  * Tipos filtrados por especie con "Ver todas" y "Otra"; el resto en "Más detalles".
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun VaccineFormScreen(
     recordId: String?,
+    photoIds: List<String>,
     onClose: () -> Unit,
     onAskPermission: () -> Unit,
-    viewModel: VaccineFormViewModel = koinViewModel(key = "vaccine-form-$recordId") { parametersOf(recordId) },
+    onOpenPhoto: (String) -> Unit,
+    viewModel: VaccineFormViewModel = koinViewModel(key = "vaccine-form-$recordId-${photoIds.joinToString()}") {
+        parametersOf(recordId, photoIds)
+    },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val vets by viewModel.vets.collectAsStateWithLifecycle()
@@ -96,6 +116,22 @@ fun VaccineFormScreen(
         dateTarget = target
         datePicker.launch(initial, max)
     }
+
+    var photoTarget by remember { mutableStateOf(PhotoTarget.PAGE) }
+    val picker = rememberImagePickerLauncher { viewModel.onPhotoPicked(photoTarget, it) }
+    val openSettings = rememberOpenAppSettings()
+    var sheet by remember { mutableStateOf<PhotoSheet?>(null) }
+
+    @Composable
+    fun AddPageButton() = DashedButton(
+        stringResource(Res.string.form_add_page),
+        onClick = {
+            photoTarget = PhotoTarget.PAGE
+            sheet = PhotoSheet.AddPage
+        },
+        icon = BestIdIcons.PhotoCamera,
+        loading = state.importing && photoTarget == PhotoTarget.PAGE,
+    )
 
     LaunchedEffect(state.done) {
         if (state.done) if (state.askPermission) onAskPermission() else onClose()
@@ -119,6 +155,29 @@ fun VaccineFormScreen(
             !state.loaded -> LoadingState()
             pet == null -> AlertCard { Text(stringResource(Res.string.form_no_pet), style = BestIdTheme.typography.body) }
             else -> {
+                // Fotos de la cartilla: se llenan los datos mirándolas (D29). Sin fotos, se agregan en "Más detalles".
+                if (state.pages.isNotEmpty()) {
+                    Column(verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs)) {
+                        SectionTitle(stringResource(Res.string.form_pages_title))
+                        Text(stringResource(Res.string.form_pages_hint), style = BestIdTheme.typography.body, color = BestIdTheme.colors.muted)
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs),
+                            verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs),
+                        ) {
+                            state.pages.forEachIndexed { index, page ->
+                                PhotoThumb(
+                                    image = page.path,
+                                    onClick = { sheet = PhotoSheet.Page(page, index + 1) },
+                                    contentDescription = stringResource(Res.string.photo_page_description, index + 1),
+                                )
+                            }
+                        }
+                        if (state.pages.size < MAX_CARD_PAGES) AddPageButton()
+                    }
+                }
+                if (state.cameraDenied) CameraDeniedCard(onOpenSettings = openSettings)
+                if (state.photoFailed > 0) PhotoFailedCard(state.photoFailed)
+
                 // Tipos
                 Column(verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs)) {
                     SectionTitle(stringResource(Res.string.form_types_question))
@@ -236,6 +295,26 @@ fun VaccineFormScreen(
                         }
                     }
                     DashedButton(stringResource(Res.string.form_add_sticker), onClick = viewModel::addSticker)
+                    if (state.pages.isEmpty()) AddPageButton()
+                    val stickerPhoto = state.stickerPhoto
+                    if (stickerPhoto != null) {
+                        FieldLabelText(stringResource(Res.string.form_sticker_photo), optional = true)
+                        PhotoThumb(
+                            image = stickerPhoto.path,
+                            onClick = { sheet = PhotoSheet.Sticker(stickerPhoto) },
+                            contentDescription = stringResource(Res.string.photo_sticker_description),
+                        )
+                    } else {
+                        DashedButton(
+                            stringResource(Res.string.form_add_sticker_photo),
+                            onClick = {
+                                photoTarget = PhotoTarget.STICKER
+                                sheet = PhotoSheet.AddSticker
+                            },
+                            icon = BestIdIcons.PhotoCamera,
+                            loading = state.importing && photoTarget == PhotoTarget.STICKER,
+                        )
+                    }
                     FormField(
                         label = stringResource(Res.string.form_vet),
                         value = state.vetName,
@@ -259,6 +338,16 @@ fun VaccineFormScreen(
             }
         }
     }
+
+    PhotoSheets(
+        sheet = sheet,
+        picker = picker,
+        maxPages = MAX_CARD_PAGES - state.pages.size,
+        onDismiss = { sheet = null },
+        onOpenPhoto = onOpenPhoto,
+        onRemovePage = { viewModel.removePage(it.id) },
+        onRemoveSticker = viewModel::removeStickerPhoto,
+    )
 }
 
 /** Celda de la cuadrícula de tipos: del catálogo, escrito a mano o el botón "Otra". */

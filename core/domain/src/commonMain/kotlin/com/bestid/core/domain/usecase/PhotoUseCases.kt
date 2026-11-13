@@ -48,19 +48,16 @@ class ImportPhotos(
     }
 }
 
-/** Foto lista para mostrar: [path] es absoluta y solo vale mientras la app corre. */
-data class PhotoFile(val id: String, val path: String)
-
-/** Fotos por ID, en el mismo orden, para mostrarlas. Las que no existen se omiten. */
-class GetPhotoFiles(private val photos: PhotoRepository, private val files: PhotoFileStore) {
-    suspend operator fun invoke(ids: List<String>): List<PhotoFile> {
+/**
+ * Fotos por ID, en el mismo orden, para mostrarlas. Las que no existen se omiten.
+ * La UI muestra la ruta relativa y Coil la resuelve con [PhotoFileStore.absolutePath].
+ */
+class GetPhotos(private val photos: PhotoRepository) {
+    suspend operator fun invoke(ids: List<String>): List<Photo> {
         if (ids.isEmpty()) return emptyList()
         val byId = photos.get(ids).associateBy { it.id }
-        return ids.mapNotNull { id -> byId[id]?.let { PhotoFile(it.id, files.absolutePath(it.path)) } }
+        return ids.mapNotNull { byId[it] }
     }
-
-    /** Ruta absoluta de una ruta relativa guardada (por ejemplo, la foto de la mascota). */
-    fun absolute(relativePath: String?): String? = relativePath?.let(files::absolutePath)
 }
 
 /**

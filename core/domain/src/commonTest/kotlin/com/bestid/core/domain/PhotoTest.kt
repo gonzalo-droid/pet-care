@@ -3,10 +3,9 @@ package com.bestid.core.domain
 import com.bestid.core.domain.catalog.VaccineCatalog
 import com.bestid.core.domain.usecase.CleanUpPhotos
 import com.bestid.core.domain.usecase.DeleteVaccineRecord
-import com.bestid.core.domain.usecase.GetPhotoFiles
+import com.bestid.core.domain.usecase.GetPhotos
 import com.bestid.core.domain.usecase.ImportPhotos
 import com.bestid.core.domain.usecase.PetDraft
-import com.bestid.core.domain.usecase.PhotoFile
 import com.bestid.core.domain.usecase.SavePet
 import com.bestid.core.domain.usecase.SavePetResult
 import com.bestid.core.domain.usecase.SaveVaccineRecord
@@ -69,8 +68,7 @@ class PhotoTest {
         assertEquals(listOf(p2.id, p1.id), saved.record.sourcePhotoIds)
         assertEquals(sticker.id, saved.record.stickerPhotoId)
 
-        val shown = GetPhotoFiles(photos, files)(saved.record.sourcePhotoIds + "missing")
-        assertEquals(listOf(PhotoFile(p2.id, "/app/${p2.path}"), PhotoFile(p1.id, "/app/${p1.path}")), shown)
+        assertEquals(listOf(p2, p1), GetPhotos(photos)(saved.record.sourcePhotoIds + "missing"))
     }
 
     @Test

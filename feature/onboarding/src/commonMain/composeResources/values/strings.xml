@@ -13,4 +13,11 @@
     <string name="permission_later">Ahora no</string>
     <string name="permission_footnote">Puedes cambiarlo cuando quieras en los ajustes del teléfono.</string>
     <string name="permission_pet_fallback">tu mascota</string>
+
+    <!-- Bienvenida (O1) -->
+    <string name="welcome_title">La cartilla de tu mascota, siempre a la mano</string>
+    <string name="welcome_body">Toma una foto de su cartilla de vacunas y te avisamos cuándo le toca.</string>
+    <string name="welcome_scan">Empezar con su cartilla</string>
+    <string name="welcome_without_card">Empezar sin cartilla</string>
+    <string name="welcome_privacy">Tus datos se guardan en tu teléfono.</string>
 </resources>

@@ -18,14 +18,22 @@ fun NavGraphBuilder.petGraph(onEditPet: (String) -> Unit, onAddPet: () -> Unit) 
     }
 }
 
-/** Flujos de mascota sobre las pestañas (sin barra inferior). */
-fun NavGraphBuilder.petFlows(onClose: () -> Unit) {
+/**
+ * Flujos de mascota sobre las pestañas (sin barra inferior). Con `thenCapture`, al guardar una
+ * mascota nueva se sigue con [onCaptureCard] (primer uso escaneando, O1 → O2).
+ */
+fun NavGraphBuilder.petFlows(onClose: () -> Unit, onCaptureCard: () -> Unit) {
     composable<PetEditRoute> { entry ->
-        PetFormScreen(petId = entry.toRoute<PetEditRoute>().petId, onClose = onClose)
+        val route = entry.toRoute<PetEditRoute>()
+        PetFormScreen(
+            petId = route.petId,
+            onClose = onClose,
+            onSaved = if (route.thenCapture) onCaptureCard else onClose,
+        )
     }
 }
 
 val petModule = module {
     viewModelOf(::PetTabViewModel)
-    viewModel { (petId: String?) -> PetFormViewModel(petId, get(), get(), get()) }
+    viewModel { (petId: String?) -> PetFormViewModel(petId, get(), get(), get(), get()) }
 }

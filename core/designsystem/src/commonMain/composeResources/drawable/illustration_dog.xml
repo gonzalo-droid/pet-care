@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Perro provisional del prototipo (docs/design). Se reemplaza cuando haya ilustraciones propias. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+    <path android:fillColor="#A8774E" android:pathData="M12,44 a10,20 0 1,0 20,0 a10,20 0 1,0 -20,0 Z M64,44 a10,20 0 1,0 20,0 a10,20 0 1,0 -20,0 Z"/>
+    <path android:fillColor="#E2B98F" android:pathData="M20,52 a28,27 0 1,0 56,0 a28,27 0 1,0 -56,0 Z"/>
+    <path android:fillColor="#F4DCC2" android:pathData="M35,64 a13,10 0 1,0 26,0 a13,10 0 1,0 -26,0 Z"/>
+    <path android:fillColor="#2B3A36" android:pathData="M34.5,48 a3.5,3.5 0 1,0 7.0,0 a3.5,3.5 0 1,0 -7.0,0 Z M54.5,48 a3.5,3.5 0 1,0 7.0,0 a3.5,3.5 0 1,0 -7.0,0 Z M43.5,59 a4.5,3.2 0 1,0 9.0,0 a4.5,3.2 0 1,0 -9.0,0 Z"/>
+    <path android:strokeColor="#2B3A36" android:strokeWidth="2.2" android:strokeLineCap="round" android:pathData="M44,66 q4,3 8,0"/>
+</vector>

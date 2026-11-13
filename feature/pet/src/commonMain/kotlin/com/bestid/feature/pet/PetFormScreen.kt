@@ -24,7 +24,10 @@ import com.bestid.core.designsystem.component.FlowScaffold
 import com.bestid.core.designsystem.component.FormField
 import com.bestid.core.designsystem.component.LoadingState
 import com.bestid.core.designsystem.component.LocalUndoController
+import com.bestid.core.designsystem.component.OptionsSheet
+import com.bestid.core.designsystem.component.PetPhotoPicker
 import com.bestid.core.designsystem.component.PrimaryButton
+import com.bestid.core.designsystem.component.SheetOption
 import com.bestid.core.designsystem.component.TextAction
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
@@ -33,6 +36,15 @@ import com.bestid.core.domain.validation.PetError
 import com.bestid.core.model.Sex
 import com.bestid.core.model.Species
 import com.bestid.core.platform.date.rememberDatePickerLauncher
+import com.bestid.core.platform.image.rememberImagePickerLauncher
+import com.bestid.core.platform.image.rememberOpenAppSettings
+import com.bestid.core.ui.CameraDeniedCard
+import com.bestid.core.ui.PhotoFailedCard
+import com.bestid.core.ui.avatar
+import com.bestid.core.ui.resources.Res as UiRes
+import com.bestid.core.ui.resources.photo_gallery
+import com.bestid.core.ui.resources.photo_remove
+import com.bestid.core.ui.resources.photo_take
 import com.bestid.core.ui.formatLong
 import com.bestid.core.ui.label
 import com.bestid.feature.pet.resources.Res
@@ -61,6 +73,9 @@ import com.bestid.feature.pet.resources.pet_form_owner
 import com.bestid.feature.pet.resources.pet_form_save
 import com.bestid.feature.pet.resources.pet_form_sex
 import com.bestid.feature.pet.resources.pet_form_species
+import com.bestid.feature.pet.resources.pet_photo_add
+import com.bestid.feature.pet.resources.pet_photo_change
+import com.bestid.feature.pet.resources.pet_photo_sheet
 import com.bestid.feature.pet.resources.pet_undo
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -76,6 +91,7 @@ private val speciesOptions = listOf(Species.CAT, Species.DOG, Species.BIRD, Spec
 fun PetFormScreen(
     petId: String?,
     onClose: () -> Unit,
+    onSaved: () -> Unit = onClose,
     viewModel: PetFormViewModel = koinViewModel(key = "pet-form-$petId") { parametersOf(petId) },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -85,14 +101,19 @@ fun PetFormScreen(
     val undoLabel = stringResource(Res.string.pet_undo)
     var confirmDelete by remember { mutableStateOf(false) }
     val birthPicker = rememberDatePickerLauncher(viewModel::onBirthDate)
+    val photoPicker = rememberImagePickerLauncher(viewModel::onPhotoPicked)
+    val openSettings = rememberOpenAppSettings()
+    var choosePhoto by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.done) {
         if (state.done) {
             val deleted = state.deletedPet
             if (deleted != null && deletedMessage != null) {
                 undo.show(deletedMessage, undoLabel) { restorePet(deleted.id) }
+                onClose()
+            } else {
+                onSaved()
             }
-            onClose()
         }
     }
 
@@ -113,6 +134,16 @@ fun PetFormScreen(
             LoadingState()
             return@FlowScaffold
         }
+        PetPhotoPicker(
+            photo = state.photoPath,
+            species = (state.species ?: Species.OTHER).avatar(),
+            name = state.name,
+            actionLabel = stringResource(if (state.photoPath == null) Res.string.pet_photo_add else Res.string.pet_photo_change),
+            onClick = { choosePhoto = true },
+            loading = state.importingPhoto,
+        )
+        if (state.cameraDenied) CameraDeniedCard(onOpenSettings = openSettings)
+        if (state.photoFailed > 0) PhotoFailedCard(state.photoFailed)
         FormField(
             label = stringResource(Res.string.pet_form_name),
             value = state.name,
@@ -196,6 +227,22 @@ fun PetFormScreen(
                 destructive = true,
             )
         }
+    }
+
+    if (choosePhoto) {
+        OptionsSheet(
+            title = stringResource(Res.string.pet_photo_sheet),
+            options = buildList {
+                if (photoPicker.canTakePhoto) {
+                    add(SheetOption(stringResource(UiRes.string.photo_take), BestIdIcons.PhotoCamera) { photoPicker.takePhoto() })
+                }
+                add(SheetOption(stringResource(UiRes.string.photo_gallery), BestIdIcons.Image) { photoPicker.pickFromGallery(1) })
+                if (state.photoPath != null) {
+                    add(SheetOption(stringResource(UiRes.string.photo_remove), BestIdIcons.Delete, destructive = true, onClick = viewModel::removePhoto))
+                }
+            },
+            onDismiss = { choosePhoto = false },
+        )
     }
 
     if (confirmDelete) {

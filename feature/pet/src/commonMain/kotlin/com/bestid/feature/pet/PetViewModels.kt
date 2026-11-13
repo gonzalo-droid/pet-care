@@ -6,6 +6,8 @@ import com.bestid.core.domain.port.AppClock
 import com.bestid.core.domain.schedule.NextDue
 import com.bestid.core.domain.schedule.NextDueCalculator
 import com.bestid.core.domain.usecase.DeletePet
+import com.bestid.core.domain.usecase.ImportPhotos
+import com.bestid.core.platform.image.ImagePickerResult
 import com.bestid.core.domain.usecase.ObservePet
 import com.bestid.core.domain.usecase.ObserveSelectedPet
 import com.bestid.core.domain.usecase.ObserveVaccineRecords
@@ -70,6 +72,11 @@ data class PetFormState(
     val marks: String = "",
     val owner: String = "",
     val address: String = "",
+    /** Ruta relativa de la foto ("photos/…"), ya importada. */
+    val photoPath: String? = null,
+    val importingPhoto: Boolean = false,
+    val photoFailed: Int = 0,
+    val cameraDenied: Boolean = false,
     val nameError: PetError? = null,
     val speciesMissing: Boolean = false,
     val saving: Boolean = false,
@@ -84,6 +91,7 @@ class PetFormViewModel(
     private val observePet: ObservePet,
     private val savePet: SavePet,
     private val deletePet: DeletePet,
+    private val importPhotos: ImportPhotos,
 ) : ViewModel() {
     private val _state = MutableStateFlow(PetFormState(loaded = petId == null))
     val state: StateFlow<PetFormState> = _state.asStateFlow()
@@ -107,6 +115,7 @@ class PetFormViewModel(
                         marks = pet.distinguishingMarks.orEmpty(),
                         owner = pet.ownerName.orEmpty(),
                         address = pet.ownerAddress.orEmpty(),
+                        photoPath = pet.photoPath,
                     )
                 }
             }
@@ -123,9 +132,31 @@ class PetFormViewModel(
     fun onOwner(value: String) = _state.update { it.copy(owner = value) }
     fun onAddress(value: String) = _state.update { it.copy(address = value) }
 
+    /** Foto elegida en la cámara o la galería: se procesa y se guarda ya; se asocia al guardar. */
+    fun onPhotoPicked(result: ImagePickerResult) {
+        when (result) {
+            ImagePickerResult.CameraDenied -> _state.update { it.copy(cameraDenied = true) }
+            is ImagePickerResult.Picked -> {
+                _state.update { it.copy(importingPhoto = true, photoFailed = 0, cameraDenied = false) }
+                viewModelScope.launch {
+                    val imported = importPhotos(result.images.take(1))
+                    _state.update { s ->
+                        s.copy(
+                            importingPhoto = false,
+                            photoPath = imported.photos.firstOrNull()?.path ?: s.photoPath,
+                            photoFailed = imported.failed,
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun removePhoto() = _state.update { it.copy(photoPath = null, photoFailed = 0) }
+
     fun save() {
         val s = _state.value
-        if (s.saving) return
+        if (s.saving || s.importingPhoto) return
         val species = s.species ?: run {
             _state.update { it.copy(speciesMissing = true) }
             return
@@ -144,6 +175,7 @@ class PetFormViewModel(
                     distinguishingMarks = s.marks,
                     ownerName = s.owner,
                     ownerAddress = s.address,
+                    photoPath = s.photoPath,
                 ),
             )
             _state.update {

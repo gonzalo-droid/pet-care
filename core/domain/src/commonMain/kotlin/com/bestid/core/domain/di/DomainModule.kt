@@ -32,7 +32,7 @@ import com.bestid.core.domain.usecase.SaveCareTask
 import com.bestid.core.domain.usecase.SaveWeight
 import com.bestid.core.domain.usecase.SetCareReminder
 import com.bestid.core.domain.usecase.CleanUpPhotos
-import com.bestid.core.domain.usecase.GetPhotoFiles
+import com.bestid.core.domain.usecase.GetPhotos
 import com.bestid.core.domain.usecase.ImportPhotos
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
@@ -68,7 +68,7 @@ val domainModule = module {
     factoryOf(::RestoreWeight)
 
     factoryOf(::ImportPhotos)
-    factoryOf(::GetPhotoFiles)
+    factoryOf(::GetPhotos)
     factory { CleanUpPhotos(get(), get(), get(), get(), get()) }
 
     // Avisos: una sola instancia para que su Mutex evite sincronizaciones simultáneas.

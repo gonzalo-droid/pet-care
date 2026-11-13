@@ -27,4 +27,15 @@
     <string name="care_deworm_external">Desparasitación externa</string>
     <string name="care_other">Otro cuidado</string>
     <string name="weight_kg">%1$s kg</string>
+
+    <!-- Fotos (M3): compartidos por la captura, la vacuna y la mascota -->
+    <string name="photo_take">Tomar foto</string>
+    <string name="photo_gallery">Elegir de galería</string>
+    <string name="photo_remove">Quitar foto</string>
+    <string name="photo_camera_denied_title">La cámara no tiene permiso</string>
+    <string name="photo_camera_denied_body">Para tomar fotos, permite la cámara en los ajustes del teléfono. También puedes elegirlas de la galería.</string>
+    <plurals name="photo_failed">
+        <item quantity="one">No pudimos abrir 1 foto. Prueba con otra.</item>
+        <item quantity="other">No pudimos abrir %1$d fotos. Prueba con otras.</item>
+    </plurals>
 </resources>

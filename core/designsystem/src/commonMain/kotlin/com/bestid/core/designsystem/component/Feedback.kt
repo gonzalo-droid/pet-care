@@ -180,6 +180,51 @@ private fun ConfirmContent(
     }
 }
 
+/** Opción de [OptionsSheet]. */
+data class SheetOption(
+    val label: String,
+    val icon: DrawableResource? = null,
+    val destructive: Boolean = false,
+    val onClick: () -> Unit,
+)
+
+/**
+ * Hoja inferior con opciones (por ejemplo "Tomar foto", "Elegir de galería", "Quitar foto").
+ * Al elegir una, la hoja se cierra y luego se ejecuta la opción.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun OptionsSheet(title: String, options: List<SheetOption>, onDismiss: () -> Unit) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = BestIdTheme.colors.bg,
+        shape = BestIdTheme.shapes.sheet,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(horizontal = BestIdTheme.spacing.screen, vertical = BestIdTheme.spacing.md),
+            verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.sm),
+        ) {
+            Text(title, style = BestIdTheme.typography.subtitle, modifier = Modifier.semantics { heading() })
+            options.forEach { option ->
+                val onClick = {
+                    onDismiss()
+                    option.onClick()
+                }
+                if (option.destructive) {
+                    TextAction(option.label, onClick = onClick, icon = option.icon, destructive = true, modifier = Modifier.fillMaxWidth())
+                } else {
+                    SecondaryButton(option.label, onClick = onClick, icon = option.icon)
+                }
+            }
+            SecondaryButton(text = stringResource(Res.string.ds_cancel), onClick = onDismiss)
+        }
+    }
+}
+
 /** Duración del snackbar "Deshacer" (sección 4). */
 const val UNDO_DURATION_MS: Long = 5_000
 

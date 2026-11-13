@@ -23,7 +23,11 @@ import com.bestid.core.designsystem.component.MainScaffold
 import com.bestid.core.designsystem.component.PetSelector
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.domain.reminder.ReminderRefType
+import com.bestid.core.navigation.CardCaptureRoute
 import com.bestid.core.navigation.CareEditRoute
+import com.bestid.core.navigation.PhotoViewerRoute
+import androidx.navigation.toRoute
+import com.bestid.feature.onboarding.WelcomeScreen
 import com.bestid.core.navigation.ComponentCatalogRoute
 import com.bestid.core.navigation.NotificationPermissionRoute
 import com.bestid.core.navigation.WeightNewRoute
@@ -50,9 +54,27 @@ import org.koin.compose.viewmodel.koinViewModel
 /** Acciones de navegación que comparten las pestañas. */
 private class AppActions(private val nav: NavHostController) {
     val openRecord: (String) -> Unit = { nav.navigate(VaccineDetailRoute(it)) }
-    val addRecord: () -> Unit = { nav.navigate(VaccineEditRoute()) }
+
+    /** "Agregar vacuna" empieza por las fotos de la cartilla (O2), que también deja seguir a mano. */
+    val addRecord: () -> Unit = { nav.navigate(CardCaptureRoute) }
     val editRecord: (String) -> Unit = { nav.navigate(VaccineEditRoute(it)) }
     val addPet: () -> Unit = { nav.navigate(PetEditRoute()) }
+
+    /** Primer uso con la cartilla (O1): mascota → fotos → vacuna. */
+    val startWithCard: () -> Unit = { nav.navigate(PetEditRoute(thenCapture = true)) }
+
+    /** Reemplaza el formulario de mascota por la captura, para que "atrás" no vuelva al formulario. */
+    val captureAfterPet: () -> Unit = {
+        nav.navigate(CardCaptureRoute) { popUpTo<PetEditRoute> { inclusive = true } }
+    }
+
+    /** Reemplaza la captura por el formulario de vacuna con las páginas elegidas. */
+    val captured: (List<String>) -> Unit = { ids ->
+        nav.navigate(VaccineEditRoute(photoIds = ids.joinToString(",").ifEmpty { null })) {
+            popUpTo<CardCaptureRoute> { inclusive = true }
+        }
+    }
+    val openPhoto: (String) -> Unit = { nav.navigate(PhotoViewerRoute(it)) }
     val editPet: (String) -> Unit = { nav.navigate(PetEditRoute(it)) }
     val addCare: () -> Unit = { nav.navigate(CareEditRoute()) }
     val openCare: (String) -> Unit = { nav.navigate(CareEditRoute(it)) }
@@ -79,6 +101,7 @@ private class AppActions(private val nav: NavHostController) {
 @Composable
 fun BestIdNavHost(navController: NavHostController = rememberNavController()) {
     val actions = AppActions(navController)
+    val mainViewModel: MainViewModel = koinViewModel()
     val tap by ReminderTaps.events.collectAsStateWithLifecycle()
     LaunchedEffect(tap) {
         tap?.let {
@@ -88,11 +111,25 @@ fun BestIdNavHost(navController: NavHostController = rememberNavController()) {
     }
     NavHost(navController = navController, startDestination = MainRoute) {
         composable<MainRoute> {
-            MainTabs(actions = actions, onOpenSettings = { navController.navigate(SettingsRoute) })
+            val main by mainViewModel.state.collectAsStateWithLifecycle()
+            when {
+                !main.loaded -> Unit
+                main.showWelcome -> WelcomeScreen(onStartWithCard = actions.startWithCard, onStartWithoutCard = actions.addPet)
+                else -> MainTabs(actions = actions, onOpenSettings = { navController.navigate(SettingsRoute) }, viewModel = mainViewModel)
+            }
         }
-        cartillaFlows(onBack = actions.back, onEditRecord = actions.editRecord, onAskPermission = actions.askPermission)
+        cartillaFlows(
+            onBack = actions.back,
+            onEditRecord = actions.editRecord,
+            onAskPermission = actions.askPermission,
+            onOpenPhoto = actions.openPhoto,
+            onCaptured = actions.captured,
+        )
         healthFlows(onClose = actions.back, onAskPermission = actions.askPermission)
-        petFlows(onClose = actions.back)
+        petFlows(onClose = actions.back, onCaptureCard = actions.captureAfterPet)
+        composable<PhotoViewerRoute> { entry ->
+            PhotoViewerScreen(path = entry.toRoute<PhotoViewerRoute>().path, onClose = actions.back)
+        }
         onboardingFlows(onDone = actions.back)
         composable<SettingsRoute> {
             SettingsPlaceholder(onClose = actions.back, onOpenCatalog = { navController.navigate(ComponentCatalogRoute) })

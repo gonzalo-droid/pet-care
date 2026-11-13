@@ -29,6 +29,7 @@ fun PreviewSurface(content: @Composable () -> Unit) {
 object PreviewData {
     const val PET_NAME = "Lilith"
     const val PET_NAME_2 = "Toby"
+    const val ADD_PAGE = "Otra página"
     const val LONG_TEXT =
         "Texto muy largo para comprobar que el componente crece y no corta contenido con letra grande"
     const val BUTTON = "Guardar 2 vacunas"

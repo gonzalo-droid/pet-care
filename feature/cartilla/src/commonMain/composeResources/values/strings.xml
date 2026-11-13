@@ -75,4 +75,38 @@
     <string name="form_error_expiry">El vencimiento debe ser después de la elaboración</string>
     <string name="form_warning_expired">Este frasco vencía antes de la fecha de aplicación. Revisa las fechas; igual puedes guardar.</string>
     <string name="form_no_pet">Agrega una mascota antes de registrar vacunas.</string>
+
+    <!-- Fotos (M3) -->
+    <string name="capture_title">Fotos de la cartilla</string>
+    <string name="capture_headline">Una foto por cada página con vacunas</string>
+    <string name="capture_limit">Puedes agregar hasta 4 páginas.</string>
+    <string name="capture_first_page">Agregar página</string>
+    <string name="capture_other_page">Otra página</string>
+    <string name="capture_tips_title">Para que se vea mejor</string>
+    <string name="capture_tip_light">Buena luz y sin sombras encima</string>
+    <string name="capture_tip_dates">Que se vean las fechas y los stickers</string>
+    <string name="capture_tip_page">La hoja completa dentro de la foto</string>
+    <plurals name="capture_continue">
+        <item quantity="one">Continuar con 1 foto</item>
+        <item quantity="other">Continuar con %1$d fotos</item>
+    </plurals>
+    <string name="capture_take">Tomar foto</string>
+    <string name="capture_gallery">Galería</string>
+    <string name="capture_by_hand">Prefiero llenarla a mano</string>
+    <string name="capture_importing">Guardando la foto…</string>
+    <string name="photo_page">Pág. %1$d</string>
+    <string name="photo_page_description">Página %1$d de la cartilla</string>
+    <string name="photo_page_sheet">Página %1$d</string>
+    <string name="photo_view">Ver foto</string>
+    <string name="photo_remove_page">Quitar página</string>
+    <string name="photo_add_sheet">Agregar foto</string>
+    <string name="photo_sticker">Sticker</string>
+    <string name="photo_sticker_description">Foto del sticker del frasco</string>
+    <string name="form_pages_title">Fotos de la cartilla</string>
+    <string name="form_pages_hint">Toca una foto para verla en grande mientras completas los datos.</string>
+    <string name="form_add_page">Agregar foto de la cartilla</string>
+    <string name="form_sticker_photo">Foto del sticker del frasco</string>
+    <string name="form_add_sticker_photo">Foto del sticker del frasco</string>
+    <string name="detail_photos">Fotos</string>
+    <string name="detail_add_sticker_photo">Agregar foto del sticker</string>
 </resources>

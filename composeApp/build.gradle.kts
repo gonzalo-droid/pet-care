@@ -33,6 +33,8 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
+            implementation(libs.coil.compose)
+            implementation(libs.okio)
         }
         commonTest.dependencies {
             implementation(libs.koin.test)
