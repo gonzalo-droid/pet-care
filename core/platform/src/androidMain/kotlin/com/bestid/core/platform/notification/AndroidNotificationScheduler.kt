@@ -21,9 +21,14 @@ import com.bestid.core.platform.resources.reminder_channel_name
 import org.jetbrains.compose.resources.getString
 
 /**
- * Adaptador Android de `NotificationScheduler`: alarmas no exactas con `setAndAllowWhileIdle`
- * (Android 14+ no concede alarmas exactas por defecto, sección 11). Cada alarma lleva el título y el
- * texto ya armados; [ReminderAlarmReceiver] solo los muestra.
+ * Adaptador Android de `NotificationScheduler`. Cada alarma lleva el título y el texto ya armados;
+ * [ReminderAlarmReceiver] solo los muestra.
+ *
+ * - Android 12+: alarma no exacta con `setAndAllowWhileIdle` (sección 11; no pide el permiso de
+ *   alarmas exactas). El sistema la entrega a lo más 1 hora después de la hora pedida.
+ * - Android 8 a 11: ahí la ventana de una alarma no exacta es el 75 % del tiempo que falta (un aviso
+ *   a 7 días podía llegar días tarde), así que se usa `setExactAndAllowWhileIdle`, que en esas
+ *   versiones no necesita ningún permiso (D28).
  */
 class AndroidNotificationScheduler(private val context: Context) : NotificationScheduler {
     private val alarms = context.getSystemService(AlarmManager::class.java)
@@ -55,7 +60,12 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
-            alarms.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, reminder.fireAt.toEpochMilliseconds(), pending)
+            val at = reminder.fireAt.toEpochMilliseconds()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                alarms.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pending)
+            } else {
+                alarms.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pending)
+            }
         }
     }
 
