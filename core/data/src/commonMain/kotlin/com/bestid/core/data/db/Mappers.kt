@@ -1,6 +1,11 @@
 package com.bestid.core.data.db
 
+import com.bestid.core.model.CareKind
+import com.bestid.core.model.CareTask
 import com.bestid.core.model.DatePrecision
+import com.bestid.core.model.IntervalUnit
+import com.bestid.core.model.ScheduledNotification
+import com.bestid.core.model.WeightEntry
 import com.bestid.core.model.ExtractionMeta
 import com.bestid.core.model.Pet
 import com.bestid.core.model.RecordSource
@@ -139,3 +144,43 @@ internal fun VaccineRecord.toEntity() = VaccineRecordEntity(
     updatedAt = updatedAt.ms(),
     deletedAt = deletedAt?.ms(),
 )
+
+internal fun CareTaskEntity.toModel() = CareTask(
+    id = id,
+    petId = petId,
+    kind = CareKind.valueOf(kind),
+    title = title,
+    lastDate = lastDate?.let(LocalDate::parse),
+    intervalValue = intervalValue,
+    intervalUnit = intervalUnit?.let(IntervalUnit::valueOf),
+    nextDate = nextDate?.let(LocalDate::parse),
+    reminderEnabled = reminderEnabled,
+    createdAt = createdAt.instant(),
+    updatedAt = updatedAt.instant(),
+    deletedAt = deletedAt?.instant(),
+)
+
+internal fun CareTask.toEntity() = CareTaskEntity(
+    id = id,
+    petId = petId,
+    kind = kind.name,
+    title = title,
+    lastDate = lastDate?.toString(),
+    intervalValue = intervalValue,
+    intervalUnit = intervalUnit?.name,
+    nextDate = nextDate?.toString(),
+    reminderEnabled = reminderEnabled,
+    createdAt = createdAt.ms(),
+    updatedAt = updatedAt.ms(),
+    deletedAt = deletedAt?.ms(),
+)
+
+internal fun WeightEntryEntity.toModel() =
+    WeightEntry(id, petId, LocalDate.parse(date), grams, createdAt.instant(), updatedAt.instant(), deletedAt?.instant())
+
+internal fun WeightEntry.toEntity() =
+    WeightEntryEntity(id, petId, date.toString(), grams, createdAt.ms(), updatedAt.ms(), deletedAt?.ms())
+
+internal fun ScheduledNotificationEntity.toModel() = ScheduledNotification(id, refType, refId, fireAt.instant())
+
+internal fun ScheduledNotification.toEntity() = ScheduledNotificationEntity(id, refType, refId, fireAt.ms())

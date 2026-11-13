@@ -85,6 +85,7 @@ import org.koin.core.parameter.parametersOf
 fun VaccineFormScreen(
     recordId: String?,
     onClose: () -> Unit,
+    onAskPermission: () -> Unit,
     viewModel: VaccineFormViewModel = koinViewModel(key = "vaccine-form-$recordId") { parametersOf(recordId) },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -96,7 +97,9 @@ fun VaccineFormScreen(
         datePicker.launch(initial, max)
     }
 
-    LaunchedEffect(state.done) { if (state.done) onClose() }
+    LaunchedEffect(state.done) {
+        if (state.done) if (state.askPermission) onAskPermission() else onClose()
+    }
 
     FlowScaffold(
         title = stringResource(if (state.isEdit) Res.string.form_edit_title else Res.string.form_new_title),

@@ -3,6 +3,7 @@ package com.bestid.feature.cartilla
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bestid.core.domain.catalog.VaccineCatalog
+import com.bestid.core.domain.reminder.ShouldAskNotificationPermission
 import com.bestid.core.domain.usecase.GetVet
 import com.bestid.core.domain.usecase.ObservePet
 import com.bestid.core.domain.usecase.ObserveSelectedPet
@@ -64,6 +65,8 @@ data class VaccineFormState(
     val warnings: List<VaccineWarning> = emptyList(),
     val saving: Boolean = false,
     val done: Boolean = false,
+    /** Primer logro: mostrar la pantalla de permiso de avisos (O5) al cerrar. */
+    val askPermission: Boolean = false,
 ) {
     /** Tipos sugeridos para la especie más los ya elegidos; todos si se pidió o no hay sugeridos. */
     val visibleTypes: List<VaccineType>
@@ -95,6 +98,7 @@ class VaccineFormViewModel(
     observeVets: ObserveVets,
     private val getVet: GetVet,
     private val saveRecord: SaveVaccineRecord,
+    private val shouldAskPermission: ShouldAskNotificationPermission,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VaccineFormState())
     val state: StateFlow<VaccineFormState> = _state.asStateFlow()
@@ -186,11 +190,13 @@ class VaccineFormViewModel(
                     vetContact = s.vetContact,
                 ),
             )
-            _state.update {
-                when (result) {
-                    is SaveVaccineResult.Saved -> it.copy(saving = false, done = true)
-                    is SaveVaccineResult.Invalid ->
-                        it.copy(saving = false, errors = result.validation.errors, warnings = result.validation.warnings)
+            when (result) {
+                is SaveVaccineResult.Saved -> {
+                    val ask = result.record.nextDate != null && shouldAskPermission()
+                    _state.update { it.copy(saving = false, done = true, askPermission = ask) }
+                }
+                is SaveVaccineResult.Invalid -> _state.update {
+                    it.copy(saving = false, errors = result.validation.errors, warnings = result.validation.warnings)
                 }
             }
         }

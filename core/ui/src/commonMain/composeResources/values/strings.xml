@@ -23,4 +23,8 @@
     <string name="sex_female">Hembra</string>
     <string name="sex_male">Macho</string>
     <string name="separator_dot">%1$s · %2$s</string>
+    <string name="care_deworm_internal">Desparasitación interna</string>
+    <string name="care_deworm_external">Desparasitación externa</string>
+    <string name="care_other">Otro cuidado</string>
+    <string name="weight_kg">%1$s kg</string>
 </resources>

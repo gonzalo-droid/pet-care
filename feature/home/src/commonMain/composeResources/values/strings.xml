@@ -22,4 +22,7 @@
     <string name="home_weight">Peso</string>
     <string name="home_add_vaccine">Agregar vacuna</string>
     <string name="home_vaccine_fallback">Vacuna</string>
+    <string name="home_add_weight">Agregar peso</string>
+    <string name="home_permission_title">Los avisos están desactivados</string>
+    <string name="home_permission_body">Actívalos en los ajustes del teléfono para saber cuándo le toca la próxima vacuna o cuidado.</string>
 </resources>

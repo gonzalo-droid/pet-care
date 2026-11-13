@@ -4,11 +4,17 @@ import com.bestid.core.data.db.BestIdDatabase
 import com.bestid.core.data.db.toEntity
 import com.bestid.core.data.db.toModel
 import com.bestid.core.domain.catalog.VaccineCatalog
+import com.bestid.core.domain.port.CareTaskRepository
 import com.bestid.core.domain.port.PetRepository
+import com.bestid.core.domain.port.ScheduledNotificationRepository
+import com.bestid.core.domain.port.WeightRepository
 import com.bestid.core.domain.port.VaccineRecordRepository
 import com.bestid.core.domain.port.VaccineTypeRepository
 import com.bestid.core.domain.port.VetRepository
+import com.bestid.core.model.CareTask
 import com.bestid.core.model.Pet
+import com.bestid.core.model.ScheduledNotification
+import com.bestid.core.model.WeightEntry
 import com.bestid.core.model.VaccineRecord
 import com.bestid.core.model.VaccineType
 import com.bestid.core.model.Vet
@@ -56,9 +62,34 @@ class RoomVaccineTypeRepository(db: BestIdDatabase) : VaccineTypeRepository {
 
 class RoomVaccineRecordRepository(db: BestIdDatabase) : VaccineRecordRepository {
     private val dao = db.vaccineRecordDao()
+    override fun observeAll(): Flow<List<VaccineRecord>> = dao.observeAll().map { list -> list.map { it.toModel() } }
     override fun observeForPet(petId: String): Flow<List<VaccineRecord>> =
         dao.observeForPet(petId).map { list -> list.map { it.toModel() } }
     override fun observe(id: String): Flow<VaccineRecord?> = dao.observe(id).map { it?.toModel() }
     override suspend fun get(id: String): VaccineRecord? = dao.get(id)?.toModel()
     override suspend fun upsert(record: VaccineRecord) = dao.upsert(record.toEntity())
+}
+
+class RoomCareTaskRepository(db: BestIdDatabase) : CareTaskRepository {
+    private val dao = db.careTaskDao()
+    override fun observeForPet(petId: String): Flow<List<CareTask>> = dao.observeForPet(petId).map { l -> l.map { it.toModel() } }
+    override fun observeAll(): Flow<List<CareTask>> = dao.observeAll().map { l -> l.map { it.toModel() } }
+    override fun observe(id: String): Flow<CareTask?> = dao.observe(id).map { it?.toModel() }
+    override suspend fun get(id: String): CareTask? = dao.get(id)?.toModel()
+    override suspend fun upsert(task: CareTask) = dao.upsert(task.toEntity())
+}
+
+class RoomWeightRepository(db: BestIdDatabase) : WeightRepository {
+    private val dao = db.weightEntryDao()
+    override fun observeForPet(petId: String): Flow<List<WeightEntry>> = dao.observeForPet(petId).map { l -> l.map { it.toModel() } }
+    override suspend fun get(id: String): WeightEntry? = dao.get(id)?.toModel()
+    override suspend fun upsert(entry: WeightEntry) = dao.upsert(entry.toEntity())
+}
+
+class RoomScheduledNotificationRepository(db: BestIdDatabase) : ScheduledNotificationRepository {
+    private val dao = db.scheduledNotificationDao()
+    override suspend fun getAll(): List<ScheduledNotification> = dao.getAll().map { it.toModel() }
+    override suspend fun replace(added: List<ScheduledNotification>, removedIds: List<String>) =
+        dao.replace(added.map { it.toEntity() }, removedIds)
+    override suspend fun clear() = dao.clear()
 }

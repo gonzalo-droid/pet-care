@@ -10,4 +10,6 @@
     <string name="settings_open_catalog">Ver catálogo de componentes</string>
     <string name="catalog_title">Componentes</string>
     <string name="back">Volver</string>
+    <string name="settings_test_reminder">Probar aviso en 1 minuto</string>
+    <string name="settings_test_reminder_done">Listo. Cierra la app o reinicia el teléfono: el aviso debería llegar en 1 minuto.</string>
 </resources>

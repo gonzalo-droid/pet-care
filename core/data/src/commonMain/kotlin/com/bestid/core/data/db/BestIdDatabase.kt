@@ -1,5 +1,6 @@
 package com.bestid.core.data.db
 
+import androidx.room.AutoMigration
 import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -13,9 +14,21 @@ import kotlinx.coroutines.IO
  * los esquemas se exportan a `core/data/schemas/`.
  */
 @Database(
-    entities = [PetEntity::class, VetEntity::class, VaccineTypeEntity::class, VaccineRecordEntity::class],
-    version = 1,
+    entities = [
+        PetEntity::class,
+        VetEntity::class,
+        VaccineTypeEntity::class,
+        VaccineRecordEntity::class,
+        CareTaskEntity::class,
+        WeightEntryEntity::class,
+        ScheduledNotificationEntity::class,
+    ],
+    version = 2,
     exportSchema = true,
+    autoMigrations = [
+        // v2 (M2): cuidados, pesos y avisos programados. Solo agrega tablas.
+        AutoMigration(from = 1, to = 2),
+    ],
 )
 @ConstructedBy(BestIdDatabaseConstructor::class)
 abstract class BestIdDatabase : RoomDatabase() {
@@ -23,6 +36,9 @@ abstract class BestIdDatabase : RoomDatabase() {
     abstract fun vetDao(): VetDao
     abstract fun vaccineTypeDao(): VaccineTypeDao
     abstract fun vaccineRecordDao(): VaccineRecordDao
+    abstract fun careTaskDao(): CareTaskDao
+    abstract fun weightEntryDao(): WeightEntryDao
+    abstract fun scheduledNotificationDao(): ScheduledNotificationDao
 
     companion object {
         const val FILE_NAME = "bestid.db"

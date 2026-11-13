@@ -80,6 +80,30 @@ class RoomRepositoriesTest {
     }
 
     @Test
+    fun careWeightAndScheduledRoundTrip() = runTest {
+        val cares = com.bestid.core.data.repository.RoomCareTaskRepository(db)
+        val weights = com.bestid.core.data.repository.RoomWeightRepository(db)
+        val scheduled = com.bestid.core.data.repository.RoomScheduledNotificationRepository(db)
+        val care = com.bestid.core.model.CareTask(
+            "c", "a", com.bestid.core.model.CareKind.OTHER, "Baño medicado", LocalDate(2026, 10, 1), 2,
+            com.bestid.core.model.IntervalUnit.MONTH, LocalDate(2026, 12, 1), true, t0, t0, null,
+        )
+        cares.upsert(care)
+        assertEquals(care, cares.get("c"))
+        assertEquals(listOf(care), cares.observeAll().first())
+
+        weights.upsert(com.bestid.core.model.WeightEntry("w2", "a", LocalDate(2026, 11, 5), 3800, t0, t0, null))
+        weights.upsert(com.bestid.core.model.WeightEntry("w1", "a", LocalDate(2026, 10, 6), 3700, t0, t0, null))
+        assertEquals(listOf("w1", "w2"), weights.observeForPet("a").first().map { it.id })
+
+        val n1 = com.bestid.core.model.ScheduledNotification("n1", "CARE", "c", t0)
+        val n2 = com.bestid.core.model.ScheduledNotification("n2", "CARE", "c", t0)
+        scheduled.replace(listOf(n1, n2), emptyList())
+        scheduled.replace(emptyList(), listOf("n1"))
+        assertEquals(listOf(n2), scheduled.getAll())
+    }
+
+    @Test
     fun catalogIsSeededOnceAndCustomTypesAreAdded() = runTest {
         assertEquals(12, types.getAll().size)
         types.insert(VaccineType("custom:1", "Giardia", setOf(Species.DOG), isCustom = true))

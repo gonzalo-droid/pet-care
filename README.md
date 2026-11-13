@@ -9,15 +9,15 @@ La especificación completa está en [`docs/SYSTEM_DESIGN.md`](docs/SYSTEM_DESIG
 | Hito | Contenido | Estado |
 |---|---|---|
 | M0 | Proyecto multimódulo, design system con previews, 4 pestañas, CI Android e iOS | Hecho |
-| M1 | Mascotas (crear, editar, eliminar, varias, selector), vacunas a mano, Cartilla, Detalle, Inicio | Hecho; falta la prueba manual en teléfonos reales |
-| M2 | Motor de avisos, notificaciones, Salud (cuidados y peso con gráfico) | Siguiente |
+| M1 | Mascotas (crear, editar, eliminar, varias, selector), vacunas a mano, Cartilla, Detalle, Inicio | Hecho |
+| M2 | Motor de avisos, notificaciones, Salud (cuidados y peso con gráfico) | Hecho en código; falta la prueba en teléfonos reales |
 | M3 | Lectura de la cartilla con foto | Pendiente: falta elegir la tecnología de lectura |
 | M4 | PDF para compartir, respaldo, Ajustes | Pendiente |
 | M5 | Estados vacíos y de error, accesibilidad, textos finales, beta cerrada | Pendiente |
 
 ## Pantallas
 
-Capturas del prototipo de diseño ([`docs/design/`](docs/design/)), que la app sigue. Las capturas de la app real se generan en el CI: artefacto `ios-capturas` de cada ejecución, con el flujo de M1 en el simulador de iOS.
+Capturas del prototipo de diseño ([`docs/design/`](docs/design/)), que la app sigue. Las capturas de la app real se generan en el CI: artefacto `ios-capturas` de cada ejecución, con los flujos de M1 y M2 en el simulador de iOS.
 
 | Inicio | Cartilla | Detalle de vacuna | Nueva vacuna |
 |---|---|---|---|
@@ -50,17 +50,18 @@ androidApp/          Punto de entrada Android (Application, MainActivity, manifi
 composeApp/          Raíz de la UI compartida: App(), navegación, Koin, MainViewController de iOS
 core/
   model/             Entidades y enums (Kotlin puro)
-  domain/            Casos de uso, validaciones, próxima dosis, puertos de repositorio
+  domain/            Casos de uso, validaciones, próxima dosis, motor de avisos, puertos
   data/              Room, DataStore y repositorios; esquemas en core/data/schemas/
   designsystem/      Tokens, AppTheme, componentes con previews, íconos, fuente Nunito, catálogo
   ui/                Presentación compartida entre features: especie, sexo, fechas es-PE, plurales
   navigation/        Rutas tipadas; los features navegan solo a través de ellas
-  platform/          Adaptadores Android e iOS de los puertos de plataforma (selector de fecha)
+  platform/          Adaptadores Android e iOS: selector de fecha y avisos locales
 feature/
   home/              Inicio
   cartilla/          Cartilla, detalle y formulario de vacuna
   health/            Salud (cuidados y peso)
   pet/               Carnet y formulario de mascota
+  onboarding/        Primer uso (por ahora, el permiso de avisos)
 build-logic/         Plugins de convención de Gradle (bestid.kmp.library, .compose, .feature)
 iosApp/              Proyecto Xcode
 docs/                SYSTEM_DESIGN.md, DECISIONS.md, licencias y design/ (prototipo)
@@ -78,7 +79,8 @@ Requisitos: JDK 21, Android Studio (aporta el Android SDK, que Gradle necesita i
 
 - **Android:** abre el proyecto en Android Studio y corre `androidApp`, o por terminal `./gradlew :androidApp:assembleDebug`.
 - **iOS:** abre `iosApp/iosApp.xcodeproj` en Xcode y corre en un simulador. La primera compilación descarga Kotlin/Native y tarda varios minutos. Para un iPhone real, completa `TEAM_ID` en `iosApp/Configuration/Config.xcconfig`.
-- **Pruebas:** `./gradlew allTests` (JVM y host de Android). En Mac, también `./gradlew iosSimulatorArm64Test`, que incluye el flujo de M1 en el simulador.
+- **Pruebas:** `./gradlew allTests` (JVM y host de Android). En Mac, también `./gradlew iosSimulatorArm64Test`, que incluye los flujos de M1 y M2 en el simulador.
+- **Avisos:** Ajustes → "Probar aviso en 1 minuto" programa un aviso de prueba; cierra la app (o reinicia el teléfono) y espera.
 - **Catálogo de componentes en el teléfono:** Ajustes (engranaje arriba a la derecha) → "Ver catálogo de componentes".
 
 ## Licencias de terceros

@@ -41,6 +41,7 @@ class FakePetRepository : PetRepository {
 
 class FakeRecordRepository : VaccineRecordRepository {
     val all = MutableStateFlow<List<VaccineRecord>>(emptyList())
+    override fun observeAll(): Flow<List<VaccineRecord>> = all.map { list -> list.filter { it.deletedAt == null } }
     override fun observeForPet(petId: String): Flow<List<VaccineRecord>> =
         all.map { list -> list.filter { it.petId == petId && it.deletedAt == null }.sortedByDescending { it.applicationDate } }
     override fun observe(id: String): Flow<VaccineRecord?> = all.map { list -> list.firstOrNull { it.id == id && it.deletedAt == null } }
@@ -73,5 +74,62 @@ class FakeSelectedPetStore : SelectedPetStore {
     override val selectedPetId: Flow<String?> = value
     override suspend fun select(petId: String?) {
         value.value = petId
+    }
+}
+
+class FakeCareRepository : com.bestid.core.domain.port.CareTaskRepository {
+    val all = MutableStateFlow<List<com.bestid.core.model.CareTask>>(emptyList())
+    override fun observeForPet(petId: String) = all.map { l -> l.filter { it.petId == petId && it.deletedAt == null } }
+    override fun observeAll() = all.map { l -> l.filter { it.deletedAt == null } }
+    override fun observe(id: String) = all.map { l -> l.firstOrNull { it.id == id && it.deletedAt == null } }
+    override suspend fun get(id: String) = all.value.firstOrNull { it.id == id }
+    override suspend fun upsert(task: com.bestid.core.model.CareTask) {
+        all.value = all.value.filterNot { it.id == task.id } + task
+    }
+}
+
+class FakeWeightRepository : com.bestid.core.domain.port.WeightRepository {
+    val all = MutableStateFlow<List<com.bestid.core.model.WeightEntry>>(emptyList())
+    override fun observeForPet(petId: String) = all.map { l -> l.filter { it.petId == petId && it.deletedAt == null }.sortedBy { it.date } }
+    override suspend fun get(id: String) = all.value.firstOrNull { it.id == id }
+    override suspend fun upsert(entry: com.bestid.core.model.WeightEntry) {
+        all.value = all.value.filterNot { it.id == entry.id } + entry
+    }
+}
+
+class FakeSettingsStore : com.bestid.core.domain.port.ReminderSettingsStore {
+    val time = MutableStateFlow(kotlinx.datetime.LocalTime(9, 0))
+    val shown = MutableStateFlow(false)
+    override val reminderTime: Flow<kotlinx.datetime.LocalTime> = time
+    override val permissionPromptShown: Flow<Boolean> = shown
+    override suspend fun setReminderTime(time: kotlinx.datetime.LocalTime) { this.time.value = time }
+    override suspend fun markPermissionPromptShown() { shown.value = true }
+    val test = MutableStateFlow<kotlin.time.Instant?>(null)
+    override val testReminderAt: Flow<kotlin.time.Instant?> = test
+    override suspend fun setTestReminderAt(at: kotlin.time.Instant?) { test.value = at }
+}
+
+class FakeScheduledRepository : com.bestid.core.domain.port.ScheduledNotificationRepository {
+    val all = MutableStateFlow<List<com.bestid.core.model.ScheduledNotification>>(emptyList())
+    override suspend fun getAll() = all.value
+    override suspend fun replace(added: List<com.bestid.core.model.ScheduledNotification>, removedIds: List<String>) {
+        all.value = all.value.filterNot { it.id in removedIds } + added
+    }
+    override suspend fun clear() { all.value = emptyList() }
+}
+
+class FakeScheduler(var permission: com.bestid.core.domain.port.NotificationPermission = com.bestid.core.domain.port.NotificationPermission.NOT_DETERMINED) :
+    com.bestid.core.domain.port.NotificationScheduler {
+    val scheduled = mutableMapOf<String, com.bestid.core.domain.reminder.PlannedReminder>()
+    val scheduleCalls = mutableListOf<List<String>>()
+    val cancelCalls = mutableListOf<List<String>>()
+    override suspend fun permission() = permission
+    override suspend fun schedule(reminders: List<com.bestid.core.domain.reminder.PlannedReminder>) {
+        scheduleCalls += reminders.map { it.id }
+        reminders.forEach { scheduled[it.id] = it }
+    }
+    override suspend fun cancel(ids: List<String>) {
+        cancelCalls += ids
+        ids.forEach { scheduled.remove(it) }
     }
 }

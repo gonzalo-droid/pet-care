@@ -24,6 +24,7 @@ kotlin {
             implementation(projects.feature.cartilla)
             implementation(projects.feature.health)
             implementation(projects.feature.pet)
+            implementation(projects.feature.onboarding)
 
             implementation(libs.androidx.navigation.compose)
             implementation(libs.androidx.lifecycle.viewmodel.compose)

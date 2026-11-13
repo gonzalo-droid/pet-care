@@ -2,6 +2,34 @@
 
 Registro de decisiones tomadas durante el desarrollo que cambian o precisan `SYSTEM_DESIGN.md`. La más reciente va arriba. Cada una dice quién la tomó y en qué hito.
 
+## 2026-11-13 · M2
+
+### D22. Salud muestra cuidados, no vacunas `[Decidido por Gonzalo]`
+El prototipo lista la vacuna de leucemia dentro de Cuidados. En la app, Cuidados muestra solo desparasitaciones y otros cuidados; las vacunas siguen en Cartilla. Los avisos cubren ambos, e Inicio muestra lo que venga antes (vacuna o cuidado).
+
+### D23. Permiso de avisos después del primer logro `[Decidido por Gonzalo]`
+La pantalla O5 se muestra una sola vez: al guardar la primera vacuna con próxima fecha o el primer cuidado con aviso, y solo si el sistema todavía no preguntó. Si el permiso está denegado, Inicio y Salud muestran una tarjeta con enlace a los ajustes del sistema. O5 vive en `feature/onboarding`, que en M3 recibirá el resto del primer uso.
+
+### D24. Sincronización de avisos `[Propuesta]`
+- `ReminderEngine` (dominio, puro) calcula los avisos deseados: 7 días antes, 1 día antes y el mismo día a las 9:00, y "¿Ya le pusiste…?" a los 3 días; como máximo los 50 más cercanos.
+- Una vacuna deja de avisar si hay un registro posterior de la misma mascota con algún tipo en común (ya se puso la siguiente dosis). Un cuidado se actualiza al cambiar su última fecha.
+- `SyncReminders` compara con la tabla `scheduled_notifications` y solo agrega o cancela la diferencia. El ID del aviso incluye una firma del texto, así que renombrar la mascota reprograma.
+- `ReminderCoordinator` sincroniza mientras la app está abierta, cuando cambian los datos o la hora preferida. En Android, `RescheduleReceiver` reprograma todo tras reiniciar o cambiar la hora; en iOS, `BGAppRefreshTask` cada ~12 h.
+- Los textos de los avisos se arman en `core/platform` con Compose Resources al programarlos (regla 3).
+- Hora preferida fija en 9:00 hasta que Ajustes (M4) permita cambiarla.
+
+### D25. Cuidado sin aviso `[Propuesta]`
+La última fecha y el intervalo son obligatorios solo si el aviso está activo: sin ellos no hay próxima fecha. Así se puede anotar un cuidado puntual sin aviso.
+
+### D26. Herramienta de prueba de avisos `[Propuesta, se quita en M5]`
+Ajustes tiene "Probar aviso en 1 minuto" para comprobar el criterio de M2 (llega con la app cerrada y tras reiniciar) sin esperar días. El aviso de prueba se guarda en DataStore y pasa por `SyncReminders` como los reales, así que también se reprograma al reiniciar. En el APK de debug, `DebugTestReminderReceiver` permite programarlo desde `adb`; el CI lo usa en la prueba del emulador (job "Android (avisos en emulador)").
+
+### D28. Alarmas exactas antes de Android 12 `[Propuesta]`
+Antes de Android 12, la ventana de una alarma no exacta es el 75 % del tiempo que falta: un aviso a 7 días podía llegar hasta 5 días tarde. En Android 8 a 11 se usa `setExactAndAllowWhileIdle`, que en esas versiones no pide permiso. Desde Android 12 sigue `setAndAllowWhileIdle` (sección 11), que el sistema entrega a lo más 1 hora después de la hora pedida.
+
+### D27. Limitaciones conocidas de avisos `[Riesgo]`
+Android puede retrasar varios minutos las alarmas no exactas en ahorro de batería, y algunas marcas (Xiaomi, Huawei, Oppo) las cortan si la app no está exenta de optimización de batería. iOS no garantiza el horario de `BGAppRefreshTask`. Ambos casos se revisan en la beta (M5).
+
 ## 2026-11-13 · M1
 
 ### D17. Módulo `core/ui` `[Propuesta]`
