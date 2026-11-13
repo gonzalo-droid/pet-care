@@ -11,3 +11,14 @@ class DateFormatTest {
         assertEquals("05/03/2026", LocalDate(2026, 3, 5).formatNumeric())
     }
 }
+
+class WeightFormatTest {
+    @Test
+    fun kilogramsWithDecimalComma() {
+        assertEquals("3,8", formatKgNumber(3800))
+        assertEquals("4,25", formatKgNumber(4250))
+        assertEquals("0,05", formatKgNumber(50))
+        assertEquals("12", formatKgNumber(12_000))
+        assertEquals("150", formatKgNumber(150_000))
+    }
+}

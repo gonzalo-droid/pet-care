@@ -36,3 +36,12 @@ sealed interface Route
 
 /** Agregar (recordId = null) o editar vacuna a mano (C3). */
 @Serializable data class VaccineEditRoute(val recordId: String? = null) : Route
+
+/** Agregar (careId = null) o editar cuidado (S2). */
+@Serializable data class CareEditRoute(val careId: String? = null) : Route
+
+/** Agregar peso (S3). */
+@Serializable data object WeightNewRoute : Route
+
+/** Permiso de avisos (O5), después del primer logro. */
+@Serializable data object NotificationPermissionRoute : Route
