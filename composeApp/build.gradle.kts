@@ -17,6 +17,7 @@ kotlin {
             implementation(projects.core.domain)
             implementation(projects.core.data)
             implementation(projects.core.ui)
+            implementation(projects.core.platform)
             implementation(projects.core.designsystem)
             implementation(projects.core.navigation)
             implementation(projects.feature.home)
@@ -35,6 +36,11 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.koin.test)
         }
+        iosTest.dependencies {
+            implementation(libs.compose.ui.test)
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.datastore.preferences)
+        }
         getByName("androidHostTest").dependencies {
             implementation(libs.koin.test)
             implementation(libs.androidx.room.runtime)
@@ -45,4 +51,9 @@ kotlin {
 
 compose.resources {
     packageOfResClass = "com.bestid.app.resources"
+}
+
+// Las pruebas de UI en el simulador de iOS guardan capturas aquí (el CI las sube como artefacto).
+tasks.withType<org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest>().configureEach {
+    environment("SIMCTL_CHILD_BESTID_SCREENSHOTS", layout.buildDirectory.dir("ui-screenshots").get().asFile.absolutePath)
 }
