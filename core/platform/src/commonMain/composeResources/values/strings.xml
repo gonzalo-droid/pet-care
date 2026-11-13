@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Textos de los avisos (sección 11). %1$s = mascota, %2$s = vacuna o cuidado, %3$s = días -->
+    <string name="reminder_title_vaccine">Vacuna de %1$s</string>
+    <string name="reminder_title_care">Cuidado de %1$s</string>
+    <string name="reminder_week_before">A %1$s le toca su %2$s en %3$s días</string>
+    <string name="reminder_day_before">Mañana le toca su %2$s a %1$s</string>
+    <string name="reminder_same_day">Hoy le toca su %2$s a %1$s</string>
+    <string name="reminder_follow_up">¿Ya le pusiste su %2$s a %1$s?</string>
+    <string name="reminder_subject_vaccine">vacuna</string>
+    <string name="reminder_subject_vaccine_of">vacuna de %1$s</string>
+    <string name="reminder_subject_deworm_internal">desparasitación interna</string>
+    <string name="reminder_subject_deworm_external">desparasitación externa</string>
+    <string name="reminder_subject_care">cuidado</string>
+    <string name="reminder_channel_name">Avisos de vacunas y cuidados</string>
+    <string name="reminder_channel_description">Te avisa antes de cada próxima vacuna, desparasitación o cuidado.</string>
+</resources>

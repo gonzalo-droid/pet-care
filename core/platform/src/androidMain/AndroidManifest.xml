@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Avisos locales (sección 11): permiso en Android 13+ y reprogramación tras reiniciar. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application>
+        <!-- Muestra el aviso cuando llega la alarma. Solo la propia app la dispara. -->
+        <receiver
+            android:name="com.bestid.core.platform.notification.ReminderAlarmReceiver"
+            android:exported="false" />
+
+        <!-- Vuelve a programar los avisos: reinicio, cambio de hora o de zona, actualización de la app.
+             Son broadcasts protegidos del sistema: otras apps no pueden enviarlos. -->
+        <receiver
+            android:name="com.bestid.core.platform.notification.RescheduleReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>
