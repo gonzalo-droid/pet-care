@@ -32,6 +32,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.bestid.core.domain.usecase.ImportedPhotos
+import com.bestid.core.ui.attempt
 import kotlinx.datetime.LocalDate
 
 /** Un frasco (sticker) en el formulario. */
@@ -51,6 +53,8 @@ sealed interface DateTarget {
 }
 
 data class VaccineFormState(
+    /** El guardado falló (por ejemplo, sin espacio): se muestra el aviso y el formulario sigue abierto. */
+    val saveFailed: Boolean = false,
     val loaded: Boolean = false,
     val isEdit: Boolean = false,
     val pet: Pet? = null,
@@ -160,7 +164,8 @@ class VaccineFormViewModel(
                 if (images.isEmpty()) return
                 _state.update { it.copy(importing = true, photoFailed = 0, cameraDenied = false) }
                 viewModelScope.launch {
-                    val imported = importPhotos(images)
+                    val picked = images
+                    val imported = attempt { importPhotos(picked) }.getOrElse { ImportedPhotos(emptyList(), picked.size) }
                     _state.update { s ->
                         when (target) {
                             PhotoTarget.PAGE -> s.copy(pages = s.pages + imported.photos)
@@ -216,9 +221,9 @@ class VaccineFormViewModel(
         val s = _state.value
         val pet = s.pet ?: return
         if (s.saving || s.importing) return
-        _state.update { it.copy(saving = true) }
+        _state.update { it.copy(saving = true, saveFailed = false) }
         viewModelScope.launch {
-            val result = saveRecord(
+            val result = attempt { saveRecord(
                 VaccineDraft(
                     id = recordId,
                     petId = pet.id,
@@ -234,7 +239,10 @@ class VaccineFormViewModel(
                     sourcePhotoIds = s.pages.map { it.id },
                     stickerPhotoId = s.stickerPhoto?.id,
                 ),
-            )
+            ) }.getOrElse {
+                _state.update { it.copy(saving = false, saveFailed = true) }
+                return@launch
+            }
             when (result) {
                 is SaveVaccineResult.Saved -> {
                     val ask = result.record.nextDate != null && shouldAskPermission()

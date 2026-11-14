@@ -12,12 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bestid.core.designsystem.component.DashedButton
 import com.bestid.core.designsystem.component.EmptyState
+import com.bestid.core.designsystem.component.ErrorState
 import com.bestid.core.designsystem.component.LoadingState
 import com.bestid.core.designsystem.component.PetIdCard
 import com.bestid.core.designsystem.component.PrimaryButton
 import com.bestid.core.designsystem.component.SecondaryButton
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
+import com.bestid.core.ui.resources.Res as UiRes
+import com.bestid.core.ui.resources.state_load_error
 import com.bestid.core.model.DatePrecision
 import com.bestid.core.ui.avatar
 import com.bestid.core.ui.formatLong
@@ -53,6 +56,7 @@ fun PetScreen(
     val pet = state.pet
     when {
         state.loading -> LoadingState(modifier = modifier.fillMaxSize())
+        state.failed -> ErrorState(stringResource(UiRes.string.state_load_error), modifier = modifier.fillMaxSize(), onRetry = viewModel::retry)
         pet == null -> Column(modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             EmptyState(
                 illustration = BestIdIcons.PetsFilled,

@@ -29,12 +29,17 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import com.bestid.core.ui.Retry
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.bestid.core.domain.usecase.ImportedPhotos
+import com.bestid.core.ui.attempt
 import kotlinx.datetime.LocalDate
 
 data class PetTabState(
     val loading: Boolean = true,
+    /** No se pudieron leer los datos: se muestra el error con "Reintentar". */
+    val failed: Boolean = false,
     val pet: Pet? = null,
     val vaccineCount: Int = 0,
     val nextDue: NextDue? = null,
@@ -47,20 +52,27 @@ class PetTabViewModel(
     observeRecords: ObserveVaccineRecords,
     clock: AppClock,
 ) : ViewModel() {
-    val state: StateFlow<PetTabState> = observeSelectedPet()
-        .flatMapLatest { pet ->
-            if (pet == null) {
-                flowOf(PetTabState(loading = false))
-            } else {
-                observeRecords(pet.id).map { records ->
-                    PetTabState(false, pet, records.size, NextDueCalculator.nextDue(records, clock.today()))
+    private val retryPetTabState = Retry()
+
+    val state: StateFlow<PetTabState> = retryPetTabState.wrap(PetTabState(loading = false, failed = true)) {
+        observeSelectedPet()
+            .flatMapLatest { pet ->
+                if (pet == null) {
+                    flowOf(PetTabState(loading = false))
+                } else {
+                    observeRecords(pet.id).map { records ->
+                        PetTabState(loading = false, pet = pet, vaccineCount = records.size, nextDue = NextDueCalculator.nextDue(records, clock.today()))
+                    }
                 }
             }
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PetTabState())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PetTabState())
+
+    fun retry() = retryPetTabState.retry()
 }
 
 data class PetFormState(
+    /** El guardado falló (por ejemplo, sin espacio): se muestra el aviso y el formulario sigue abierto. */
+    val saveFailed: Boolean = false,
     val loaded: Boolean = false,
     val isEdit: Boolean = false,
     val name: String = "",
@@ -139,7 +151,8 @@ class PetFormViewModel(
             is ImagePickerResult.Picked -> {
                 _state.update { it.copy(importingPhoto = true, photoFailed = 0, cameraDenied = false) }
                 viewModelScope.launch {
-                    val imported = importPhotos(result.images.take(1))
+                    val picked = result.images.take(1)
+                    val imported = attempt { importPhotos(picked) }.getOrElse { ImportedPhotos(emptyList(), picked.size) }
                     _state.update { s ->
                         s.copy(
                             importingPhoto = false,
@@ -161,9 +174,9 @@ class PetFormViewModel(
             _state.update { it.copy(speciesMissing = true) }
             return
         }
-        _state.update { it.copy(saving = true) }
+        _state.update { it.copy(saving = true, saveFailed = false) }
         viewModelScope.launch {
-            val result = savePet(
+            val result = attempt { savePet(
                 PetDraft(
                     id = petId,
                     name = s.name,
@@ -177,7 +190,10 @@ class PetFormViewModel(
                     ownerAddress = s.address,
                     photoPath = s.photoPath,
                 ),
-            )
+            ) }.getOrElse {
+                _state.update { it.copy(saving = false, saveFailed = true) }
+                return@launch
+            }
             _state.update {
                 when (result) {
                     is SavePetResult.Saved -> it.copy(saving = false, done = true)

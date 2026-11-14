@@ -31,6 +31,7 @@ import com.bestid.core.designsystem.component.SheetOption
 import com.bestid.core.designsystem.component.TextAction
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
+import com.bestid.core.ui.SaveFailedCard
 import com.bestid.core.domain.usecase.RestorePet
 import com.bestid.core.domain.validation.PetError
 import com.bestid.core.model.Sex
@@ -122,6 +123,7 @@ fun PetFormScreen(
         onClose = onClose,
         closeDescription = stringResource(Res.string.pet_close),
         bottomAction = {
+            if (state.saveFailed) SaveFailedCard()
             PrimaryButton(
                 text = stringResource(Res.string.pet_form_save),
                 onClick = viewModel::save,

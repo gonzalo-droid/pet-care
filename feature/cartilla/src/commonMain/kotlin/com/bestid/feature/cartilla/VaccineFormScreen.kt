@@ -34,6 +34,7 @@ import com.bestid.core.designsystem.component.SectionTitle
 import com.bestid.core.designsystem.component.TextAction
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
+import com.bestid.core.ui.SaveFailedCard
 import com.bestid.core.domain.validation.VaccineError
 import com.bestid.core.platform.date.rememberDatePickerLauncher
 import com.bestid.core.platform.image.MAX_CARD_PAGES
@@ -142,6 +143,7 @@ fun VaccineFormScreen(
         onClose = onClose,
         closeDescription = stringResource(Res.string.form_close),
         bottomAction = {
+            if (state.saveFailed) SaveFailedCard()
             PrimaryButton(
                 text = stringResource(Res.string.form_save),
                 onClick = viewModel::save,

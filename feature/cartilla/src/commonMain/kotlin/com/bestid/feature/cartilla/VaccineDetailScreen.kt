@@ -34,6 +34,8 @@ import com.bestid.core.designsystem.component.SecondaryButton
 import com.bestid.core.designsystem.component.TextAction
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
+import com.bestid.core.ui.resources.Res as UiRes
+import com.bestid.core.ui.resources.state_load_error
 import com.bestid.core.domain.usecase.RestoreVaccineRecord
 import com.bestid.core.ui.daysText
 import com.bestid.core.ui.formatLong
@@ -113,6 +115,7 @@ fun VaccineDetailScreen(
     ) {
         when {
             state.loading -> LoadingState()
+            state.failed -> ErrorState(stringResource(UiRes.string.state_load_error), onRetry = viewModel::retry)
             record == null -> ErrorState(stringResource(Res.string.detail_not_found))
             else -> {
                 state.pet?.let {

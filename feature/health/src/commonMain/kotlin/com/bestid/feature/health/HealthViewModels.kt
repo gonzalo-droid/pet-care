@@ -36,12 +36,16 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
+import com.bestid.core.ui.Retry
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.bestid.core.ui.attempt
 import kotlinx.datetime.LocalDate
 
 data class HealthState(
     val loading: Boolean = true,
+    /** No se pudieron leer los datos: se muestra el error con "Reintentar". */
+    val failed: Boolean = false,
     val pet: Pet? = null,
     val cares: List<CareTask> = emptyList(),
     val weights: List<WeightEntry> = emptyList(),
@@ -65,19 +69,25 @@ class HealthViewModel(
     private val permission = MutableStateFlow<NotificationPermission?>(null)
     private val deletedWeight = MutableStateFlow<String?>(null)
 
-    val state: StateFlow<HealthState> = combine(
-        observeSelectedPet().flatMapLatest { pet ->
-            if (pet == null) {
-                flowOf(Triple<Pet?, List<CareTask>, List<WeightEntry>>(null, emptyList(), emptyList()))
-            } else {
-                combine(observeCares(pet.id), observeWeights(pet.id)) { cares, weights -> Triple(pet, cares, weights) }
-            }
-        },
-        permission,
-        deletedWeight,
-    ) { (pet, cares, weights), perm, deleted ->
-        HealthState(false, pet, cares, weights, clock.today(), perm, deleted)
+    private val retryHealthState = Retry()
+
+    val state: StateFlow<HealthState> = retryHealthState.wrap(HealthState(loading = false, failed = true)) {
+        combine(
+            observeSelectedPet().flatMapLatest { pet ->
+                if (pet == null) {
+                    flowOf(Triple<Pet?, List<CareTask>, List<WeightEntry>>(null, emptyList(), emptyList()))
+                } else {
+                    combine(observeCares(pet.id), observeWeights(pet.id)) { cares, weights -> Triple(pet, cares, weights) }
+                }
+            },
+            permission,
+            deletedWeight,
+        ) { (pet, cares, weights), perm, deleted ->
+            HealthState(loading = false, pet = pet, cares = cares, weights = weights, today = clock.today(), permission = perm, deletedWeightId = deleted)
+        }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HealthState())
+
+    fun retry() = retryHealthState.retry()
 
     /** Se vuelve a leer al volver a la pantalla (por si se cambió en los ajustes del sistema). */
     fun refreshPermission() {
@@ -101,6 +111,8 @@ class HealthViewModel(
 }
 
 data class CareFormState(
+    /** El guardado falló (por ejemplo, sin espacio): se muestra el aviso y el formulario sigue abierto. */
+    val saveFailed: Boolean = false,
     val loaded: Boolean = false,
     val isEdit: Boolean = false,
     val petId: String? = null,
@@ -162,9 +174,9 @@ class CareFormViewModel(
         val s = _state.value
         val petId = s.petId ?: return
         if (s.saving) return
-        _state.update { it.copy(saving = true) }
+        _state.update { it.copy(saving = true, saveFailed = false) }
         viewModelScope.launch {
-            val result = saveCare(
+            val result = attempt { saveCare(
                 CareDraft(
                     id = careId,
                     petId = petId,
@@ -175,7 +187,10 @@ class CareFormViewModel(
                     intervalUnit = s.unit,
                     reminderEnabled = s.reminderEnabled,
                 ),
-            )
+            ) }.getOrElse {
+                _state.update { it.copy(saving = false, saveFailed = true) }
+                return@launch
+            }
             when (result) {
                 is SaveCareResult.Saved -> {
                     val ask = result.task.reminderEnabled && result.task.nextDate != null && shouldAskPermission()
@@ -196,6 +211,8 @@ class CareFormViewModel(
 }
 
 data class WeightFormState(
+    /** El guardado falló (por ejemplo, sin espacio): se muestra el aviso y el formulario sigue abierto. */
+    val saveFailed: Boolean = false,
     val petId: String? = null,
     val date: LocalDate? = null,
     val kgText: String = "",
@@ -225,9 +242,13 @@ class WeightFormViewModel(
         val petId = s.petId ?: return
         val date = s.date ?: return
         if (s.saving) return
-        _state.update { it.copy(saving = true) }
+        _state.update { it.copy(saving = true, saveFailed = false) }
         viewModelScope.launch {
-            when (val result = saveWeight(petId, date, HealthValidation.parseKilograms(s.kgText))) {
+            val result = attempt { saveWeight(petId, date, HealthValidation.parseKilograms(s.kgText)) }.getOrElse {
+                _state.update { it.copy(saving = false, saveFailed = true) }
+                return@launch
+            }
+            when (result) {
                 is SaveWeightResult.Saved -> _state.update { it.copy(saving = false, done = true) }
                 is SaveWeightResult.Invalid -> _state.update { it.copy(saving = false, error = result.error) }
             }

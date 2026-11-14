@@ -9,6 +9,7 @@ import com.bestid.core.ui.resources.Res
 import com.bestid.core.ui.resources.photo_camera_denied_body
 import com.bestid.core.ui.resources.photo_camera_denied_title
 import com.bestid.core.ui.resources.photo_failed
+import com.bestid.core.ui.resources.state_save_error
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -26,4 +27,10 @@ fun CameraDeniedCard(onOpenSettings: () -> Unit) {
 @Composable
 fun PhotoFailedCard(count: Int) {
     AlertCard { Text(pluralStringResource(Res.plurals.photo_failed, count, count), style = BestIdTheme.typography.body) }
+}
+
+/** No se pudo guardar: el formulario sigue abierto para intentarlo de nuevo. */
+@Composable
+fun SaveFailedCard() {
+    AlertCard { Text(stringResource(Res.string.state_save_error), style = BestIdTheme.typography.body) }
 }

@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
+import com.bestid.core.ui.Retry
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
@@ -39,6 +40,8 @@ sealed interface Upcoming {
 
 data class HomeState(
     val loading: Boolean = true,
+    /** No se pudieron leer los datos: se muestra el error con "Reintentar". */
+    val failed: Boolean = false,
     val pet: Pet? = null,
     val vaccineCount: Int = 0,
     val upcoming: Upcoming? = null,
@@ -62,30 +65,35 @@ class HomeViewModel(
 ) : ViewModel() {
     private val permission = MutableStateFlow<NotificationPermission?>(null)
 
-    val state: StateFlow<HomeState> = observeSelectedPet()
-        .flatMapLatest { pet ->
-            if (pet == null) {
-                flowOf(HomeState(loading = false))
-            } else {
-                combine(observeRecords(pet.id), observeTypes(), observeCares(pet.id), observeWeights(pet.id), permission) { records, types, cares, weights, perm ->
-                    val today = clock.today()
-                    val vaccine = NextDueCalculator.nextDue(records, today)?.let { Upcoming.Vaccine(it.record, it.date, it.daysLeft) }
-                    val care = CareSchedule.nextDue(cares, today)?.let { Upcoming.Care(it.task, it.date, it.daysLeft) }
-                    val hasReminders = vaccine?.record?.nextDateConfirmed == true || care != null
-                    HomeState(
-                        loading = false,
-                        pet = pet,
-                        vaccineCount = records.size,
-                        upcoming = listOfNotNull(vaccine, care).sortedWith(upcomingOrder).firstOrNull(),
-                        lastRecord = records.firstOrNull(),
-                        lastWeight = weights.lastOrNull(),
-                        types = types.associateBy { it.id },
-                        remindersBlocked = hasReminders && perm == NotificationPermission.DENIED,
-                    )
+    private val retryHomeState = Retry()
+
+    val state: StateFlow<HomeState> = retryHomeState.wrap(HomeState(loading = false, failed = true)) {
+        observeSelectedPet()
+            .flatMapLatest { pet ->
+                if (pet == null) {
+                    flowOf(HomeState(loading = false))
+                } else {
+                    combine(observeRecords(pet.id), observeTypes(), observeCares(pet.id), observeWeights(pet.id), permission) { records, types, cares, weights, perm ->
+                        val today = clock.today()
+                        val vaccine = NextDueCalculator.nextDue(records, today)?.let { Upcoming.Vaccine(it.record, it.date, it.daysLeft) }
+                        val care = CareSchedule.nextDue(cares, today)?.let { Upcoming.Care(it.task, it.date, it.daysLeft) }
+                        val hasReminders = vaccine?.record?.nextDateConfirmed == true || care != null
+                        HomeState(
+                            loading = false,
+                            pet = pet,
+                            vaccineCount = records.size,
+                            upcoming = listOfNotNull(vaccine, care).sortedWith(upcomingOrder).firstOrNull(),
+                            lastRecord = records.firstOrNull(),
+                            lastWeight = weights.lastOrNull(),
+                            types = types.associateBy { it.id },
+                            remindersBlocked = hasReminders && perm == NotificationPermission.DENIED,
+                        )
+                    }
                 }
             }
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeState())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeState())
+
+    fun retry() = retryHomeState.retry()
 
     fun refreshPermission() {
         viewModelScope.launch { permission.value = observePermission() }

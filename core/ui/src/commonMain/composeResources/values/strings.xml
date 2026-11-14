@@ -38,4 +38,8 @@
         <item quantity="one">No pudimos abrir 1 foto. Prueba con otra.</item>
         <item quantity="other">No pudimos abrir %1$d fotos. Prueba con otras.</item>
     </plurals>
+
+    <!-- Estados de error (M5) -->
+    <string name="state_load_error">No pudimos cargar los datos. Inténtalo de nuevo.</string>
+    <string name="state_save_error">No pudimos guardar los cambios. Inténtalo de nuevo.</string>
 </resources>

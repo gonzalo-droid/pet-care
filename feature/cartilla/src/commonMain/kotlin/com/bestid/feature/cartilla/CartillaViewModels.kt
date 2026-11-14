@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
+import com.bestid.core.ui.Retry
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -36,6 +37,8 @@ internal fun List<String>.labels(types: Map<String, VaccineType>): List<String> 
 
 data class CartillaState(
     val loading: Boolean = true,
+    /** No se pudieron leer los datos: se muestra el error con "Reintentar". */
+    val failed: Boolean = false,
     val pet: Pet? = null,
     val records: List<VaccineRecord> = emptyList(),
     val types: Map<String, VaccineType> = emptyMap(),
@@ -50,27 +53,34 @@ class CartillaViewModel(
     observeTypes: ObserveVaccineTypes,
     clock: AppClock,
 ) : ViewModel() {
-    val state: StateFlow<CartillaState> = observeSelectedPet()
-        .flatMapLatest { pet ->
-            if (pet == null) {
-                flowOf(CartillaState(loading = false))
-            } else {
-                combine(observeRecords(pet.id), observeTypes()) { records, types ->
-                    CartillaState(
-                        loading = false,
-                        pet = pet,
-                        records = records,
-                        types = types.associateBy { it.id },
-                        nextDue = NextDueCalculator.nextDue(records, clock.today()),
-                    )
+    private val retryCartillaState = Retry()
+
+    val state: StateFlow<CartillaState> = retryCartillaState.wrap(CartillaState(loading = false, failed = true)) {
+        observeSelectedPet()
+            .flatMapLatest { pet ->
+                if (pet == null) {
+                    flowOf(CartillaState(loading = false))
+                } else {
+                    combine(observeRecords(pet.id), observeTypes()) { records, types ->
+                        CartillaState(
+                            loading = false,
+                            pet = pet,
+                            records = records,
+                            types = types.associateBy { it.id },
+                            nextDue = NextDueCalculator.nextDue(records, clock.today()),
+                        )
+                    }
                 }
             }
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CartillaState())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CartillaState())
+
+    fun retry() = retryCartillaState.retry()
 }
 
 data class DetailState(
     val loading: Boolean = true,
+    /** No se pudieron leer los datos: se muestra el error con "Reintentar". */
+    val failed: Boolean = false,
     val record: VaccineRecord? = null,
     val pet: Pet? = null,
     val vet: Vet? = null,
@@ -96,33 +106,39 @@ class VaccineDetailViewModel(
 ) : ViewModel() {
     private val deleted = MutableStateFlow<String?>(null)
 
-    val state: StateFlow<DetailState> = combine(
-        observeRecord(recordId).flatMapLatest { record ->
-            if (record == null) {
-                flowOf(DetailParts(null, null, null, emptyList()))
-            } else {
-                combine(
-                    observePet(record.petId),
-                    flow { emit(record.vetId?.let { getVet(it) }) },
-                    flow { emit(getPhotos(record.sourcePhotoIds + listOfNotNull(record.stickerPhotoId))) },
-                ) { pet, vet, photos -> DetailParts(record, pet, vet, photos) }
-            }
-        },
-        observeTypes(),
-        deleted,
-    ) { (record, pet, vet, photos), types, deletedId ->
-        DetailState(
-            loading = false,
-            record = record,
-            pet = pet,
-            vet = vet,
-            pages = photos.filter { it.id != record?.stickerPhotoId },
-            stickerPhoto = photos.firstOrNull { it.id == record?.stickerPhotoId },
-            types = types.associateBy { it.id },
-            daysLeft = record?.nextDate?.let { clock.today().daysUntilDate(it) },
-            deletedId = deletedId,
-        )
+    private val retryDetailState = Retry()
+
+    val state: StateFlow<DetailState> = retryDetailState.wrap(DetailState(loading = false, failed = true)) {
+        combine(
+            observeRecord(recordId).flatMapLatest { record ->
+                if (record == null) {
+                    flowOf(DetailParts(null, null, null, emptyList()))
+                } else {
+                    combine(
+                        observePet(record.petId),
+                        flow { emit(record.vetId?.let { getVet(it) }) },
+                        flow { emit(getPhotos(record.sourcePhotoIds + listOfNotNull(record.stickerPhotoId))) },
+                    ) { pet, vet, photos -> DetailParts(record, pet, vet, photos) }
+                }
+            },
+            observeTypes(),
+            deleted,
+        ) { (record, pet, vet, photos), types, deletedId ->
+            DetailState(
+                loading = false,
+                record = record,
+                pet = pet,
+                vet = vet,
+                pages = photos.filter { it.id != record?.stickerPhotoId },
+                stickerPhoto = photos.firstOrNull { it.id == record?.stickerPhotoId },
+                types = types.associateBy { it.id },
+                daysLeft = record?.nextDate?.let { clock.today().daysUntilDate(it) },
+                deletedId = deletedId,
+            )
+        }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DetailState())
+
+    fun retry() = retryDetailState.retry()
 
     fun delete() {
         viewModelScope.launch {

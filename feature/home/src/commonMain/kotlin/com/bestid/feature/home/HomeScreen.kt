@@ -24,6 +24,7 @@ import com.bestid.core.designsystem.component.BadgeTone
 import com.bestid.core.designsystem.component.EmptyState
 import com.bestid.core.designsystem.component.Eyebrow
 import com.bestid.core.designsystem.component.InfoCard
+import com.bestid.core.designsystem.component.ErrorState
 import com.bestid.core.designsystem.component.LoadingState
 import com.bestid.core.designsystem.component.PermissionCard
 import com.bestid.core.designsystem.component.PetAvatar
@@ -32,6 +33,8 @@ import com.bestid.core.designsystem.component.PrimaryButton
 import com.bestid.core.designsystem.component.StatCard
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
+import com.bestid.core.ui.resources.Res as UiRes
+import com.bestid.core.ui.resources.state_load_error
 import com.bestid.core.ui.avatar
 import com.bestid.core.ui.displayName
 import com.bestid.core.ui.formatWeight
@@ -87,6 +90,7 @@ fun HomeScreen(
     val pet = state.pet
     when {
         state.loading -> LoadingState(modifier = modifier.fillMaxSize())
+        state.failed -> ErrorState(stringResource(UiRes.string.state_load_error), modifier = modifier.fillMaxSize(), onRetry = viewModel::retry)
         pet == null -> Column(modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             EmptyState(
                 illustration = BestIdIcons.Pets,

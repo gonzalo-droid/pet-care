@@ -71,6 +71,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.bestid.core.ui.attempt
+import com.bestid.core.domain.usecase.ImportedPhotos
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
@@ -98,7 +100,8 @@ class CardCaptureViewModel(private val importPhotos: ImportPhotos) : ViewModel()
                 if (images.isEmpty()) return
                 _state.update { it.copy(importing = true, failed = 0, cameraDenied = false) }
                 viewModelScope.launch {
-                    val imported = importPhotos(images)
+                    val picked = images
+                    val imported = attempt { importPhotos(picked) }.getOrElse { ImportedPhotos(emptyList(), picked.size) }
                     _state.update { it.copy(importing = false, pages = it.pages + imported.photos, failed = imported.failed) }
                 }
             }

@@ -29,6 +29,7 @@ import com.bestid.core.designsystem.component.SwitchRow
 import com.bestid.core.designsystem.component.TextAction
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
+import com.bestid.core.ui.SaveFailedCard
 import com.bestid.core.domain.schedule.CareSchedule
 import com.bestid.core.domain.usecase.RestoreCareTask
 import com.bestid.core.domain.validation.CareError
@@ -107,6 +108,7 @@ fun CareFormScreen(
         onClose = onClose,
         closeDescription = stringResource(Res.string.care_form_close),
         bottomAction = {
+            if (state.saveFailed) SaveFailedCard()
             PrimaryButton(stringResource(Res.string.care_form_save), onClick = viewModel::save, loading = state.saving, enabled = state.loaded)
         },
     ) {
@@ -205,6 +207,7 @@ fun WeightFormScreen(onClose: () -> Unit, viewModel: WeightFormViewModel = koinV
         onClose = onClose,
         closeDescription = stringResource(Res.string.weight_form_close),
         bottomAction = {
+            if (state.saveFailed) SaveFailedCard()
             PrimaryButton(stringResource(Res.string.weight_form_save), onClick = viewModel::save, loading = state.saving)
         },
     ) {
