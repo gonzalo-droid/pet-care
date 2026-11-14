@@ -6,6 +6,7 @@ Registro de decisiones tomadas durante el desarrollo que cambian o precisan `SYS
 
 ### D33. CI solo con Android en Linux `[Decidido por Gonzalo]`
 El CI compila el APK y corre `./gradlew allTests` (JVM y host de Android). Las pruebas en el emulador Android (procesado de fotos y avisos) y en el simulador de iOS (pruebas comunes, flujo de UI, compilación con Xcode y apertura de la app) se corren en local antes de cada hito. Los scripts siguen en `.github/scripts/`.
+Para ahorrar minutos, el CI corre solo en PRs que cambian código de la app (filtro `paths:`; no en cambios de docs ni de `iosApp/`) o a mano desde Actions. Un push nuevo al PR cancela el build anterior, el job tiene un tope de 30 min y el APK se guarda 3 días.
 
 ### D29. M3 con fotos y sin lectura automática (opción C) `[Decidido por Gonzalo]`
 Sin Firebase por ahora (D4), M3 hace todo lo que no depende de la tecnología de lectura: `ImagePicker`, `ImageProcessor`, guardado de fotos, Bienvenida (O1), fotos de la cartilla (O2), foto del sticker, foto de la mascota y visor. Quedan para cuando se elija la lectura: Leyendo (O3), Revisar lectura (O4), la cola sin internet y la hoja C4.
