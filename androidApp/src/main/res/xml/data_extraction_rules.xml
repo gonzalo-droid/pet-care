@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+: respaldo en la nube de Google y paso directo a un teléfono nuevo (sección 13).
+     Van la base, las fotos y las preferencias. La caché (PDF y zips por compartir) no va.
+     Google limita este respaldo a 25 MB: el respaldo manual de Ajustes es el que garantiza las fotos. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="database" path="." />
+        <include domain="file" path="photos/" />
+        <include domain="file" path="bestid.preferences_pb" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="database" path="." />
+        <include domain="file" path="photos/" />
+        <include domain="file" path="bestid.preferences_pb" />
+    </device-transfer>
+</data-extraction-rules>

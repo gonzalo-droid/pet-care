@@ -90,6 +90,9 @@ class SyncReminders(
 /**
  * Mantiene los avisos al día mientras la app está abierta: vuelve a sincronizar cuando cambian
  * mascotas, vacunas, cuidados o la hora preferida (y una vez al empezar, que cubre "al abrir la app").
+ * La primera sincronización de cada arranque reprograma todo: si la base vino de un respaldo del
+ * sistema (Android Auto Backup o restaurar el iPhone), la tabla de avisos programados dice que ya
+ * existen, pero el sistema operativo del teléfono nuevo no los tiene (D35).
  */
 class ReminderCoordinator(
     private val pets: PetRepository,
@@ -100,9 +103,13 @@ class ReminderCoordinator(
 ) {
     @OptIn(FlowPreview::class)
     suspend fun run() {
+        var first = true
         combine(pets.observePets(), records.observeAll(), cares.observeAll(), settings.reminderTime) { _, _, _, _ -> }
             .debounce(DEBOUNCE)
-            .collect { sync() }
+            .collect {
+                sync(force = first)
+                first = false
+            }
     }
 
     private companion object {

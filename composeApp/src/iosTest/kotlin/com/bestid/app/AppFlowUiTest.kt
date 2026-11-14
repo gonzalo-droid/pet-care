@@ -30,6 +30,10 @@ import com.bestid.core.platform.date.LocalDatePickerOverride
 import com.bestid.core.platform.image.ImagePickerOverride
 import com.bestid.core.platform.image.ImagePickerResult
 import com.bestid.core.platform.image.LocalImagePickerOverride
+import com.bestid.core.platform.share.FilePickerOverride
+import com.bestid.core.platform.share.LocalFilePickerOverride
+import com.bestid.core.platform.share.LocalShareSheetOverride
+import com.bestid.core.platform.share.ShareSheet
 import com.bestid.core.data.repository.OkioPhotoFileStore
 import com.bestid.core.domain.port.PhotoFileStore
 import okio.FileSystem
@@ -66,6 +70,7 @@ import kotlin.test.Test
  * M2: agregar un cuidado con aviso (pantalla de permiso y avisos programados) y un peso.
  * M3: primer uso desde la Bienvenida con foto de Lilith y 2 páginas de la cartilla, que quedan en el
  * detalle de la vacuna y se abren en el visor.
+ * M4: compartir la ficha en PDF, exportar el respaldo, borrar todo e importarlo desde la Bienvenida.
  * El selector de fecha nativo y la galería se reemplazan (no se pueden tocar desde Compose); las fotos
  * falsas pasan por el ImageProcessor real de iOS.
  */
@@ -73,6 +78,14 @@ import kotlin.test.Test
 class AppFlowUiTest {
     private val dates = ArrayDeque<LocalDate>()
     private val dir = NSTemporaryDirectory() + NSUUID().UUIDString
+
+    /** Hoja de compartir falsa: guarda la ruta de cada archivo que la app quiso compartir. */
+    private val shared = mutableListOf<String>()
+    private val shareSheet = object : ShareSheet {
+        override fun share(path: String, mimeType: String, title: String) {
+            shared += path
+        }
+    }
 
     /** Galería falsa: devuelve fotos JPEG generadas, tantas como permita el selector (máximo 2). */
     private val gallery = ImagePickerOverride { _, max -> ImagePickerResult.Picked(List(minOf(max, 2)) { samplePhoto(it) }) }
@@ -110,6 +123,8 @@ class AppFlowUiTest {
             CompositionLocalProvider(
                 LocalDatePickerOverride provides DatePickerOverride { dates.removeFirstOrNull() },
                 LocalImagePickerOverride provides gallery,
+                LocalShareSheetOverride provides shareSheet,
+                LocalFilePickerOverride provides FilePickerOverride { shared.lastOrNull { it.endsWith(".zip") } },
             ) {
                 App()
             }
@@ -213,6 +228,46 @@ class AppFlowUiTest {
         onNodeWithText("Guardar peso").performClick()
         waitForText("3,8 kg")
         screenshot("10-salud-peso")
+
+        // M4: ficha en PDF desde el carnet
+        onNodeWithText("Mascota").performClick()
+        onNodeWithText("Compartir carnet").performScrollTo().performClick()
+        waitForText("Vista previa del PDF")
+        screenshot("11-compartir-ficha")
+        onNodeWithText("Compartir PDF").performClick()
+        waitUntil(timeoutMillis = 20_000) { shared.any { it.endsWith(".pdf") } }
+        val pdf = shared.last { it.endsWith(".pdf") }
+        check(readStart(pdf, 5) == "%PDF-") { "No es un PDF: $pdf" }
+        onAllNodes(hasContentDescription("Cerrar"))[0].performClick()
+
+        // Respaldo: exportar
+        onNode(hasContentDescription("Ajustes")).performClick()
+        waitForText("Hora de los avisos")
+        screenshot("12-ajustes")
+        onNodeWithText("Aún no exportaste un respaldo").performClick()
+        onNodeWithText("Exportar respaldo").performClick()
+        waitUntil(timeoutMillis = 20_000) { shared.any { it.endsWith(".zip") } }
+        check(readStart(shared.last { it.endsWith(".zip") }, 2) == "PK") { "No es un zip" }
+        waitForText("Último respaldo exportado")
+        screenshot("13-respaldo")
+        onNode(hasContentDescription("Volver")).performClick()
+
+        // Borrar todo: vuelve a la Bienvenida
+        waitForText("Borrar todos los datos")
+        onNodeWithText("Borrar todos los datos").performScrollTo().performClick()
+        onNodeWithText("Borrar todo").performClick()
+        waitForText("La cartilla de tu mascota")
+        check(NSFileManager.defaultManager.contentsOfDirectoryAtPath("$dir/photos", null).orEmpty().isEmpty())
+
+        // Teléfono "nuevo": importar el respaldo desde la Bienvenida
+        onNodeWithText("Tengo un respaldo").performClick()
+        onNodeWithText("Importar respaldo").performClick()
+        waitForText("Respaldo importado")
+        waitForText("2 mascotas")
+        screenshot("14-respaldo-importado")
+        onNode(hasContentDescription("Volver")).performClick()
+        waitForText("Lilith")
+        check(NSFileManager.defaultManager.contentsOfDirectoryAtPath("$dir/photos", null).orEmpty().size == 3)
     }
 
     private fun ComposeUiTest.fillPetForm(name: String, species: String) {
@@ -239,6 +294,14 @@ class AppFlowUiTest {
         onNode(hasContentDescription("Fecha", substring = true)).performScrollTo().performClick()
         screenshot("vacuna-${date}")
         onNodeWithText("Guardar vacuna").performClick()
+    }
+
+    /** Primeros [count] bytes de un archivo como texto (firma del formato). */
+    private fun readStart(path: String, count: Int): String {
+        val data = NSFileManager.defaultManager.contentsAtPath(path) ?: return ""
+        val bytes = ByteArray(data.length.toInt())
+        bytes.usePinned { memcpy(it.addressOf(0), data.bytes, data.length) }
+        return bytes.take(count).toByteArray().decodeToString()
     }
 
     /** JPEG de 1200x1600 de un color, como si fuera una foto de la galería. */

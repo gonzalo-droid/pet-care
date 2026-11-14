@@ -123,7 +123,7 @@ fun BestIdNavHost(navController: NavHostController = rememberNavController()) {
             val main by mainViewModel.state.collectAsStateWithLifecycle()
             when {
                 !main.loaded -> Unit
-                main.showWelcome -> WelcomeScreen(onStartWithCard = actions.startWithCard, onStartWithoutCard = actions.addPet)
+                main.showWelcome -> WelcomeScreen(onStartWithCard = actions.startWithCard, onStartWithoutCard = actions.addPet, onRestore = actions.openBackup)
                 else -> MainTabs(actions = actions, onOpenSettings = { navController.navigate(SettingsRoute) }, viewModel = mainViewModel)
             }
         }

@@ -24,11 +24,13 @@ import androidx.compose.ui.text.style.TextAlign
 import com.bestid.core.designsystem.component.BrandLogo
 import com.bestid.core.designsystem.component.PrimaryButton
 import com.bestid.core.designsystem.component.SecondaryButton
+import com.bestid.core.designsystem.component.TextAction
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
 import com.bestid.feature.onboarding.resources.Res
 import com.bestid.feature.onboarding.resources.welcome_body
 import com.bestid.feature.onboarding.resources.welcome_privacy
+import com.bestid.feature.onboarding.resources.welcome_restore
 import com.bestid.feature.onboarding.resources.welcome_scan
 import com.bestid.feature.onboarding.resources.welcome_title
 import com.bestid.feature.onboarding.resources.welcome_without_card
@@ -40,7 +42,7 @@ import org.jetbrains.compose.resources.stringResource
  * y especie) y sigue a las fotos de la cartilla; la lectura automática llega después (D29).
  */
 @Composable
-fun WelcomeScreen(onStartWithCard: () -> Unit, onStartWithoutCard: () -> Unit) {
+fun WelcomeScreen(onStartWithCard: () -> Unit, onStartWithoutCard: () -> Unit, onRestore: () -> Unit) {
     val colors = BestIdTheme.colors
     Column(
         modifier = Modifier
@@ -69,6 +71,8 @@ fun WelcomeScreen(onStartWithCard: () -> Unit, onStartWithoutCard: () -> Unit) {
         Spacer(Modifier.weight(1f, fill = false))
         PrimaryButton(stringResource(Res.string.welcome_scan), onClick = onStartWithCard, icon = BestIdIcons.PhotoCamera)
         SecondaryButton(stringResource(Res.string.welcome_without_card), onClick = onStartWithoutCard)
+        // Teléfono nuevo: importar el respaldo del anterior (sección 13).
+        TextAction(stringResource(Res.string.welcome_restore), onClick = onRestore, modifier = Modifier.align(Alignment.CenterHorizontally))
         Text(
             stringResource(Res.string.welcome_privacy),
             style = BestIdTheme.typography.support,

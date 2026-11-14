@@ -23,6 +23,8 @@ import com.bestid.core.domain.port.NotificationPermission
 import com.bestid.core.model.CareKind
 import com.bestid.core.model.IntervalUnit
 import com.bestid.core.model.Species
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -124,6 +126,20 @@ class SyncRemindersTest {
             VaccineDraft(petId = pet.id, petSpecies = Species.CAT, applicationDate = LocalDate(2025, 12, 21), nextDate = LocalDate(2026, 12, 31), typeIds = setOf("leucemia")),
         ) as com.bestid.core.domain.usecase.SaveVaccineResult.Saved
         return saved.record.id
+    }
+
+    /** Como tras restaurar un respaldo del sistema: la tabla dice que hay avisos, el teléfono no los tiene. */
+    @Test
+    fun firstSyncAfterLaunchReschedulesEverything() = runTest {
+        lilithWithVaccine()
+        sync()
+        val restoredTable = scheduled.all.value
+        val newPhone = FakeScheduler()
+        val coordinatorSync = SyncReminders(pets, records, cares, types, settings, FakeScheduledRepository().also { it.all.value = restoredTable }, newPhone, clock) { TimeZone.of("America/Lima") }
+        val job = launch { com.bestid.core.domain.reminder.ReminderCoordinator(pets, records, cares, settings, coordinatorSync).run() }
+        advanceTimeBy(1_000)
+        job.cancel()
+        assertEquals(4, newPhone.scheduled.size)
     }
 
     @Test

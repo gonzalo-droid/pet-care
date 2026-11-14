@@ -19,5 +19,6 @@
     <string name="welcome_body">Toma una foto de su cartilla de vacunas y te avisamos cuándo le toca.</string>
     <string name="welcome_scan">Empezar con su cartilla</string>
     <string name="welcome_without_card">Empezar sin cartilla</string>
+    <string name="welcome_restore">Tengo un respaldo</string>
     <string name="welcome_privacy">Tus datos se guardan en tu teléfono.</string>
 </resources>
