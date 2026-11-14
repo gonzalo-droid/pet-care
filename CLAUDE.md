@@ -61,7 +61,9 @@ Un feature nunca depende de otro feature. `core/designsystem` no depende de `cor
 - Pruebas en la JVM (dominio, Room en memoria, host de Android): `./gradlew allTests` en Linux
 - Pruebas comunes en el simulador iOS (solo en Mac): `./gradlew iosSimulatorArm64Test`
 - iOS: abrir `iosApp/iosApp.xcodeproj` en Xcode, o `xcodebuild -project iosApp/iosApp.xcodeproj -target iosApp -sdk iphonesimulator ARCHS=arm64 CODE_SIGNING_ALLOWED=NO build`
-- Catálogo de componentes en el teléfono: Ajustes (ícono arriba a la derecha) → "Ver catálogo de componentes"
+- Reglas del proyecto (también en el CI): `.github/scripts/check-rules.sh`
+- Catálogo de componentes en el teléfono (solo en debug): Ajustes (ícono arriba a la derecha) → "Ver catálogo de componentes"
+- Beta y tiendas: `docs/BETA.md`, `docs/store/`, `docs/legal/`
 
 ## Fuera del MVP (no implementar)
 

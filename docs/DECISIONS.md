@@ -2,6 +2,30 @@
 
 Registro de decisiones tomadas durante el desarrollo que cambian o precisan `SYSTEM_DESIGN.md`. La más reciente va arriba. Cada una dice quién la tomó y en qué hito.
 
+## 2026-11-14 · M5
+
+### D37. Errores sin cerrar la app `[Propuesta]`
+Si la base no se puede leer (por ejemplo, disco lleno), Inicio, Cartilla, Salud, Mascota y el detalle de la vacuna muestran "No pudimos cargar los datos" con "Reintentar" (`Retry` en `core/ui`), en lugar de cerrar la app. Si guardar falla, el formulario sigue abierto con "No pudimos guardar los cambios". Si importar una foto falla, se cuenta como foto que no se pudo abrir.
+
+### D38. Herramientas de prueba solo en debug `[Propuesta]`
+Cumple D26: "Probar aviso en 1 minuto" y el catálogo de componentes se ven en Ajustes solo en compilaciones de debug (Android `FLAG_DEBUGGABLE`, iOS `Platform.isDebugBinary`), no en la beta ni en la tienda. `DebugTestReminderReceiver` ya vivía solo en el APK de debug.
+
+### D39. Accesibilidad y reglas comprobadas en pruebas `[Propuesta]`
+- `AccessibilityUiTest` (simulador iOS): con el texto al 200 %, en Bienvenida, Nueva mascota, las 4 pestañas, Ajustes y Respaldo ningún texto queda cortado y todo lo tocable mide 48 × 48 dp o más.
+- `.github/scripts/check-rules.sh` (CI y local): sin colores ni tamaños sueltos fuera del design system, ningún estilo bajo 13 sp, sin textos escritos en el código, sin logs, sin `google-services.json` ni `testdata/private` en el repositorio y ningún feature importando otro.
+- Queda manual: probar con TalkBack y VoiceOver en teléfonos reales (`docs/BETA.md`).
+
+### D40. Beta y tiendas `[Propuesta]`
+- **Android:** firma de subida leída de `local.properties` o de variables de entorno (nunca en el repositorio). `versionCode` se pasa con `-Pbestid.versionCode`. Sin R8 en la beta: Room, Koin y kotlinx.serialization necesitan reglas que se validan aparte.
+- **iOS:**
+  - El bundle es exactamente `com.bestid.app`. La plantilla le agregaba el `TEAM_ID`, lo que habría impedido usar el ID de D11.
+  - Versiones en `Config.xcconfig`.
+  - `PrivacyInfo.xcprivacy` sin rastreo ni recopilación.
+  - `ITSAppUsesNonExemptEncryption = NO`.
+- **Fichas y política:** borradores en `docs/store/` y `docs/legal/politica-de-privacidad.md`. La política sigue `[Pendiente]` de asesoría legal (sección 14).
+- **Métricas:** el criterio de M5 pide "métricas de la sección 16 registrándose", pero la sección 16 y D5 deciden no usar analítica. Durante la beta se miden a mano (`docs/BETA.md`). Si Gonzalo quiere métricas automáticas, se agrega PostHog con un ID aleatorio, sin datos personales.
+- **Sentry** sigue fuera hasta tener el DSN (D12).
+
 ## 2026-11-14 · M4
 
 ### D34. Qué incluye la ficha en PDF: se sigue el prototipo `[Propuesta, revisar]`

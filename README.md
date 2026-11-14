@@ -14,7 +14,7 @@ La especificación completa está en [`docs/SYSTEM_DESIGN.md`](docs/SYSTEM_DESIG
 | M3 | Fotos: bienvenida, fotos de la cartilla, sticker, foto de la mascota, visor | Hecho en código (sin lectura automática, ver D29); falta probar en teléfonos reales |
 | M3b | Lectura automática de la cartilla (Leyendo, Revisar lectura, cola sin internet) | Pendiente: falta elegir la tecnología de lectura |
 | M4 | PDF para compartir, respaldo (exportar e importar), Ajustes | Hecho en código; falta probar Android ↔ iOS en teléfonos reales |
-| M5 | Estados vacíos y de error, accesibilidad, textos finales, beta cerrada | Pendiente |
+| M5 | Estados vacíos y de error, accesibilidad, textos finales, fichas de tienda, beta cerrada | Hecho en código; falta la beta con 10 dueños (ver [`docs/BETA.md`](docs/BETA.md)) |
 
 ## Pantallas
 
@@ -67,7 +67,7 @@ feature/
   settings/          Ajustes y respaldo
 build-logic/         Plugins de convención de Gradle (bestid.kmp.library, .compose, .feature)
 iosApp/              Proyecto Xcode
-docs/                SYSTEM_DESIGN.md, DECISIONS.md, licencias y design/ (prototipo)
+docs/                SYSTEM_DESIGN.md, DECISIONS.md, BETA.md, store/ (fichas), legal/ (privacidad), licencias y design/
 .github/             CI: compila Android y corre las pruebas de JVM; scripts para probar en emulador y simulador en local
 ```
 
@@ -82,13 +82,15 @@ Requisitos: JDK 21, Android Studio (aporta el Android SDK, que Gradle necesita i
 
 - **Android:** abre el proyecto en Android Studio y corre `androidApp`, o por terminal `./gradlew :androidApp:assembleDebug`.
 - **iOS:** abre `iosApp/iosApp.xcodeproj` en Xcode y corre en un simulador. La primera compilación descarga Kotlin/Native y tarda varios minutos. Para un iPhone real, completa `TEAM_ID` en `iosApp/Configuration/Config.xcconfig`.
-- **Pruebas:** `./gradlew allTests` (JVM y host de Android). En Mac, también `./gradlew iosSimulatorArm64Test`, que incluye los flujos de M1 a M4 en el simulador.
+- **Reglas del proyecto:** `.github/scripts/check-rules.sh` (colores, tamaños, textos, privacidad, dependencias).
+- **Pruebas:** `./gradlew allTests` (JVM y host de Android). En Mac, también `./gradlew iosSimulatorArm64Test`, que incluye los flujos de M1 a M4 y la prueba de accesibilidad con texto al 200 % en el simulador.
 - **Fotos en Android:** el emulador no tiene cámara real (muestra una escena virtual); para la galería, arrastra imágenes a la ventana del emulador y se guardan en Descargas.
 - **Procesado de fotos en Android** (con un emulador o teléfono conectado): `./gradlew :core:platform:connectedAndroidDeviceTest`.
 - **Avisos en Android de punta a punta** (emulador encendido): `.github/scripts/android-reminders-e2e.sh build/android-e2e`.
 - **Respaldo:** Ajustes → Respaldo → "Exportar respaldo" lo manda a la hoja de compartir. En el otro teléfono, "Importar respaldo" (o "Tengo un respaldo" en la Bienvenida).
-- **Avisos:** Ajustes → "Probar aviso en 1 minuto" programa un aviso de prueba; cierra la app (o reinicia el teléfono) y espera.
-- **Catálogo de componentes en el teléfono:** Ajustes (engranaje arriba a la derecha) → "Ver catálogo de componentes".
+- **Avisos (debug):** Ajustes → "Probar aviso en 1 minuto" programa un aviso de prueba; cierra la app (o reinicia el teléfono) y espera.
+- **Catálogo de componentes y "Probar aviso" (solo en debug):** Ajustes (engranaje arriba a la derecha) → "Herramientas de prueba".
+- **Beta (Google Play y TestFlight):** ver [`docs/BETA.md`](docs/BETA.md).
 
 ## Licencias de terceros
 
