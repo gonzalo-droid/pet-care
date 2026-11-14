@@ -12,9 +12,9 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 /** Pestaña Mascota. */
-fun NavGraphBuilder.petGraph(onEditPet: (String) -> Unit, onAddPet: () -> Unit) {
+fun NavGraphBuilder.petGraph(onEditPet: (String) -> Unit, onAddPet: () -> Unit, onShare: () -> Unit) {
     navigation<PetGraph>(startDestination = PetRoute) {
-        composable<PetRoute> { PetScreen(onEditPet = onEditPet, onAddPet = onAddPet) }
+        composable<PetRoute> { PetScreen(onEditPet = onEditPet, onAddPet = onAddPet, onShare = onShare) }
     }
 }
 

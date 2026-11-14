@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ajustes (A1) -->
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_back">Volver</string>
+    <string name="settings_backup">Respaldo</string>
+    <string name="settings_backup_last">Último respaldo: %1$s</string>
+    <string name="settings_backup_never">Aún no exportaste un respaldo</string>
+    <string name="settings_reminders">Avisos</string>
+    <string name="settings_reminder_time">Hora de los avisos</string>
+    <string name="settings_reminder_time_value">%1$d:%2$s %3$s</string>
+    <string name="settings_am">a. m.</string>
+    <string name="settings_pm">p. m.</string>
+    <string name="settings_reminder_time_dialog">¿A qué hora te avisamos?</string>
+    <string name="settings_reminder_time_hint">Los avisos de vacunas y cuidados llegan a esta hora.</string>
+    <string name="settings_privacy">Privacidad</string>
+    <string name="settings_privacy_body">Tus datos y fotos se guardan solo en este teléfono: BestID no tiene cuenta ni servidor. Solo salen del teléfono cuando tú compartes una ficha o exportas un respaldo.</string>
+    <string name="settings_about">Acerca de</string>
+    <string name="settings_about_body">BestID te ayuda a llevar la cartilla de vacunas de tu mascota. No reemplaza la opinión de tu veterinario.</string>
+    <string name="settings_version">Versión %1$s</string>
+    <string name="settings_delete_all">Borrar todos los datos</string>
+    <string name="settings_delete_title">¿Borrar todos los datos?</string>
+    <string name="settings_delete_body">Se borran todas las mascotas, vacunas, cuidados, pesos, fotos y avisos de este teléfono. No se puede deshacer. Si quieres conservarlos, exporta un respaldo antes.</string>
+    <string name="settings_delete_confirm">Borrar todo</string>
+    <string name="settings_tools">Herramientas de prueba</string>
+    <string name="settings_open_catalog">Ver catálogo de componentes</string>
+    <string name="settings_test_reminder">Probar aviso en 1 minuto</string>
+    <string name="settings_test_reminder_done">Listo. Cierra la app o reinicia el teléfono: el aviso debería llegar en 1 minuto.</string>
+
+    <!-- Respaldo (A2) -->
+    <string name="backup_title">Respaldo</string>
+    <string name="backup_body">El respaldo es un archivo con tus mascotas, vacunas, cuidados, pesos y fotos. Guárdalo en Drive, en Archivos o envíatelo por WhatsApp. Para pasar tus datos a otro teléfono, impórtalo allí.</string>
+    <string name="backup_last">Último respaldo exportado: %1$s</string>
+    <string name="backup_never">Aún no exportaste un respaldo.</string>
+    <string name="backup_export">Exportar respaldo</string>
+    <string name="backup_import">Importar respaldo</string>
+    <string name="backup_exporting">Preparando el respaldo…</string>
+    <string name="backup_importing">Importando el respaldo…</string>
+    <string name="backup_file_name">BestID-respaldo-%1$s.zip</string>
+    <string name="backup_share_title">Respaldo de BestID</string>
+    <string name="backup_import_hint">Al importar se combinan los datos: lo más reciente queda y no se borra nada de este teléfono.</string>
+    <string name="backup_done_title">Respaldo importado</string>
+    <plurals name="backup_done_pets">
+        <item quantity="one">1 mascota</item>
+        <item quantity="other">%1$d mascotas</item>
+    </plurals>
+    <plurals name="backup_done_vaccines">
+        <item quantity="one">1 vacuna</item>
+        <item quantity="other">%1$d vacunas</item>
+    </plurals>
+    <plurals name="backup_done_cares">
+        <item quantity="one">1 cuidado</item>
+        <item quantity="other">%1$d cuidados</item>
+    </plurals>
+    <plurals name="backup_done_weights">
+        <item quantity="one">1 peso</item>
+        <item quantity="other">%1$d pesos</item>
+    </plurals>
+    <plurals name="backup_done_photos">
+        <item quantity="one">1 foto</item>
+        <item quantity="other">%1$d fotos</item>
+    </plurals>
+    <string name="backup_done_body">Se importaron %1$s.</string>
+    <string name="backup_done_and">y</string>
+    <string name="backup_done_nothing">Este teléfono ya tenía todo lo del respaldo. No había nada nuevo.</string>
+    <string name="backup_error_invalid">Ese archivo no es un respaldo de BestID o está dañado.</string>
+    <string name="backup_error_too_new">Ese respaldo se hizo con una versión más nueva de BestID. Actualiza la app e inténtalo de nuevo.</string>
+    <string name="backup_error_export">No pudimos crear el respaldo. Inténtalo de nuevo.</string>
+</resources>

@@ -25,6 +25,8 @@ kotlin {
             implementation(projects.feature.health)
             implementation(projects.feature.pet)
             implementation(projects.feature.onboarding)
+            implementation(projects.feature.share)
+            implementation(projects.feature.settings)
 
             implementation(libs.androidx.navigation.compose)
             implementation(libs.androidx.lifecycle.viewmodel.compose)

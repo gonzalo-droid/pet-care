@@ -10,6 +10,7 @@
     <string name="ds_more_details">Más detalles</string>
     <string name="ds_close">Cerrar</string>
     <string name="ds_cancel">Cancelar</string>
+    <string name="ds_accept">Aceptar</string>
     <string name="ds_change_pet">Cambiar de mascota. Seleccionada: %1$s</string>
     <string name="ds_pets_title">Tus mascotas</string>
     <string name="ds_add_pet">Agregar mascota</string>

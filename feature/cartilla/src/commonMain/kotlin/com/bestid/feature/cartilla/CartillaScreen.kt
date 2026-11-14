@@ -19,6 +19,7 @@ import com.bestid.core.designsystem.component.Eyebrow
 import com.bestid.core.designsystem.component.InfoCard
 import com.bestid.core.designsystem.component.LoadingState
 import com.bestid.core.designsystem.component.PrimaryButton
+import com.bestid.core.designsystem.component.SecondaryButton
 import com.bestid.core.designsystem.component.VaccineRecordCard
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
@@ -32,6 +33,7 @@ import com.bestid.core.ui.vaccinesRegisteredText
 import com.bestid.feature.cartilla.resources.Res
 import com.bestid.feature.cartilla.resources.cartilla_add_pet
 import com.bestid.feature.cartilla.resources.cartilla_add_vaccine
+import com.bestid.feature.cartilla.resources.cartilla_share
 import com.bestid.feature.cartilla.resources.cartilla_empty_body
 import com.bestid.feature.cartilla.resources.cartilla_empty_title
 import com.bestid.feature.cartilla.resources.cartilla_in_days
@@ -54,6 +56,7 @@ fun CartillaScreen(
     onOpenRecord: (String) -> Unit,
     onAddRecord: () -> Unit,
     onAddPet: () -> Unit,
+    onShare: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CartillaViewModel = koinViewModel(),
 ) {
@@ -112,6 +115,9 @@ fun CartillaScreen(
                 onClick = onAddRecord,
                 icon = BestIdIcons.Add,
             )
+            if (state.records.isNotEmpty()) {
+                SecondaryButton(text = stringResource(Res.string.cartilla_share), onClick = onShare, icon = BestIdIcons.Share)
+            }
         }
     }
 }

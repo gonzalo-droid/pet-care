@@ -26,6 +26,7 @@ import com.bestid.feature.pet.resources.Res
 import com.bestid.feature.pet.resources.pet_add
 import com.bestid.feature.pet.resources.pet_add_another
 import com.bestid.feature.pet.resources.pet_complete_data
+import com.bestid.feature.pet.resources.pet_share
 import com.bestid.feature.pet.resources.pet_empty_body
 import com.bestid.feature.pet.resources.pet_empty_title
 import com.bestid.feature.pet.resources.pet_next_none
@@ -44,6 +45,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun PetScreen(
     onEditPet: (String) -> Unit,
     onAddPet: () -> Unit,
+    onShare: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PetTabViewModel = koinViewModel(),
 ) {
@@ -88,6 +90,7 @@ fun PetScreen(
                 vaccineCount = state.vaccineCount.toString(),
                 nextDate = state.nextDue?.date?.formatLong() ?: stringResource(Res.string.pet_next_none),
             )
+            PrimaryButton(text = stringResource(Res.string.pet_share), onClick = onShare, icon = BestIdIcons.Share)
             SecondaryButton(
                 text = stringResource(Res.string.pet_complete_data),
                 onClick = { onEditPet(pet.id) },

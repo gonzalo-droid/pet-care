@@ -7,6 +7,7 @@
     <string name="cartilla_no_pet_body">La cartilla muestra las vacunas de la mascota que elijas arriba.</string>
     <string name="cartilla_add_pet">Agregar mascota</string>
     <string name="cartilla_add_vaccine">Agregar vacuna</string>
+    <string name="cartilla_share">Compartir ficha</string>
     <string name="cartilla_next">Próxima</string>
     <string name="cartilla_next_line">%1$s · %2$s</string>
     <string name="cartilla_in_days">En %1$s</string>

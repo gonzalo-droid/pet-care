@@ -19,8 +19,14 @@ sealed interface Route
 @Serializable data object HealthRoute : Route
 @Serializable data object PetRoute : Route
 
-/** Ajustes (A1). En M0 solo enlaza al catálogo de componentes. */
+/** Ajustes (A1). */
 @Serializable data object SettingsRoute : Route
+
+/** Respaldo (A2): exportar, importar y fecha del último respaldo. */
+@Serializable data object BackupRoute : Route
+
+/** Compartir ficha en PDF (SH1) de la mascota seleccionada. */
+@Serializable data object ShareRoute : Route
 
 /** Catálogo de componentes del design system (herramienta de desarrollo). */
 @Serializable data object ComponentCatalogRoute : Route

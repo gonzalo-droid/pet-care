@@ -17,11 +17,15 @@ import com.bestid.core.model.WeightEntry
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.LocalDate
 
-/** Qué incluir en la ficha (SH1). Propietario y dirección van solo si se marcan (sección 12). */
+/**
+ * Qué incluir en la ficha (SH1), como en el prototipo: vacunas y fotos de la cartilla marcadas,
+ * peso y nombre del tutor sin marcar. La dirección nunca va en la ficha (D34).
+ */
 data class SheetOptions(
-    val includeOwner: Boolean = false,
+    val includeVaccines: Boolean = true,
+    val includeCardPhotos: Boolean = true,
     val includeWeight: Boolean = false,
-    val includeCardPhotos: Boolean = false,
+    val includeOwnerName: Boolean = false,
 )
 
 /** Una vacuna lista para la tabla: con los nombres de sus tipos y su veterinaria. */
@@ -29,7 +33,7 @@ data class SheetVaccine(val record: VaccineRecord, val typeLabels: List<String>,
 
 /** Datos de la ficha en PDF. Sin textos de interfaz: los pone la pantalla (regla 3). */
 data class PetSheet(
-    /** Sin propietario ni dirección si no se pidieron. */
+    /** Nunca con dirección; con el nombre del tutor solo si se pidió. */
     val pet: Pet,
     /** De la más reciente a la más antigua. */
     val vaccines: List<SheetVaccine>,
@@ -55,13 +59,13 @@ class BuildPetSheet(
         val petRecords = records.observeForPet(petId).first()
         val labels = types.getAll().associate { it.id to it.label }
         val today = clock.today()
-        val vaccines = petRecords.map { record ->
+        val vaccines = if (!options.includeVaccines) emptyList() else petRecords.map { record ->
             SheetVaccine(record, record.typeIds.mapNotNull { labels[it] }, record.vetId?.let { vets.get(it) })
         }
         val pageIds = if (options.includeCardPhotos) petRecords.flatMap { it.sourcePhotoIds }.distinct() else emptyList()
         val pages = photos.get(pageIds).associateBy { it.id }
         return PetSheet(
-            pet = if (options.includeOwner) pet else pet.copy(ownerName = null, ownerAddress = null),
+            pet = pet.copy(ownerName = pet.ownerName.takeIf { options.includeOwnerName }, ownerAddress = null),
             vaccines = vaccines,
             nextDue = NextDueCalculator.nextDue(petRecords, today),
             weights = if (options.includeWeight) weights.observeForPet(petId).first() else emptyList(),

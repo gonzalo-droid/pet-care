@@ -18,10 +18,11 @@ fun NavGraphBuilder.cartillaGraph(
     onOpenRecord: (String) -> Unit,
     onAddRecord: () -> Unit,
     onAddPet: () -> Unit,
+    onShare: () -> Unit,
 ) {
     navigation<CartillaGraph>(startDestination = CartillaRoute) {
         composable<CartillaRoute> {
-            CartillaScreen(onOpenRecord = onOpenRecord, onAddRecord = onAddRecord, onAddPet = onAddPet)
+            CartillaScreen(onOpenRecord = onOpenRecord, onAddRecord = onAddRecord, onAddPet = onAddPet, onShare = onShare)
         }
     }
 }

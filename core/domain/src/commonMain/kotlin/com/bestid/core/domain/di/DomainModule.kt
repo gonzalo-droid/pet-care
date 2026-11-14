@@ -34,6 +34,7 @@ import com.bestid.core.domain.usecase.SetCareReminder
 import com.bestid.core.domain.usecase.CleanUpPhotos
 import com.bestid.core.domain.usecase.GetPhotos
 import com.bestid.core.domain.usecase.ImportPhotos
+import com.bestid.core.domain.usecase.ShareFilePaths
 import com.bestid.core.domain.backup.DeleteAllData
 import com.bestid.core.domain.backup.ExportBackup
 import com.bestid.core.domain.backup.ImportBackup
@@ -83,6 +84,7 @@ val domainModule = module {
     factoryOf(::ImportBackup)
     factoryOf(::DeleteAllData)
     factoryOf(::BuildPetSheet)
+    factoryOf(::ShareFilePaths)
     factoryOf(::ObserveReminderTime)
     factoryOf(::SetReminderTime)
     factoryOf(::ObserveLastBackup)

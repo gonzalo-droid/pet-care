@@ -23,7 +23,11 @@ import com.bestid.core.designsystem.component.MainScaffold
 import com.bestid.core.designsystem.component.PetSelector
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.domain.reminder.ReminderRefType
+import com.bestid.core.navigation.BackupRoute
 import com.bestid.core.navigation.CardCaptureRoute
+import com.bestid.core.navigation.ShareRoute
+import com.bestid.feature.settings.settingsFlows
+import com.bestid.feature.share.shareFlows
 import com.bestid.core.navigation.CareEditRoute
 import com.bestid.core.navigation.PhotoViewerRoute
 import androidx.navigation.toRoute
@@ -75,6 +79,11 @@ private class AppActions(private val nav: NavHostController) {
         }
     }
     val openPhoto: (String) -> Unit = { nav.navigate(PhotoViewerRoute(it)) }
+    val share: () -> Unit = { nav.navigate(ShareRoute) }
+    val openBackup: () -> Unit = { nav.navigate(BackupRoute) }
+
+    /** Tras "Borrar todos los datos" se vuelve a la raíz, que muestra la Bienvenida. */
+    val deletedAll: () -> Unit = { nav.popBackStack(MainRoute, inclusive = false) }
     val editPet: (String) -> Unit = { nav.navigate(PetEditRoute(it)) }
     val addCare: () -> Unit = { nav.navigate(CareEditRoute()) }
     val openCare: (String) -> Unit = { nav.navigate(CareEditRoute(it)) }
@@ -131,9 +140,13 @@ fun BestIdNavHost(navController: NavHostController = rememberNavController()) {
             PhotoViewerScreen(path = entry.toRoute<PhotoViewerRoute>().path, onClose = actions.back)
         }
         onboardingFlows(onDone = actions.back)
-        composable<SettingsRoute> {
-            SettingsPlaceholder(onClose = actions.back, onOpenCatalog = { navController.navigate(ComponentCatalogRoute) })
-        }
+        shareFlows(onClose = actions.back)
+        settingsFlows(
+            onClose = actions.back,
+            onOpenBackup = actions.openBackup,
+            onOpenCatalog = { navController.navigate(ComponentCatalogRoute) },
+            onDeletedAll = actions.deletedAll,
+        )
         composable<ComponentCatalogRoute> {
             CatalogScreen(onClose = actions.back)
         }
@@ -187,9 +200,9 @@ private fun MainTabs(
                 onOpenCare = actions.openCare,
                 onAddWeight = actions.addWeight,
             )
-            cartillaGraph(onOpenRecord = actions.openRecord, onAddRecord = actions.addRecord, onAddPet = actions.addPet)
+            cartillaGraph(onOpenRecord = actions.openRecord, onAddRecord = actions.addRecord, onAddPet = actions.addPet, onShare = actions.share)
             healthGraph(onAddCare = actions.addCare, onOpenCare = actions.openCare, onAddWeight = actions.addWeight, onAddPet = actions.addPet)
-            petGraph(onEditPet = actions.editPet, onAddPet = actions.addPet)
+            petGraph(onEditPet = actions.editPet, onAddPet = actions.addPet, onShare = actions.share)
         }
     }
 }

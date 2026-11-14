@@ -8,11 +8,15 @@ import com.bestid.core.ui.resources.months_short
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
 import org.jetbrains.compose.resources.pluralStringResource
+import org.jetbrains.compose.resources.getStringArray
 import org.jetbrains.compose.resources.stringArrayResource
 
 /** "21 dic 2025" (sección 15: fechas legibles en es-PE). */
 @Composable
 fun LocalDate.formatLong(): String = "$day ${monthShort()} $year"
+
+/** "21 dic 2025" fuera de la composición (por ejemplo, al armar el PDF en un ViewModel). */
+suspend fun LocalDate.formatLongText(): String = "$day ${getStringArray(Res.array.months_short)[month.number - 1]} $year"
 
 /** "31 dic" */
 @Composable

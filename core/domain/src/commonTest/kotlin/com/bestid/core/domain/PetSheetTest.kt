@@ -55,12 +55,14 @@ class PetSheetTest {
     }
 
     @Test
-    fun byDefaultTheSheetHasNoOwnerAddressWeightOrPhotos() = runTest {
+    fun byDefaultTheSheetHasVaccinesAndPhotosButNoOwnerAddressOrWeight() = runTest {
         val sheet = assertNotNull(build(lilith(), SheetOptions()))
         assertNull(sheet.pet.ownerName)
         assertNull(sheet.pet.ownerAddress)
         assertTrue(sheet.weights.isEmpty())
-        assertTrue(sheet.cardPhotos.isEmpty())
+        assertEquals(2, sheet.vaccines.size)
+        // Sin repetir la página que comparten las dos vacunas.
+        assertEquals(2, sheet.cardPhotos.size)
         assertEquals(clock.today(), sheet.generatedOn)
     }
 
@@ -74,13 +76,19 @@ class PetSheetTest {
     }
 
     @Test
-    fun ownerWeightAndPhotosAreAddedWhenChosen() = runTest {
-        val sheet = assertNotNull(build(lilith(), SheetOptions(includeOwner = true, includeWeight = true, includeCardPhotos = true)))
+    fun ownerNameAndWeightAreAddedWhenChosenButNeverTheAddress() = runTest {
+        val sheet = assertNotNull(build(lilith(), SheetOptions(includeOwnerName = true, includeWeight = true)))
         assertEquals("Tutor de Prueba", sheet.pet.ownerName)
-        assertEquals("Av. Siempre Viva 123", sheet.pet.ownerAddress)
+        assertNull(sheet.pet.ownerAddress)
         assertEquals(listOf(3800), sheet.weights.map { it.grams })
-        // Sin repetir la página que comparten las dos vacunas.
-        assertEquals(2, sheet.cardPhotos.size)
+    }
+
+    @Test
+    fun vaccinesAndPhotosCanBeLeftOut() = runTest {
+        val sheet = assertNotNull(build(lilith(), SheetOptions(includeVaccines = false, includeCardPhotos = false)))
+        assertTrue(sheet.vaccines.isEmpty())
+        assertTrue(sheet.cardPhotos.isEmpty())
+        assertEquals(LocalDate(2026, 12, 21), sheet.nextDue?.date) // la próxima dosis sigue en la ficha
     }
 
     @Test

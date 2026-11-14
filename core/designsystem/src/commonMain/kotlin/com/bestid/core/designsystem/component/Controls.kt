@@ -193,6 +193,32 @@ fun SegmentedControl(
     }
 }
 
+/**
+ * Casilla en una lista dentro de una tarjeta ("¿Qué incluimos?" al compartir). Toda la fila es
+ * tocable; el estado se ve en la casilla, no solo en el color.
+ */
+@Composable
+fun CheckRow(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = BestIdTheme.sizes.minTouch)
+            .toggleable(value = checked, enabled = enabled, role = Role.Checkbox, onValueChange = onCheckedChange)
+            .padding(vertical = BestIdTheme.spacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.sm),
+    ) {
+        Checkbox(checked = checked, onCheckedChange = null, enabled = enabled, colors = optionCheckboxColors())
+        Text(label, style = BestIdTheme.typography.bodyStrong, color = if (enabled) BestIdTheme.colors.ink else BestIdTheme.colors.muted)
+    }
+}
+
 /** Fila con interruptor (activar avisos de un cuidado). Toda la fila es tocable. */
 @Composable
 fun SwitchRow(

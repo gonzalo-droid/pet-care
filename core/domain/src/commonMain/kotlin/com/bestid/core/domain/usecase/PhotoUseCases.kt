@@ -90,3 +90,12 @@ class CleanUpPhotos(
         return toDelete.size
     }
 }
+
+/** Rutas absolutas para generar y compartir archivos ahora mismo (no se guardan). */
+class ShareFilePaths(private val temp: com.bestid.core.domain.port.TempFileStore, private val files: PhotoFileStore) {
+    /** Archivo nuevo en la carpeta de compartir. */
+    fun target(fileName: String): String = temp.path(fileName)
+
+    /** Ruta absoluta de una foto guardada ("photos/…"). */
+    fun photo(relativePath: String): String = files.absolutePath(relativePath)
+}
