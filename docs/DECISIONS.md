@@ -2,6 +2,25 @@
 
 Registro de decisiones tomadas durante el desarrollo que cambian o precisan `SYSTEM_DESIGN.md`. La más reciente va arriba. Cada una dice quién la tomó y en qué hito.
 
+## 2026-11-14 · M4
+
+### D34. Qué incluye la ficha en PDF: se sigue el prototipo `[Propuesta, revisar]`
+La sección 12 permite incluir propietario y dirección si se marcan. El prototipo (captura 14) es más estricto y es lo que se implementó: la dirección **nunca** va en la ficha, solo se puede marcar el nombre del tutor. Casillas: "Vacunas con lote y fecha" y "Fotos de la cartilla" marcadas; "Historial de peso" y "Nombre del tutor" sin marcar. Cumple el criterio de M4 (sin dirección por defecto).
+
+### D35. Reprogramar todos los avisos al arrancar `[Propuesta]`
+Android Auto Backup y la restauración del iPhone traen la base con la tabla `scheduled_notifications`, pero no las alarmas del sistema. Con la sincronización por diferencia (D24), el teléfono nuevo creería que los avisos ya están programados. Por eso la primera sincronización de cada arranque cancela y vuelve a programar todo (máximo 50 avisos); las siguientes siguen siendo solo la diferencia.
+
+### D36. Respaldo, PDF y Ajustes: detalles técnicos `[Propuesta]`
+- **Formato del respaldo:** `manifest.json` (versión del formato 1, fecha, versión de la app), `data.json` con todas las entidades (también las borradas, sin los avisos programados) y `photos/`. El JSON es propio del respaldo, no de la base: fechas ISO, instantes en milisegundos y enums por nombre. Un respaldo de una versión de formato más nueva se rechaza con un mensaje para actualizar la app.
+- **Zip:** okio solo lee zips, así que se escribe con un escritor propio sin compresión (las fotos ya son JPEG) y se lee con okio, que también abre un zip vuelto a comprimir en una computadora. Probado contra `java.util.zip`.
+- **Importar:** combina por ID y gana el `updatedAt` más reciente; los tipos escritos a mano y las fotos entran solo si faltan. Solo se aceptan fotos `photos/<id>.jpg`, para que un zip manipulado no escriba fuera de esa carpeta. No borra nada del teléfono.
+- **Exportar e importar** usan la hoja de compartir del sistema y el selector de archivos en ambas plataformas `[Decidido por Gonzalo]`. La Bienvenida tiene "Tengo un respaldo" para importarlo en un teléfono nuevo.
+- **Auto Backup de Android:** base, fotos y preferencias; la caché queda fuera.
+- **PDF:** el diseño (A4, encabezado, tablas que repiten su encabezado al cambiar de página, pie en cada página, fotos a página completa) es código común y probado; cada plataforma solo dibuja (`PdfDocument`, `UIGraphicsPDFRenderer`). Usa la fuente del sistema, no Nunito.
+- **Hora de los avisos:** selector de hora de Material 3 (común), reloj de 12 horas.
+- **Privacidad y Acerca de:** texto provisional; el texto legal sigue `[Pendiente]` de asesoría (sección 14).
+- **Ajustes** pasa a `feature/settings` y la ficha a `feature/share`. "Probar aviso" y el catálogo siguen en "Herramientas de prueba" hasta M5 (D26).
+
 ## 2026-11-13 · M3
 
 ### D33. CI solo con Android en Linux `[Decidido por Gonzalo]`

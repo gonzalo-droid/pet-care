@@ -33,9 +33,9 @@ App móvil (Android e iOS) que digitaliza la cartilla de vacunación de mascotas
 /core/ui             presentación compartida entre features: etiquetas (especie, sexo), fechas es-PE, plurales
 /core/navigation     rutas tipadas; los features navegan solo a través de ellas
 /core/domain         casos de uso, validaciones, próxima dosis, ReminderEngine y puertos (repositorios, avisos)
-/core/data           Room, DataStore, repositorios (luego respaldo)
+/core/data           Room, DataStore, repositorios, fotos y respaldo
 /core/platform       adaptadores Android e iOS de los puertos de plataforma (DatePicker, avisos, cámara, galería y procesado de fotos)
-/feature/*           home, cartilla, health, pet, onboarding: pantalla + ViewModel
+/feature/*           home, cartilla, health, pet, onboarding, share, settings: pantalla + ViewModel
 /build-logic         plugins de convención de Gradle
 /iosApp              proyecto Xcode
 /docs                SYSTEM_DESIGN.md, DECISIONS.md, licencias y design/ (prototipo: capturas, HTML por pantalla y flujos)
