@@ -166,3 +166,56 @@ class FakePhotoRepository : com.bestid.core.domain.port.PhotoRepository {
         all.value = all.value.filterNot { it.id in ids }
     }
 }
+
+/** Respaldo sobre los repositorios falsos, como haría Room. */
+class FakeBackupStore(
+    private val pets: FakePetRepository,
+    private val vets: FakeVetRepository,
+    private val types: FakeTypeRepository,
+    private val records: FakeRecordRepository,
+    private val cares: FakeCareRepository,
+    private val weights: FakeWeightRepository,
+    private val photos: FakePhotoRepository,
+) : com.bestid.core.domain.port.BackupStore {
+    override suspend fun snapshot() = com.bestid.core.domain.backup.BackupData(
+        pets.all.value, vets.all.value, types.all.value.filter { it.isCustom }, records.all.value,
+        cares.all.value, weights.all.value, photos.all.value,
+    )
+    override suspend fun apply(changes: com.bestid.core.domain.backup.BackupData) {
+        changes.pets.forEach { pets.upsert(it) }
+        changes.vets.forEach { vets.upsert(it) }
+        changes.vaccineTypes.forEach { types.insert(it) }
+        changes.records.forEach { records.upsert(it) }
+        changes.cares.forEach { cares.upsert(it) }
+        changes.weights.forEach { weights.upsert(it) }
+        changes.photos.forEach { photos.insert(it) }
+    }
+    override suspend fun clearAll() {
+        pets.all.value = emptyList(); vets.all.value = emptyList(); records.all.value = emptyList()
+        cares.all.value = emptyList(); weights.all.value = emptyList(); photos.all.value = emptyList()
+        types.all.value = types.all.value.filterNot { it.isCustom }
+    }
+}
+
+/** "Zip" en memoria: cada ruta guarda el manifiesto, los datos y los bytes de las fotos. */
+class FakeBackupArchive(private val files: FakePhotoFileStore) : com.bestid.core.domain.port.BackupArchive {
+    class Zip(val manifest: com.bestid.core.domain.backup.BackupManifest, val data: com.bestid.core.domain.backup.BackupData, val photos: Map<String, ByteArray>)
+    val zips = mutableMapOf<String, Zip>()
+    override suspend fun write(target: String, manifest: com.bestid.core.domain.backup.BackupManifest, data: com.bestid.core.domain.backup.BackupData) {
+        zips[target] = Zip(manifest, data, data.photos.mapNotNull { p -> files.files[p.path]?.let { p.path to it } }.toMap())
+    }
+    override suspend fun read(source: String) =
+        zips[source]?.let { com.bestid.core.domain.port.ArchiveContent.Read(it.manifest, it.data) } ?: com.bestid.core.domain.port.ArchiveContent.Invalid
+    override suspend fun readPhoto(source: String, relativePath: String) = zips[source]?.photos?.get(relativePath)
+}
+
+class FakeTempFiles : com.bestid.core.domain.port.TempFileStore {
+    override fun path(fileName: String) = "/tmp/$fileName"
+    override suspend fun delete(path: String) = Unit
+}
+
+class FakeBackupSettings : com.bestid.core.domain.port.BackupSettingsStore {
+    val last = MutableStateFlow<kotlin.time.Instant?>(null)
+    override val lastExportAt: Flow<kotlin.time.Instant?> = last
+    override suspend fun setLastExportAt(at: kotlin.time.Instant) { last.value = at }
+}
