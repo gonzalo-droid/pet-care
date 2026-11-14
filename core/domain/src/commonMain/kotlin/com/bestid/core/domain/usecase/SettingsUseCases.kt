@@ -23,3 +23,8 @@ class ObserveLastBackup(private val settings: BackupSettingsStore) {
 class GetAppVersion(private val info: AppInfo) {
     operator fun invoke(): String = info.versionName
 }
+
+/** Las herramientas de prueba (catálogo, aviso de prueba) solo existen en debug, no en la beta. */
+class ShowDeveloperTools(private val info: AppInfo) {
+    operator fun invoke(): Boolean = info.isDebugBuild
+}

@@ -43,6 +43,9 @@ interface TempFileStore {
 /** Datos de la app instalada. */
 interface AppInfo {
     val versionName: String
+
+    /** Compilación de desarrollo: muestra las herramientas de prueba de Ajustes (D26). */
+    val isDebugBuild: Boolean get() = false
 }
 
 /** Preferencias del respaldo (DataStore). */

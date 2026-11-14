@@ -40,6 +40,7 @@ import com.bestid.core.domain.backup.ExportBackup
 import com.bestid.core.domain.backup.ImportBackup
 import com.bestid.core.domain.share.BuildPetSheet
 import com.bestid.core.domain.usecase.GetAppVersion
+import com.bestid.core.domain.usecase.ShowDeveloperTools
 import com.bestid.core.domain.usecase.ObserveLastBackup
 import com.bestid.core.domain.usecase.ObserveReminderTime
 import com.bestid.core.domain.usecase.SetReminderTime
@@ -89,6 +90,7 @@ val domainModule = module {
     factoryOf(::SetReminderTime)
     factoryOf(::ObserveLastBackup)
     factoryOf(::GetAppVersion)
+    factoryOf(::ShowDeveloperTools)
 
     // Avisos: una sola instancia para que su Mutex evite sincronizaciones simultáneas.
     single { SyncReminders(get(), get(), get(), get(), get(), get(), get(), get()) }

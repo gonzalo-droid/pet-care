@@ -28,6 +28,7 @@ import com.bestid.core.domain.usecase.GetAppVersion
 import com.bestid.core.domain.usecase.ObserveLastBackup
 import com.bestid.core.domain.usecase.ObserveReminderTime
 import com.bestid.core.domain.usecase.SetReminderTime
+import com.bestid.core.domain.usecase.ShowDeveloperTools
 import com.bestid.core.platform.notification.rememberNotificationPermissionRequester
 import com.bestid.core.ui.formatLong
 import com.bestid.feature.settings.resources.Res
@@ -74,6 +75,7 @@ data class SettingsState(
     val reminderTime: LocalTime? = null,
     val lastBackup: LocalDate? = null,
     val version: String = "",
+    val showTools: Boolean = false,
     val deleted: Boolean = false,
 )
 
@@ -82,14 +84,15 @@ class SettingsViewModel(
     observeTime: ObserveReminderTime,
     observeLastBackup: ObserveLastBackup,
     getVersion: GetAppVersion,
+    showTools: ShowDeveloperTools,
     private val setTime: SetReminderTime,
     private val deleteAll: DeleteAllData,
 ) : ViewModel() {
     private val deleted = MutableStateFlow(false)
 
     val state: StateFlow<SettingsState> = combine(observeTime(), observeLastBackup(), deleted) { time, last, gone ->
-        SettingsState(time, last?.toLocalDateTime(TimeZone.currentSystemDefault())?.date, getVersion(), gone)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsState(version = getVersion()))
+        SettingsState(time, last?.toLocalDateTime(TimeZone.currentSystemDefault())?.date, getVersion(), showTools(), gone)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsState(version = getVersion(), showTools = showTools()))
 
     fun setReminderTime(hour: Int, minute: Int) {
         viewModelScope.launch { setTime(LocalTime(hour, minute)) }
@@ -161,9 +164,11 @@ fun SettingsScreen(
             destructive = true,
         )
 
-        Eyebrow(stringResource(Res.string.settings_tools))
-        SecondaryButton(text = stringResource(Res.string.settings_open_catalog), onClick = onOpenCatalog)
-        TestReminderButton()
+        if (state.showTools) {
+            Eyebrow(stringResource(Res.string.settings_tools))
+            SecondaryButton(text = stringResource(Res.string.settings_open_catalog), onClick = onOpenCatalog)
+            TestReminderButton()
+        }
     }
 
     val time = state.reminderTime

@@ -15,6 +15,7 @@ on:
       - "gradle.properties"
       - "gradlew"
       - ".github/workflows/ci.yml"
+      - ".github/scripts/check-rules.sh"
   workflow_dispatch:
 
 # Un solo build por PR: un push nuevo cancela el que estaba corriendo.
@@ -31,6 +32,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
+      - name: Reglas del proyecto (colores, tamaños, textos, privacidad, dependencias)
+        run: .github/scripts/check-rules.sh
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
