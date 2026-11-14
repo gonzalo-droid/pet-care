@@ -108,3 +108,16 @@ data class ScheduledNotificationEntity(
     val refId: String,
     val fireAt: Long,
 )
+
+/**
+ * Fotos de la cartilla, del sticker y de la mascota (v3, M3). El archivo vive en el directorio
+ * privado de la app y aquí va solo la ruta relativa. Una foto no se edita: se crea o se borra.
+ */
+@Entity(tableName = "photos")
+data class PhotoEntity(
+    @PrimaryKey val id: String,
+    val path: String,
+    val width: Int,
+    val height: Int,
+    val createdAt: Long,
+)

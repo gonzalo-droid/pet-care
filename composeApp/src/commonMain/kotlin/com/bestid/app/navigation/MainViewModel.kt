@@ -12,7 +12,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-data class MainState(val pets: List<Pet> = emptyList(), val selectedId: String? = null)
+data class MainState(val loaded: Boolean = false, val pets: List<Pet> = emptyList(), val selectedId: String? = null) {
+    /** Sin mascotas se muestra la Bienvenida (O1). */
+    val showWelcome: Boolean get() = loaded && pets.isEmpty()
+}
 
 /** Selector de mascota de la barra superior (U7): lista y selección recordada entre sesiones. */
 class MainViewModel(
@@ -21,7 +24,7 @@ class MainViewModel(
     private val selectPet: SelectPet,
 ) : ViewModel() {
     val state: StateFlow<MainState> = combine(observePets(), observeSelectedPet()) { pets, selected ->
-        MainState(pets, selected?.id)
+        MainState(loaded = true, pets = pets, selectedId = selected?.id)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), MainState())
 
     fun select(petId: String) {

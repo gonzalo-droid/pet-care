@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compartir ficha (SH1) -->
+    <string name="share_title">Compartir ficha</string>
+    <string name="share_close">Cerrar</string>
+    <string name="share_preview">Vista previa del PDF</string>
+    <string name="share_include">¿Qué incluimos?</string>
+    <string name="share_vaccines">Vacunas con lote y fecha</string>
+    <string name="share_card_photos">Fotos de la cartilla</string>
+    <string name="share_weight">Historial de peso</string>
+    <string name="share_owner">Nombre del tutor</string>
+    <string name="share_no_address">La dirección nunca se incluye en la ficha.</string>
+    <string name="share_button">Compartir PDF</string>
+    <string name="share_hint">Elige WhatsApp u otra app en el siguiente paso.</string>
+    <string name="share_no_pet">Agrega una mascota para compartir su ficha.</string>
+    <string name="share_error">No pudimos crear el PDF. Inténtalo de nuevo.</string>
+    <string name="share_no_vaccines_preview">Sin vacunas registradas</string>
+    <plurals name="share_vaccine_count">
+        <item quantity="one">1 vacuna</item>
+        <item quantity="other">%1$d vacunas</item>
+    </plurals>
+
+    <!-- Contenido del PDF (sección 12) -->
+    <string name="pdf_brand">BestID · Ficha de vacunas</string>
+    <string name="pdf_file_name">Ficha-%1$s.pdf</string>
+    <string name="pdf_section_data">Datos</string>
+    <string name="pdf_species">Especie</string>
+    <string name="pdf_sex">Sexo</string>
+    <string name="pdf_breed">Raza</string>
+    <string name="pdf_birth">Nacimiento</string>
+    <string name="pdf_birth_approx">%1$s (aproximada)</string>
+    <string name="pdf_marks">Señas particulares</string>
+    <string name="pdf_owner">Tutor</string>
+    <string name="pdf_section_next">Próxima dosis</string>
+    <string name="pdf_next_line">%1$s: %2$s</string>
+    <string name="pdf_next_unconfirmed">%1$s: %2$s (fecha por confirmar)</string>
+    <string name="pdf_next_none">Sin próximas fechas registradas.</string>
+    <string name="pdf_vaccine_fallback">Vacuna</string>
+    <string name="pdf_section_vaccines">Vacunas</string>
+    <string name="pdf_col_date">Fecha</string>
+    <string name="pdf_col_types">Tipos</string>
+    <string name="pdf_col_product">Producto y lote</string>
+    <string name="pdf_col_expiry">Vence</string>
+    <string name="pdf_col_vet">Veterinaria</string>
+    <string name="pdf_lot">lote %1$s</string>
+    <string name="pdf_no_vaccines">Sin vacunas registradas.</string>
+    <string name="pdf_section_weight">Historial de peso</string>
+    <string name="pdf_col_weight">Peso</string>
+    <string name="pdf_page">Cartilla, página %1$d</string>
+    <string name="pdf_footer">Generado por BestID el %1$s. Los datos fueron registrados por el dueño; verificar con la cartilla original.</string>
+</resources>

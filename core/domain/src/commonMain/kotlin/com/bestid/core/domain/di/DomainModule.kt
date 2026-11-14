@@ -31,6 +31,19 @@ import com.bestid.core.domain.usecase.RestoreWeight
 import com.bestid.core.domain.usecase.SaveCareTask
 import com.bestid.core.domain.usecase.SaveWeight
 import com.bestid.core.domain.usecase.SetCareReminder
+import com.bestid.core.domain.usecase.CleanUpPhotos
+import com.bestid.core.domain.usecase.GetPhotos
+import com.bestid.core.domain.usecase.ImportPhotos
+import com.bestid.core.domain.usecase.ShareFilePaths
+import com.bestid.core.domain.backup.DeleteAllData
+import com.bestid.core.domain.backup.ExportBackup
+import com.bestid.core.domain.backup.ImportBackup
+import com.bestid.core.domain.share.BuildPetSheet
+import com.bestid.core.domain.usecase.GetAppVersion
+import com.bestid.core.domain.usecase.ShowDeveloperTools
+import com.bestid.core.domain.usecase.ObserveLastBackup
+import com.bestid.core.domain.usecase.ObserveReminderTime
+import com.bestid.core.domain.usecase.SetReminderTime
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
@@ -63,6 +76,21 @@ val domainModule = module {
     factoryOf(::SaveWeight)
     factoryOf(::DeleteWeight)
     factoryOf(::RestoreWeight)
+
+    factoryOf(::ImportPhotos)
+    factoryOf(::GetPhotos)
+    factory { CleanUpPhotos(get(), get(), get(), get(), get()) }
+
+    factoryOf(::ExportBackup)
+    factoryOf(::ImportBackup)
+    factoryOf(::DeleteAllData)
+    factoryOf(::BuildPetSheet)
+    factoryOf(::ShareFilePaths)
+    factoryOf(::ObserveReminderTime)
+    factoryOf(::SetReminderTime)
+    factoryOf(::ObserveLastBackup)
+    factoryOf(::GetAppVersion)
+    factoryOf(::ShowDeveloperTools)
 
     // Avisos: una sola instancia para que su Mutex evite sincronizaciones simultáneas.
     single { SyncReminders(get(), get(), get(), get(), get(), get(), get(), get()) }

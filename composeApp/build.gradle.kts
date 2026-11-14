@@ -25,6 +25,8 @@ kotlin {
             implementation(projects.feature.health)
             implementation(projects.feature.pet)
             implementation(projects.feature.onboarding)
+            implementation(projects.feature.share)
+            implementation(projects.feature.settings)
 
             implementation(libs.androidx.navigation.compose)
             implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -33,6 +35,8 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
+            implementation(libs.coil.compose)
+            implementation(libs.okio)
         }
         commonTest.dependencies {
             implementation(libs.koin.test)

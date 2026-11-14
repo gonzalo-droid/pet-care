@@ -2,6 +2,76 @@
 
 Registro de decisiones tomadas durante el desarrollo que cambian o precisan `SYSTEM_DESIGN.md`. La más reciente va arriba. Cada una dice quién la tomó y en qué hito.
 
+## 2026-11-14 · M5
+
+### D37. Errores sin cerrar la app `[Propuesta]`
+Si la base no se puede leer (por ejemplo, disco lleno), Inicio, Cartilla, Salud, Mascota y el detalle de la vacuna muestran "No pudimos cargar los datos" con "Reintentar" (`Retry` en `core/ui`), en lugar de cerrar la app. Si guardar falla, el formulario sigue abierto con "No pudimos guardar los cambios". Si importar una foto falla, se cuenta como foto que no se pudo abrir.
+
+### D38. Herramientas de prueba solo en debug `[Propuesta]`
+Cumple D26: "Probar aviso en 1 minuto" y el catálogo de componentes se ven en Ajustes solo en compilaciones de debug (Android `FLAG_DEBUGGABLE`, iOS `Platform.isDebugBinary`), no en la beta ni en la tienda. `DebugTestReminderReceiver` ya vivía solo en el APK de debug.
+
+### D39. Accesibilidad y reglas comprobadas en pruebas `[Propuesta]`
+- `AccessibilityUiTest` (simulador iOS): con el texto al 200 %, en Bienvenida, Nueva mascota, las 4 pestañas, Ajustes y Respaldo ningún texto queda cortado y todo lo tocable mide 48 × 48 dp o más.
+- `.github/scripts/check-rules.sh` (CI y local): sin colores ni tamaños sueltos fuera del design system, ningún estilo bajo 13 sp, sin textos escritos en el código, sin logs, sin `google-services.json` ni `testdata/private` en el repositorio y ningún feature importando otro.
+- Queda manual: probar con TalkBack y VoiceOver en teléfonos reales (`docs/BETA.md`).
+
+### D40. Beta y tiendas `[Propuesta]`
+- **Android:** firma de subida leída de `local.properties` o de variables de entorno (nunca en el repositorio). `versionCode` se pasa con `-Pbestid.versionCode`. Sin R8 en la beta: Room, Koin y kotlinx.serialization necesitan reglas que se validan aparte.
+- **iOS:**
+  - El bundle es exactamente `com.bestid.app`. La plantilla le agregaba el `TEAM_ID`, lo que habría impedido usar el ID de D11.
+  - Versiones en `Config.xcconfig`.
+  - `PrivacyInfo.xcprivacy` sin rastreo ni recopilación.
+  - `ITSAppUsesNonExemptEncryption = NO`.
+- **Fichas y política:** borradores en `docs/store/` y `docs/legal/politica-de-privacidad.md`. La política sigue `[Pendiente]` de asesoría legal (sección 14).
+- **Métricas:** el criterio de M5 pide "métricas de la sección 16 registrándose", pero la sección 16 y D5 deciden no usar analítica. Durante la beta se miden a mano (`docs/BETA.md`). Si Gonzalo quiere métricas automáticas, se agrega PostHog con un ID aleatorio, sin datos personales.
+- **Sentry** sigue fuera hasta tener el DSN (D12).
+
+## 2026-11-14 · M4
+
+### D34. Qué incluye la ficha en PDF: se sigue el prototipo `[Propuesta, revisar]`
+La sección 12 permite incluir propietario y dirección si se marcan. El prototipo (captura 14) es más estricto y es lo que se implementó: la dirección **nunca** va en la ficha, solo se puede marcar el nombre del tutor. Casillas: "Vacunas con lote y fecha" y "Fotos de la cartilla" marcadas; "Historial de peso" y "Nombre del tutor" sin marcar. Cumple el criterio de M4 (sin dirección por defecto).
+
+### D35. Reprogramar todos los avisos al arrancar `[Propuesta]`
+Android Auto Backup y la restauración del iPhone traen la base con la tabla `scheduled_notifications`, pero no las alarmas del sistema. Con la sincronización por diferencia (D24), el teléfono nuevo creería que los avisos ya están programados. Por eso la primera sincronización de cada arranque cancela y vuelve a programar todo (máximo 50 avisos); las siguientes siguen siendo solo la diferencia.
+
+### D36. Respaldo, PDF y Ajustes: detalles técnicos `[Propuesta]`
+- **Formato del respaldo:** `manifest.json` (versión del formato 1, fecha, versión de la app), `data.json` con todas las entidades (también las borradas, sin los avisos programados) y `photos/`. El JSON es propio del respaldo, no de la base: fechas ISO, instantes en milisegundos y enums por nombre. Un respaldo de una versión de formato más nueva se rechaza con un mensaje para actualizar la app.
+- **Zip:** okio solo lee zips, así que se escribe con un escritor propio sin compresión (las fotos ya son JPEG) y se lee con okio, que también abre un zip vuelto a comprimir en una computadora. Probado contra `java.util.zip`.
+- **Importar:** combina por ID y gana el `updatedAt` más reciente; los tipos escritos a mano y las fotos entran solo si faltan. Solo se aceptan fotos `photos/<id>.jpg`, para que un zip manipulado no escriba fuera de esa carpeta. No borra nada del teléfono.
+- **Exportar e importar** usan la hoja de compartir del sistema y el selector de archivos en ambas plataformas `[Decidido por Gonzalo]`. La Bienvenida tiene "Tengo un respaldo" para importarlo en un teléfono nuevo.
+- **Auto Backup de Android:** base, fotos y preferencias; la caché queda fuera.
+- **PDF:** el diseño (A4, encabezado, tablas que repiten su encabezado al cambiar de página, pie en cada página, fotos a página completa) es código común y probado; cada plataforma solo dibuja (`PdfDocument`, `UIGraphicsPDFRenderer`). Usa la fuente del sistema, no Nunito.
+- **Hora de los avisos:** selector de hora de Material 3 (común), reloj de 12 horas.
+- **Privacidad y Acerca de:** texto provisional; el texto legal sigue `[Pendiente]` de asesoría (sección 14).
+- **Ajustes** pasa a `feature/settings` y la ficha a `feature/share`. "Probar aviso" y el catálogo siguen en "Herramientas de prueba" hasta M5 (D26).
+
+## 2026-11-13 · M3
+
+### D33. CI solo con Android en Linux `[Decidido por Gonzalo]`
+El CI compila el APK y corre `./gradlew allTests` (JVM y host de Android). Las pruebas en el emulador Android (procesado de fotos y avisos) y en el simulador de iOS (pruebas comunes, flujo de UI, compilación con Xcode y apertura de la app) se corren en local antes de cada hito. Los scripts siguen en `.github/scripts/`.
+Para ahorrar minutos, el CI corre solo en PRs que cambian código de la app (filtro `paths:`; no en cambios de docs ni de `iosApp/`) o a mano desde Actions. Un push nuevo al PR cancela el build anterior, el job tiene un tope de 30 min y el APK se guarda 3 días.
+
+### D29. M3 con fotos y sin lectura automática (opción C) `[Decidido por Gonzalo]`
+Sin Firebase por ahora (D4), M3 hace todo lo que no depende de la tecnología de lectura: `ImagePicker`, `ImageProcessor`, guardado de fotos, Bienvenida (O1), fotos de la cartilla (O2), foto del sticker, foto de la mascota y visor. Quedan para cuando se elija la lectura: Leyendo (O3), Revisar lectura (O4), la cola sin internet y la hoja C4.
+- Criterio de terminado ajustado: *con las fotos de la cartilla de Lilith, se registran sus 2 vacunas a mano viendo la foto; las fotos quedan en el detalle de cada vacuna y la foto de Lilith en su carnet, en ambas plataformas y sin internet.*
+- `CardReader` queda declarado en el dominio, sin implementación.
+- "Empezar con su cartilla" (O1) pide primero nombre y especie (sin lectura no hay de dónde sacarlos), luego las fotos y luego el formulario de vacuna con las páginas arriba. El botón dice "Empezar con su cartilla" y no "Escanear su cartilla" porque todavía no se escanea.
+- "Agregar vacuna" abre las fotos de la cartilla, con "Prefiero llenarla a mano" para seguir sin fotos. Eso reemplaza la hoja C4 mientras no haya lectura.
+
+### D30. Almacenamiento de fotos `[Propuesta]`
+- Tabla `photos` (base v3, migración automática 2→3 probada). Una foto no se edita: se crea o se borra, por eso no lleva `updatedAt` ni `deletedAt` (excepción a la regla 8, igual que `Photo` en la sección 9).
+- Archivo `photos/<id>.jpg` en el directorio privado (Android `filesDir`, iOS Application Support) y en la base solo la ruta relativa. Las pantallas pasan esa ruta a Coil y un `Mapper` la resuelve a la absoluta, que en iOS cambia entre instalaciones.
+- La foto de la mascota también va en `photos`; `Pet.photoPath` guarda su ruta relativa.
+- Las fotos se procesan y guardan apenas se eligen. Al abrir la app, `CleanUpPhotos` borra las que nadie usa (ni una vacuna ni una mascota) con más de 24 h; las de registros o mascotas borrados se conservan para poder restaurarlos y para el respaldo.
+
+### D31. Permisos de cámara y fotos `[Propuesta]`
+- Android: la app no declara el permiso de cámara, así `TakePicture` abre la cámara del sistema sin pedirlo. La galería usa el selector de fotos del sistema, que no pide permisos.
+- iOS: la cámara pide permiso con el texto de `NSCameraUsageDescription` en español. La galería usa `PHPickerViewController`, que no pide permiso de fotos. Si se niega la cámara, la pantalla muestra una tarjeta con enlace a Ajustes y la galería sigue disponible.
+- Las fotos se guardan sin metadatos: `ImageProcessor` vuelve a codificar el JPEG, así que no queda la ubicación.
+
+### D32. Prueba del procesado de fotos en el emulador `[Propuesta]`
+`Bitmap` y `ExifInterface` no existen en la JVM. `core/platform` tiene pruebas de dispositivo (`androidDeviceTest`) que se corren en local con un emulador o teléfono conectado (`./gradlew :core:platform:connectedAndroidDeviceTest`, ver D33): rota según EXIF, reduce a 2000 px, conserva fotos chicas, quita la ubicación y rechaza lo que no es imagen. En iOS, el flujo de UI del simulador pasa fotos generadas por el `ImageProcessor` real.
+
 ## 2026-11-13 · M2
 
 ### D22. Salud muestra cuidados, no vacunas `[Decidido por Gonzalo]`
@@ -22,7 +92,7 @@ La pantalla O5 se muestra una sola vez: al guardar la primera vacuna con próxim
 La última fecha y el intervalo son obligatorios solo si el aviso está activo: sin ellos no hay próxima fecha. Así se puede anotar un cuidado puntual sin aviso.
 
 ### D26. Herramienta de prueba de avisos `[Propuesta, se quita en M5]`
-Ajustes tiene "Probar aviso en 1 minuto" para comprobar el criterio de M2 (llega con la app cerrada y tras reiniciar) sin esperar días. El aviso de prueba se guarda en DataStore y pasa por `SyncReminders` como los reales, así que también se reprograma al reiniciar. En el APK de debug, `DebugTestReminderReceiver` permite programarlo desde `adb`; el CI lo usa en la prueba del emulador (job "Android (avisos en emulador)").
+Ajustes tiene "Probar aviso en 1 minuto" para comprobar el criterio de M2 (llega con la app cerrada y tras reiniciar) sin esperar días. El aviso de prueba se guarda en DataStore y pasa por `SyncReminders` como los reales, así que también se reprograma al reiniciar. En el APK de debug, `DebugTestReminderReceiver` permite programarlo desde `adb`; `.github/scripts/android-reminders-e2e.sh` lo usa para probar en un emulador local.
 
 ### D28. Alarmas exactas antes de Android 12 `[Propuesta]`
 Antes de Android 12, la ventana de una alarma no exacta es el 75 % del tiempo que falta: un aviso a 7 días podía llegar hasta 5 días tarde. En Android 8 a 11 se usa `setExactAndAllowWhileIdle`, que en esas versiones no pide permiso. Desde Android 12 sigue `setAndAllowWhileIdle` (sección 11), que el sistema entrega a lo más 1 hora después de la hora pedida.

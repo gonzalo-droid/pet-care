@@ -1,5 +1,10 @@
 package com.bestid.core.designsystem.component
 
+import com.bestid.core.designsystem.resources.ds_loading
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -222,6 +227,59 @@ fun PetSelector(
                 )
             }
         }
+    }
+}
+
+/**
+ * Foto de la mascota en su formulario: círculo punteado con cámara si no hay foto, o la foto.
+ * [actionLabel] es "Agregar foto" o "Cambiar foto"; al tocar se eligen la cámara o la galería.
+ */
+@Composable
+fun PetPhotoPicker(
+    photo: String?,
+    species: AvatarSpecies,
+    name: String,
+    actionLabel: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    loading: Boolean = false,
+) {
+    val colors = BestIdTheme.colors
+    val strokeWidth = BestIdTheme.sizes.border
+    val outline = colors.outlineStrong
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(enabled = !loading, role = Role.Button, onClickLabel = actionLabel, onClick = onClick),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs),
+    ) {
+        if (photo != null) {
+            PetAvatar(photo, species, name, size = AvatarSize.LARGE)
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(BestIdTheme.sizes.avatarLarge)
+                    .clip(BestIdTheme.shapes.pill)
+                    .background(colors.surface)
+                    .drawWithContent {
+                        drawContent()
+                        drawCircle(
+                            color = outline,
+                            style = Stroke(strokeWidth.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(8.dp.toPx(), 6.dp.toPx()))),
+                            radius = size.minDimension / 2 - strokeWidth.toPx() / 2,
+                        )
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(painterResource(BestIdIcons.PhotoCamera), contentDescription = null, tint = colors.primary)
+            }
+        }
+        Text(
+            if (loading) stringResource(Res.string.ds_loading) else actionLabel,
+            style = BestIdTheme.typography.bodyStrong,
+            color = colors.primary,
+        )
     }
 }
 

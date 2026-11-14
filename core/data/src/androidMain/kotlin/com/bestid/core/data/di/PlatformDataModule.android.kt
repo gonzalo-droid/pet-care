@@ -4,6 +4,13 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.bestid.core.data.db.BestIdDatabase
+import com.bestid.core.data.repository.OkioPhotoFileStore
+import com.bestid.core.domain.port.PhotoFileStore
+import com.bestid.core.data.backup.OkioBackupArchive
+import com.bestid.core.data.repository.OkioTempFileStore
+import com.bestid.core.domain.port.BackupArchive
+import com.bestid.core.domain.port.TempFileStore
+import okio.FileSystem
 import org.koin.dsl.module
 
 internal actual fun platformDataModule() = module {
@@ -15,4 +22,7 @@ internal actual fun platformDataModule() = module {
         )
     }
     single { createPreferences(get<Context>().filesDir.resolve(PREFERENCES_FILE).absolutePath) }
+    single<PhotoFileStore> { OkioPhotoFileStore(get<Context>().filesDir.absolutePath, FileSystem.SYSTEM) }
+    single<TempFileStore> { OkioTempFileStore(get<Context>().cacheDir.absolutePath, FileSystem.SYSTEM) }
+    single<BackupArchive> { OkioBackupArchive(FileSystem.SYSTEM, get()) }
 }

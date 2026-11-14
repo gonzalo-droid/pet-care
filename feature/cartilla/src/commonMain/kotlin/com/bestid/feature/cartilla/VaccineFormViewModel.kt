@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bestid.core.domain.catalog.VaccineCatalog
 import com.bestid.core.domain.reminder.ShouldAskNotificationPermission
+import com.bestid.core.domain.usecase.GetPhotos
 import com.bestid.core.domain.usecase.GetVet
+import com.bestid.core.domain.usecase.ImportPhotos
 import com.bestid.core.domain.usecase.ObservePet
 import com.bestid.core.domain.usecase.ObserveSelectedPet
 import com.bestid.core.domain.usecase.ObserveVaccineRecord
@@ -16,6 +18,9 @@ import com.bestid.core.domain.usecase.VaccineDraft
 import com.bestid.core.domain.validation.VaccineError
 import com.bestid.core.domain.validation.VaccineWarning
 import com.bestid.core.model.Pet
+import com.bestid.core.model.Photo
+import com.bestid.core.platform.image.ImagePickerResult
+import com.bestid.core.platform.image.MAX_CARD_PAGES
 import com.bestid.core.model.VaccineItem
 import com.bestid.core.model.VaccineType
 import com.bestid.core.model.Vet
@@ -27,6 +32,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.bestid.core.domain.usecase.ImportedPhotos
+import com.bestid.core.ui.attempt
 import kotlinx.datetime.LocalDate
 
 /** Un frasco (sticker) en el formulario. */
@@ -46,6 +53,8 @@ sealed interface DateTarget {
 }
 
 data class VaccineFormState(
+    /** El guardado falló (por ejemplo, sin espacio): se muestra el aviso y el formulario sigue abierto. */
+    val saveFailed: Boolean = false,
     val loaded: Boolean = false,
     val isEdit: Boolean = false,
     val pet: Pet? = null,
@@ -61,6 +70,12 @@ data class VaccineFormState(
     val stickers: List<StickerForm> = listOf(StickerForm()),
     val vetName: String = "",
     val vetContact: String = "",
+    /** Páginas de la cartilla, ya importadas (O2 o "Agregar foto"). */
+    val pages: List<Photo> = emptyList(),
+    val stickerPhoto: Photo? = null,
+    val importing: Boolean = false,
+    val photoFailed: Int = 0,
+    val cameraDenied: Boolean = false,
     val errors: List<VaccineError> = emptyList(),
     val warnings: List<VaccineWarning> = emptyList(),
     val saving: Boolean = false,
@@ -88,9 +103,13 @@ data class VaccineFormState(
         get() = pet?.let { VaccineCatalog.suggestedFor(types, it.species).isNotEmpty() } ?: false
 }
 
-/** Agregar o editar vacuna a mano (C3). */
+/** Adónde va la próxima foto elegida. */
+enum class PhotoTarget { PAGE, STICKER }
+
+/** Agregar o editar vacuna a mano (C3), con las fotos de la cartilla a la vista (D29). */
 class VaccineFormViewModel(
     private val recordId: String?,
+    private val photoIds: List<String>,
     private val observeSelectedPet: ObserveSelectedPet,
     private val observePet: ObservePet,
     private val observeRecord: ObserveVaccineRecord,
@@ -99,6 +118,8 @@ class VaccineFormViewModel(
     private val getVet: GetVet,
     private val saveRecord: SaveVaccineRecord,
     private val shouldAskPermission: ShouldAskNotificationPermission,
+    private val getPhotos: GetPhotos,
+    private val importPhotos: ImportPhotos,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VaccineFormState())
     val state: StateFlow<VaccineFormState> = _state.asStateFlow()
@@ -111,7 +132,7 @@ class VaccineFormViewModel(
             val types = observeTypes().first()
             val record = recordId?.let { observeRecord(it).first() }
             if (record == null) {
-                _state.value = VaccineFormState(loaded = true, pet = observeSelectedPet().first(), types = types)
+                _state.value = VaccineFormState(loaded = true, pet = observeSelectedPet().first(), types = types, pages = getPhotos(photoIds))
                 return@launch
             }
             val vet = record.vetId?.let { getVet(it) }
@@ -128,9 +149,36 @@ class VaccineFormViewModel(
                     .ifEmpty { listOf(StickerForm()) },
                 vetName = vet?.name.orEmpty(),
                 vetContact = vet?.contact.orEmpty(),
+                pages = getPhotos(record.sourcePhotoIds),
+                stickerPhoto = record.stickerPhotoId?.let { getPhotos(listOf(it)).firstOrNull() },
             )
         }
     }
+
+    fun onPhotoPicked(target: PhotoTarget, result: ImagePickerResult) {
+        when (result) {
+            ImagePickerResult.CameraDenied -> _state.update { it.copy(cameraDenied = true) }
+            is ImagePickerResult.Picked -> {
+                val max = if (target == PhotoTarget.PAGE) MAX_CARD_PAGES - _state.value.pages.size else 1
+                val images = result.images.take(max)
+                if (images.isEmpty()) return
+                _state.update { it.copy(importing = true, photoFailed = 0, cameraDenied = false) }
+                viewModelScope.launch {
+                    val picked = images
+                    val imported = attempt { importPhotos(picked) }.getOrElse { ImportedPhotos(emptyList(), picked.size) }
+                    _state.update { s ->
+                        when (target) {
+                            PhotoTarget.PAGE -> s.copy(pages = s.pages + imported.photos)
+                            PhotoTarget.STICKER -> s.copy(stickerPhoto = imported.photos.firstOrNull() ?: s.stickerPhoto)
+                        }.copy(importing = false, photoFailed = imported.failed)
+                    }
+                }
+            }
+        }
+    }
+
+    fun removePage(id: String) = _state.update { s -> s.copy(pages = s.pages.filterNot { it.id == id }) }
+    fun removeStickerPhoto() = _state.update { it.copy(stickerPhoto = null) }
 
     fun toggleType(id: String, selected: Boolean) = _state.update {
         it.copy(selectedTypeIds = if (selected) it.selectedTypeIds + id else it.selectedTypeIds - id, errors = it.errors - VaccineError.NoType)
@@ -172,10 +220,10 @@ class VaccineFormViewModel(
     fun save() {
         val s = _state.value
         val pet = s.pet ?: return
-        if (s.saving) return
-        _state.update { it.copy(saving = true) }
+        if (s.saving || s.importing) return
+        _state.update { it.copy(saving = true, saveFailed = false) }
         viewModelScope.launch {
-            val result = saveRecord(
+            val result = attempt { saveRecord(
                 VaccineDraft(
                     id = recordId,
                     petId = pet.id,
@@ -188,8 +236,13 @@ class VaccineFormViewModel(
                     items = s.stickers.map { VaccineItem(it.product, it.lot, it.manufactureDate, it.expiryDate) },
                     vetName = s.vetName,
                     vetContact = s.vetContact,
+                    sourcePhotoIds = s.pages.map { it.id },
+                    stickerPhotoId = s.stickerPhoto?.id,
                 ),
-            )
+            ) }.getOrElse {
+                _state.update { it.copy(saving = false, saveFailed = true) }
+                return@launch
+            }
             when (result) {
                 is SaveVaccineResult.Saved -> {
                     val ask = result.record.nextDate != null && shouldAskPermission()

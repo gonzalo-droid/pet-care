@@ -12,12 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bestid.core.designsystem.component.DashedButton
 import com.bestid.core.designsystem.component.EmptyState
+import com.bestid.core.designsystem.component.ErrorState
 import com.bestid.core.designsystem.component.LoadingState
 import com.bestid.core.designsystem.component.PetIdCard
 import com.bestid.core.designsystem.component.PrimaryButton
 import com.bestid.core.designsystem.component.SecondaryButton
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
+import com.bestid.core.ui.resources.Res as UiRes
+import com.bestid.core.ui.resources.state_load_error
 import com.bestid.core.model.DatePrecision
 import com.bestid.core.ui.avatar
 import com.bestid.core.ui.formatLong
@@ -26,6 +29,7 @@ import com.bestid.feature.pet.resources.Res
 import com.bestid.feature.pet.resources.pet_add
 import com.bestid.feature.pet.resources.pet_add_another
 import com.bestid.feature.pet.resources.pet_complete_data
+import com.bestid.feature.pet.resources.pet_share
 import com.bestid.feature.pet.resources.pet_empty_body
 import com.bestid.feature.pet.resources.pet_empty_title
 import com.bestid.feature.pet.resources.pet_next_none
@@ -44,6 +48,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun PetScreen(
     onEditPet: (String) -> Unit,
     onAddPet: () -> Unit,
+    onShare: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PetTabViewModel = koinViewModel(),
 ) {
@@ -51,6 +56,7 @@ fun PetScreen(
     val pet = state.pet
     when {
         state.loading -> LoadingState(modifier = modifier.fillMaxSize())
+        state.failed -> ErrorState(stringResource(UiRes.string.state_load_error), modifier = modifier.fillMaxSize(), onRetry = viewModel::retry)
         pet == null -> Column(modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             EmptyState(
                 illustration = BestIdIcons.PetsFilled,
@@ -88,6 +94,7 @@ fun PetScreen(
                 vaccineCount = state.vaccineCount.toString(),
                 nextDate = state.nextDue?.date?.formatLong() ?: stringResource(Res.string.pet_next_none),
             )
+            PrimaryButton(text = stringResource(Res.string.pet_share), onClick = onShare, icon = BestIdIcons.Share)
             SecondaryButton(
                 text = stringResource(Res.string.pet_complete_data),
                 onClick = { onEditPet(pet.id) },

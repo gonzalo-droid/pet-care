@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Solo carpetas de la caché: la foto de la cámara antes de procesarla y los archivos para compartir
+     (PDF y respaldo). Las fotos guardadas y la base nunca se exponen. -->
+<paths>
+    <cache-path name="camera" path="camera/" />
+    <cache-path name="share" path="share/" />
+</paths>

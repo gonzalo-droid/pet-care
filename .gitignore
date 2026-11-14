@@ -18,3 +18,7 @@ xcuserdata/
 
 # Kotlin
 .kotlin/
+
+# Firma (nunca en el repositorio)
+*.jks
+*.keystore

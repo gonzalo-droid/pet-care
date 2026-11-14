@@ -38,4 +38,7 @@ object BestIdIcons {
 
     /** Ilustración provisional de gato para el avatar sin foto. */
     val CatIllustration: DrawableResource get() = Res.drawable.illustration_cat
+
+    /** Ilustración provisional de perro (Bienvenida). */
+    val DogIllustration: DrawableResource get() = Res.drawable.illustration_dog
 }

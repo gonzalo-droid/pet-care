@@ -6,6 +6,8 @@ import com.bestid.core.data.db.toModel
 import com.bestid.core.domain.catalog.VaccineCatalog
 import com.bestid.core.domain.port.CareTaskRepository
 import com.bestid.core.domain.port.PetRepository
+import com.bestid.core.domain.port.PhotoRepository
+import com.bestid.core.model.Photo
 import com.bestid.core.domain.port.ScheduledNotificationRepository
 import com.bestid.core.domain.port.WeightRepository
 import com.bestid.core.domain.port.VaccineRecordRepository
@@ -27,6 +29,7 @@ class RoomPetRepository(db: BestIdDatabase) : PetRepository {
     override fun observePets(): Flow<List<Pet>> = dao.observeActive().map { list -> list.map { it.toModel() } }
     override fun observePet(id: String): Flow<Pet?> = dao.observe(id).map { it?.toModel() }
     override suspend fun get(id: String): Pet? = dao.get(id)?.toModel()
+    override suspend fun getAllIncludingDeleted(): List<Pet> = dao.getAll().map { it.toModel() }
     override suspend fun upsert(pet: Pet) = dao.upsert(pet.toEntity())
 }
 
@@ -67,6 +70,7 @@ class RoomVaccineRecordRepository(db: BestIdDatabase) : VaccineRecordRepository 
         dao.observeForPet(petId).map { list -> list.map { it.toModel() } }
     override fun observe(id: String): Flow<VaccineRecord?> = dao.observe(id).map { it?.toModel() }
     override suspend fun get(id: String): VaccineRecord? = dao.get(id)?.toModel()
+    override suspend fun getAllIncludingDeleted(): List<VaccineRecord> = dao.getAll().map { it.toModel() }
     override suspend fun upsert(record: VaccineRecord) = dao.upsert(record.toEntity())
 }
 
@@ -92,4 +96,14 @@ class RoomScheduledNotificationRepository(db: BestIdDatabase) : ScheduledNotific
     override suspend fun replace(added: List<ScheduledNotification>, removedIds: List<String>) =
         dao.replace(added.map { it.toEntity() }, removedIds)
     override suspend fun clear() = dao.clear()
+}
+
+class RoomPhotoRepository(db: BestIdDatabase) : PhotoRepository {
+    private val dao = db.photoDao()
+    override suspend fun insert(photo: Photo) = dao.insert(photo.toEntity())
+    override suspend fun get(ids: List<String>): List<Photo> = if (ids.isEmpty()) emptyList() else dao.get(ids).map { it.toModel() }
+    override suspend fun getAll(): List<Photo> = dao.getAll().map { it.toModel() }
+    override suspend fun delete(ids: List<String>) {
+        if (ids.isNotEmpty()) dao.delete(ids)
+    }
 }

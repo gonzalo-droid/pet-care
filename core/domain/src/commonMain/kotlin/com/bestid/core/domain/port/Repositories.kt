@@ -20,6 +20,8 @@ interface PetRepository {
     fun observePet(id: String): Flow<Pet?>
     /** Incluye mascotas borradas, para poder restaurarlas. */
     suspend fun get(id: String): Pet?
+    /** Todas, también las borradas (sus fotos se conservan para poder restaurarlas). */
+    suspend fun getAllIncludingDeleted(): List<Pet>
     suspend fun upsert(pet: Pet)
 }
 
@@ -31,6 +33,8 @@ interface VaccineRecordRepository {
     fun observe(id: String): Flow<VaccineRecord?>
     /** Incluye registros borrados, para poder restaurarlos. */
     suspend fun get(id: String): VaccineRecord?
+    /** Todos, también los borrados (sus fotos se conservan para poder restaurarlos). */
+    suspend fun getAllIncludingDeleted(): List<VaccineRecord>
     suspend fun upsert(record: VaccineRecord)
 }
 

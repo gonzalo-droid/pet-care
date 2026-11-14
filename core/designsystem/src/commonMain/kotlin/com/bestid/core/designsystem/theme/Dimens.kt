@@ -32,6 +32,8 @@ data class BestIdSizes(
     val avatarMedium: Dp = 56.dp,
     val avatarLarge: Dp = 96.dp,
     val thumb: Dp = 72.dp,
+    /** Ilustraciones de gato y perro de la Bienvenida. */
+    val illustration: Dp = 120.dp,
     val border: Dp = 2.dp,
     val chartHeight: Dp = 200.dp,
 )

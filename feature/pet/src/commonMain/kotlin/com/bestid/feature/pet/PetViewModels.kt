@@ -6,6 +6,8 @@ import com.bestid.core.domain.port.AppClock
 import com.bestid.core.domain.schedule.NextDue
 import com.bestid.core.domain.schedule.NextDueCalculator
 import com.bestid.core.domain.usecase.DeletePet
+import com.bestid.core.domain.usecase.ImportPhotos
+import com.bestid.core.platform.image.ImagePickerResult
 import com.bestid.core.domain.usecase.ObservePet
 import com.bestid.core.domain.usecase.ObserveSelectedPet
 import com.bestid.core.domain.usecase.ObserveVaccineRecords
@@ -27,12 +29,17 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import com.bestid.core.ui.Retry
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.bestid.core.domain.usecase.ImportedPhotos
+import com.bestid.core.ui.attempt
 import kotlinx.datetime.LocalDate
 
 data class PetTabState(
     val loading: Boolean = true,
+    /** No se pudieron leer los datos: se muestra el error con "Reintentar". */
+    val failed: Boolean = false,
     val pet: Pet? = null,
     val vaccineCount: Int = 0,
     val nextDue: NextDue? = null,
@@ -45,20 +52,27 @@ class PetTabViewModel(
     observeRecords: ObserveVaccineRecords,
     clock: AppClock,
 ) : ViewModel() {
-    val state: StateFlow<PetTabState> = observeSelectedPet()
-        .flatMapLatest { pet ->
-            if (pet == null) {
-                flowOf(PetTabState(loading = false))
-            } else {
-                observeRecords(pet.id).map { records ->
-                    PetTabState(false, pet, records.size, NextDueCalculator.nextDue(records, clock.today()))
+    private val retryPetTabState = Retry()
+
+    val state: StateFlow<PetTabState> = retryPetTabState.wrap(PetTabState(loading = false, failed = true)) {
+        observeSelectedPet()
+            .flatMapLatest { pet ->
+                if (pet == null) {
+                    flowOf(PetTabState(loading = false))
+                } else {
+                    observeRecords(pet.id).map { records ->
+                        PetTabState(loading = false, pet = pet, vaccineCount = records.size, nextDue = NextDueCalculator.nextDue(records, clock.today()))
+                    }
                 }
             }
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PetTabState())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PetTabState())
+
+    fun retry() = retryPetTabState.retry()
 }
 
 data class PetFormState(
+    /** El guardado falló (por ejemplo, sin espacio): se muestra el aviso y el formulario sigue abierto. */
+    val saveFailed: Boolean = false,
     val loaded: Boolean = false,
     val isEdit: Boolean = false,
     val name: String = "",
@@ -70,6 +84,11 @@ data class PetFormState(
     val marks: String = "",
     val owner: String = "",
     val address: String = "",
+    /** Ruta relativa de la foto ("photos/…"), ya importada. */
+    val photoPath: String? = null,
+    val importingPhoto: Boolean = false,
+    val photoFailed: Int = 0,
+    val cameraDenied: Boolean = false,
     val nameError: PetError? = null,
     val speciesMissing: Boolean = false,
     val saving: Boolean = false,
@@ -84,6 +103,7 @@ class PetFormViewModel(
     private val observePet: ObservePet,
     private val savePet: SavePet,
     private val deletePet: DeletePet,
+    private val importPhotos: ImportPhotos,
 ) : ViewModel() {
     private val _state = MutableStateFlow(PetFormState(loaded = petId == null))
     val state: StateFlow<PetFormState> = _state.asStateFlow()
@@ -107,6 +127,7 @@ class PetFormViewModel(
                         marks = pet.distinguishingMarks.orEmpty(),
                         owner = pet.ownerName.orEmpty(),
                         address = pet.ownerAddress.orEmpty(),
+                        photoPath = pet.photoPath,
                     )
                 }
             }
@@ -123,16 +144,39 @@ class PetFormViewModel(
     fun onOwner(value: String) = _state.update { it.copy(owner = value) }
     fun onAddress(value: String) = _state.update { it.copy(address = value) }
 
+    /** Foto elegida en la cámara o la galería: se procesa y se guarda ya; se asocia al guardar. */
+    fun onPhotoPicked(result: ImagePickerResult) {
+        when (result) {
+            ImagePickerResult.CameraDenied -> _state.update { it.copy(cameraDenied = true) }
+            is ImagePickerResult.Picked -> {
+                _state.update { it.copy(importingPhoto = true, photoFailed = 0, cameraDenied = false) }
+                viewModelScope.launch {
+                    val picked = result.images.take(1)
+                    val imported = attempt { importPhotos(picked) }.getOrElse { ImportedPhotos(emptyList(), picked.size) }
+                    _state.update { s ->
+                        s.copy(
+                            importingPhoto = false,
+                            photoPath = imported.photos.firstOrNull()?.path ?: s.photoPath,
+                            photoFailed = imported.failed,
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun removePhoto() = _state.update { it.copy(photoPath = null, photoFailed = 0) }
+
     fun save() {
         val s = _state.value
-        if (s.saving) return
+        if (s.saving || s.importingPhoto) return
         val species = s.species ?: run {
             _state.update { it.copy(speciesMissing = true) }
             return
         }
-        _state.update { it.copy(saving = true) }
+        _state.update { it.copy(saving = true, saveFailed = false) }
         viewModelScope.launch {
-            val result = savePet(
+            val result = attempt { savePet(
                 PetDraft(
                     id = petId,
                     name = s.name,
@@ -144,8 +188,12 @@ class PetFormViewModel(
                     distinguishingMarks = s.marks,
                     ownerName = s.owner,
                     ownerAddress = s.address,
+                    photoPath = s.photoPath,
                 ),
-            )
+            ) }.getOrElse {
+                _state.update { it.copy(saving = false, saveFailed = true) }
+                return@launch
+            }
             _state.update {
                 when (result) {
                     is SavePetResult.Saved -> it.copy(saving = false, done = true)

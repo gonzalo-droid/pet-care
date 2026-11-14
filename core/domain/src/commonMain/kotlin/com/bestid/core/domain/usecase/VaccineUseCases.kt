@@ -33,6 +33,10 @@ data class VaccineDraft(
     val items: List<VaccineItem> = emptyList(),
     val vetName: String? = null,
     val vetContact: String? = null,
+    /** Páginas de la cartilla (fotos ya importadas), en orden. */
+    val sourcePhotoIds: List<String> = emptyList(),
+    /** Foto del sticker del frasco. */
+    val stickerPhotoId: String? = null,
 )
 
 sealed interface SaveVaccineResult {
@@ -62,7 +66,8 @@ class GetVet(private val vets: VetRepository) {
 
 /**
  * Guarda una vacuna registrada a mano: valida, resuelve los tipos escritos a mano y la
- * veterinaria (reutiliza la existente por nombre), y conserva lo que venía de un escaneo al editar.
+ * veterinaria (reutiliza la existente por nombre), y conserva lo que venía de un escaneo al editar. Las fotos
+ * llegan ya importadas ([ImportPhotos]); quitar una solo la desvincula y [CleanUpPhotos] borra el archivo.
  */
 class SaveVaccineRecord(
     private val records: VaccineRecordRepository,
@@ -98,8 +103,8 @@ class SaveVaccineRecord(
             items = items,
             vetId = resolveVet(draft.vetName, draft.vetContact),
             source = existing?.source ?: RecordSource.MANUAL,
-            sourcePhotoIds = existing?.sourcePhotoIds.orEmpty(),
-            stickerPhotoId = existing?.stickerPhotoId,
+            sourcePhotoIds = draft.sourcePhotoIds.distinct(),
+            stickerPhotoId = draft.stickerPhotoId,
             extraction = existing?.extraction,
             createdAt = existing?.createdAt ?: now,
             updatedAt = now,

@@ -36,4 +36,19 @@ class MigrationTest {
         db.execSQL("INSERT INTO scheduled_notifications (id, refType, refId, fireAt) VALUES ('n', 'CARE', 'c', 1)")
         db.close()
     }
+
+    @Test
+    fun migrate2To3KeepsDataAndAddsPhotos() {
+        helper.createDatabase(2).apply {
+            execSQL("INSERT INTO pets (id, name, species, createdAt, updatedAt) VALUES ('lilith', 'Lilith', 'CAT', 1, 1)")
+            close()
+        }
+        val db = helper.runMigrationsAndValidate(3)
+        db.prepare("SELECT COUNT(*) FROM pets").use { st ->
+            st.step()
+            assertEquals(1, st.getLong(0))
+        }
+        db.execSQL("INSERT INTO photos (id, path, width, height, createdAt) VALUES ('p', 'photos/p.jpg', 2000, 1500, 1)")
+        db.close()
+    }
 }

@@ -33,9 +33,9 @@ App móvil (Android e iOS) que digitaliza la cartilla de vacunación de mascotas
 /core/ui             presentación compartida entre features: etiquetas (especie, sexo), fechas es-PE, plurales
 /core/navigation     rutas tipadas; los features navegan solo a través de ellas
 /core/domain         casos de uso, validaciones, próxima dosis, ReminderEngine y puertos (repositorios, avisos)
-/core/data           Room, DataStore, repositorios (luego respaldo)
-/core/platform       adaptadores Android e iOS de los puertos de plataforma (DatePicker, avisos; luego imágenes...)
-/feature/*           home, cartilla, health, pet, onboarding: pantalla + ViewModel
+/core/data           Room, DataStore, repositorios, fotos y respaldo
+/core/platform       adaptadores Android e iOS de los puertos de plataforma (DatePicker, avisos, cámara, galería y procesado de fotos)
+/feature/*           home, cartilla, health, pet, onboarding, share, settings: pantalla + ViewModel
 /build-logic         plugins de convención de Gradle
 /iosApp              proyecto Xcode
 /docs                SYSTEM_DESIGN.md, DECISIONS.md, licencias y design/ (prototipo: capturas, HTML por pantalla y flujos)
@@ -61,7 +61,9 @@ Un feature nunca depende de otro feature. `core/designsystem` no depende de `cor
 - Pruebas en la JVM (dominio, Room en memoria, host de Android): `./gradlew allTests` en Linux
 - Pruebas comunes en el simulador iOS (solo en Mac): `./gradlew iosSimulatorArm64Test`
 - iOS: abrir `iosApp/iosApp.xcodeproj` en Xcode, o `xcodebuild -project iosApp/iosApp.xcodeproj -target iosApp -sdk iphonesimulator ARCHS=arm64 CODE_SIGNING_ALLOWED=NO build`
-- Catálogo de componentes en el teléfono: Ajustes (ícono arriba a la derecha) → "Ver catálogo de componentes"
+- Reglas del proyecto (también en el CI): `.github/scripts/check-rules.sh`
+- Catálogo de componentes en el teléfono (solo en debug): Ajustes (ícono arriba a la derecha) → "Ver catálogo de componentes"
+- Beta y tiendas: `docs/BETA.md`, `docs/store/`, `docs/legal/`
 
 ## Fuera del MVP (no implementar)
 

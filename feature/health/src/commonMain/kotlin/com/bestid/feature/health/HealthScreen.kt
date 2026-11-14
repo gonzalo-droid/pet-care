@@ -26,6 +26,7 @@ import com.bestid.core.designsystem.component.ConfirmSheet
 import com.bestid.core.designsystem.component.DashedButton
 import com.bestid.core.designsystem.component.EmptyState
 import com.bestid.core.designsystem.component.InfoCard
+import com.bestid.core.designsystem.component.ErrorState
 import com.bestid.core.designsystem.component.LoadingState
 import com.bestid.core.designsystem.component.LocalUndoController
 import com.bestid.core.designsystem.component.PermissionCard
@@ -37,6 +38,8 @@ import com.bestid.core.designsystem.component.WeightChart
 import com.bestid.core.designsystem.component.WeightPoint
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
+import com.bestid.core.ui.resources.Res as UiRes
+import com.bestid.core.ui.resources.state_load_error
 import com.bestid.core.domain.port.NotificationPermission
 import com.bestid.core.domain.usecase.RestoreWeight
 import com.bestid.core.model.CareTask
@@ -120,6 +123,7 @@ fun HealthScreen(
     val pet = state.pet
     when {
         state.loading -> LoadingState(modifier = modifier.fillMaxSize())
+        state.failed -> ErrorState(stringResource(UiRes.string.state_load_error), modifier = modifier.fillMaxSize(), onRetry = viewModel::retry)
         pet == null -> Column(modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             EmptyState(
                 illustration = BestIdIcons.Health,

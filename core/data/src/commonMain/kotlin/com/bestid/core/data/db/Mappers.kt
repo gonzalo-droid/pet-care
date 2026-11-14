@@ -8,6 +8,7 @@ import com.bestid.core.model.ScheduledNotification
 import com.bestid.core.model.WeightEntry
 import com.bestid.core.model.ExtractionMeta
 import com.bestid.core.model.Pet
+import com.bestid.core.model.Photo
 import com.bestid.core.model.RecordSource
 import com.bestid.core.model.Sex
 import com.bestid.core.model.Species
@@ -184,3 +185,7 @@ internal fun WeightEntry.toEntity() =
 internal fun ScheduledNotificationEntity.toModel() = ScheduledNotification(id, refType, refId, fireAt.instant())
 
 internal fun ScheduledNotification.toEntity() = ScheduledNotificationEntity(id, refType, refId, fireAt.ms())
+
+internal fun PhotoEntity.toModel() = Photo(id, path, width, height, createdAt.instant())
+
+internal fun Photo.toEntity() = PhotoEntity(id, path, width, height, createdAt.ms())

@@ -9,6 +9,8 @@ import com.bestid.feature.health.healthModule
 import com.bestid.feature.home.homeModule
 import com.bestid.feature.onboarding.onboardingModule
 import com.bestid.feature.pet.petModule
+import com.bestid.feature.settings.settingsModule
+import com.bestid.feature.share.shareModule
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModelOf
@@ -30,6 +32,8 @@ val appModules: List<Module> = listOf(
     healthModule,
     petModule,
     onboardingModule,
+    shareModule,
+    settingsModule,
 )
 
 /** Punto único de arranque de Koin. Android lo llama desde Application e iOS desde iOSApp.swift. */
