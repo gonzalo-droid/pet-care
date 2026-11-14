@@ -1,3 +1,9 @@
+// Equipo de Apple Developer: complétalo en tu Mac para firmar (no es un secreto, pero es de tu cuenta).
 TEAM_ID=
+// Identificador de la app (D11). Debe ser exactamente este en App Store Connect.
 BUNDLE_ID=com.bestid.app
 APP_NAME=BestID
+
+// Versión visible y número de compilación. Sube CURRENT_PROJECT_VERSION en cada subida a TestFlight.
+MARKETING_VERSION=0.5.0
+CURRENT_PROJECT_VERSION=1

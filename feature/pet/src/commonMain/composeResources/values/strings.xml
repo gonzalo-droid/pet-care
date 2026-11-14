@@ -27,7 +27,7 @@
     <string name="pet_form_marks_placeholder">Ej. Mancha blanca en la cola</string>
     <string name="pet_form_owner">Nombre del tutor</string>
     <string name="pet_form_address">Dirección</string>
-    <string name="pet_form_address_helper">No se comparte salvo que lo elijas.</string>
+    <string name="pet_form_address_helper">Queda solo en este teléfono: nunca va en la ficha que compartes.</string>
     <string name="pet_form_save">Guardar mascota</string>
     <string name="pet_form_delete">Eliminar mascota</string>
     <string name="pet_error_name_empty">Escribe el nombre de tu mascota</string>
