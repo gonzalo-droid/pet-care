@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Solo la carpeta temporal donde la cámara del sistema deja la foto antes de procesarla. -->
+<!-- Solo carpetas de la caché: la foto de la cámara antes de procesarla y los archivos para compartir
+     (PDF y respaldo). Las fotos guardadas y la base nunca se exponen. -->
 <paths>
     <cache-path name="camera" path="camera/" />
+    <cache-path name="share" path="share/" />
 </paths>
