@@ -3,7 +3,11 @@ package com.bestid.core.data.di
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
+import com.bestid.core.data.backup.RoomBackupStore
 import com.bestid.core.data.db.BestIdDatabase
+import com.bestid.core.data.repository.DataStoreBackupSettings
+import com.bestid.core.domain.port.BackupSettingsStore
+import com.bestid.core.domain.port.BackupStore
 import com.bestid.core.data.db.configured
 import com.bestid.core.data.repository.DataStoreReminderSettings
 import com.bestid.core.data.repository.DataStoreSelectedPetStore
@@ -56,6 +60,8 @@ val dataModule: Module = module {
     }
     single<ReminderSettingsStore> { DataStoreReminderSettings(get()) }
     single<PhotoRepository> { RoomPhotoRepository(get()) }
+    single<BackupStore> { RoomBackupStore(get()) }
+    single<BackupSettingsStore> { DataStoreBackupSettings(get()) }
     single<AppClock> { SystemAppClock() }
     single<IdGenerator> { UuidGenerator() }
 }

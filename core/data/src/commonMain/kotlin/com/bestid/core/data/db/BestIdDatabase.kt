@@ -43,6 +43,7 @@ abstract class BestIdDatabase : RoomDatabase() {
     abstract fun weightEntryDao(): WeightEntryDao
     abstract fun scheduledNotificationDao(): ScheduledNotificationDao
     abstract fun photoDao(): PhotoDao
+    abstract fun backupDao(): BackupDao
 
     companion object {
         const val FILE_NAME = "bestid.db"

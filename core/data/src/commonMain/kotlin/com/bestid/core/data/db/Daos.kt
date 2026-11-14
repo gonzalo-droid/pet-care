@@ -136,3 +136,57 @@ interface PhotoDao {
     @Query("DELETE FROM photos WHERE id IN (:ids)")
     suspend fun delete(ids: List<String>)
 }
+
+/** Respaldo (sección 13): leer todo, aplicar lo importado y borrar todo, cada uno en una transacción. */
+@Dao
+interface BackupDao {
+    @Query("SELECT * FROM pets") suspend fun pets(): List<PetEntity>
+    @Query("SELECT * FROM vets") suspend fun vets(): List<VetEntity>
+    @Query("SELECT * FROM vaccine_types WHERE isCustom = 1") suspend fun customTypes(): List<VaccineTypeEntity>
+    @Query("SELECT * FROM vaccine_records") suspend fun records(): List<VaccineRecordEntity>
+    @Query("SELECT * FROM care_tasks") suspend fun cares(): List<CareTaskEntity>
+    @Query("SELECT * FROM weight_entries") suspend fun weights(): List<WeightEntryEntity>
+    @Query("SELECT * FROM photos") suspend fun photos(): List<PhotoEntity>
+
+    @Upsert suspend fun upsertPets(items: List<PetEntity>)
+    @Upsert suspend fun upsertVets(items: List<VetEntity>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) suspend fun insertTypes(items: List<VaccineTypeEntity>)
+    @Upsert suspend fun upsertRecords(items: List<VaccineRecordEntity>)
+    @Upsert suspend fun upsertCares(items: List<CareTaskEntity>)
+    @Upsert suspend fun upsertWeights(items: List<WeightEntryEntity>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) suspend fun insertPhotos(items: List<PhotoEntity>)
+
+    @Query("DELETE FROM pets") suspend fun deletePets()
+    @Query("DELETE FROM vets") suspend fun deleteVets()
+    @Query("DELETE FROM vaccine_types WHERE isCustom = 1") suspend fun deleteCustomTypes()
+    @Query("DELETE FROM vaccine_records") suspend fun deleteRecords()
+    @Query("DELETE FROM care_tasks") suspend fun deleteCares()
+    @Query("DELETE FROM weight_entries") suspend fun deleteWeights()
+    @Query("DELETE FROM photos") suspend fun deletePhotos()
+
+    @Transaction
+    suspend fun apply(
+        pets: List<PetEntity>, vets: List<VetEntity>, types: List<VaccineTypeEntity>, records: List<VaccineRecordEntity>,
+        cares: List<CareTaskEntity>, weights: List<WeightEntryEntity>, photos: List<PhotoEntity>,
+    ) {
+        insertTypes(types)
+        upsertVets(vets)
+        upsertPets(pets)
+        upsertRecords(records)
+        upsertCares(cares)
+        upsertWeights(weights)
+        insertPhotos(photos)
+    }
+
+    /** Los avisos programados no se borran aquí: la sincronización los cancela al no haber datos. */
+    @Transaction
+    suspend fun clearAll() {
+        deleteRecords()
+        deleteCares()
+        deleteWeights()
+        deletePets()
+        deleteVets()
+        deleteCustomTypes()
+        deletePhotos()
+    }
+}
