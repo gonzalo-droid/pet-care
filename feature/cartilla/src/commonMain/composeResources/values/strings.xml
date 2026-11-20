@@ -110,4 +110,5 @@
     <string name="form_add_sticker_photo">Foto del sticker del frasco</string>
     <string name="detail_photos">Fotos</string>
     <string name="detail_add_sticker_photo">Agregar foto del sticker</string>
+    <string name="cartilla_open_vaccine">Ver la vacuna</string>
 </resources>

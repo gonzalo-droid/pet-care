@@ -44,8 +44,8 @@ import com.bestid.core.designsystem.preview.PreviewSurface
 import com.bestid.core.designsystem.resources.Res
 import com.bestid.core.designsystem.resources.ds_collapsed_state
 import com.bestid.core.designsystem.resources.ds_expanded_state
-import com.bestid.core.designsystem.resources.ds_not_selected_state
-import com.bestid.core.designsystem.resources.ds_selected_state
+import com.bestid.core.designsystem.resources.ds_off_state
+import com.bestid.core.designsystem.resources.ds_on_state
 import com.bestid.core.designsystem.theme.BestIdTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -230,7 +230,7 @@ fun SwitchRow(
     enabled: Boolean = true,
 ) {
     val colors = BestIdTheme.colors
-    val state = stringResource(if (checked) Res.string.ds_selected_state else Res.string.ds_not_selected_state)
+    val state = stringResource(if (checked) Res.string.ds_on_state else Res.string.ds_off_state)
     Row(
         modifier = modifier
             .fillMaxWidth()

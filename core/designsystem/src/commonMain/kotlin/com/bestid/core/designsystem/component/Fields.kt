@@ -1,5 +1,7 @@
 package com.bestid.core.designsystem.component
 
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -65,8 +67,9 @@ fun FormField(
     enabled: Boolean = true,
 ) {
     val colors = BestIdTheme.colors
+    val spokenLabel = if (optional) "$label, ${stringResource(Res.string.ds_optional)}" else label
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs)) {
-        FieldLabel(label = label, optional = optional)
+        FieldLabel(label = label, optional = optional, readByField = true)
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
@@ -76,7 +79,11 @@ fun FormField(
             minLines = if (kind == FieldKind.MULTILINE) 3 else 1,
             textStyle = BestIdTheme.typography.input,
             placeholder = placeholder?.let { { Text(it, style = BestIdTheme.typography.input) } },
-            keyboardOptions = KeyboardOptions(keyboardType = kind.keyboardType()),
+            // "Siguiente" en el teclado pasa al próximo campo; el multilínea mantiene el salto de línea.
+            keyboardOptions = KeyboardOptions(
+                keyboardType = kind.keyboardType(),
+                imeAction = if (kind == FieldKind.MULTILINE) ImeAction.Default else ImeAction.Next,
+            ),
             shape = BestIdTheme.shapes.field,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = colors.ink,
@@ -98,7 +105,7 @@ fun FormField(
                 .fillMaxWidth()
                 .heightIn(min = BestIdTheme.sizes.field)
                 .semantics {
-                    contentDescription = label
+                    contentDescription = spokenLabel
                     if (error != null) error(error)
                 },
         )
@@ -108,7 +115,7 @@ fun FormField(
 
 /**
  * Campo de fecha de solo lectura: al tocarlo, la pantalla abre el selector nativo de fecha.
- * El valor llega ya formateado (dd/MM/aaaa).
+ * El valor llega ya formateado ("21 dic 2025", con `formatLong`).
  */
 @Composable
 fun DateField(
@@ -126,7 +133,7 @@ fun DateField(
 ) {
     val chooseDate = stringResource(Res.string.ds_choose_date)
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs)) {
-        FieldLabel(label = label, optional = optional)
+        FieldLabel(label = label, optional = optional, readByField = true)
         ReadOnlyBox(
             text = value ?: chooseDate,
             isPlaceholder = value == null,
@@ -134,7 +141,7 @@ fun DateField(
             onClick = onClick,
             enabled = enabled,
             error = error,
-            accessibilityLabel = "$label: ${value ?: chooseDate}",
+            accessibilityLabel = "$label${if (optional) ", ${stringResource(Res.string.ds_optional)}" else ""}: ${value ?: chooseDate}",
         )
         if (allowApproximate) {
             SwitchRow(
@@ -212,8 +219,12 @@ fun FieldLabelText(label: String, optional: Boolean = false) = FieldLabel(label,
 fun FieldError(text: String) = FieldSupport(helper = null, error = text)
 
 @Composable
-internal fun FieldLabel(label: String, optional: Boolean) {
-    Row(horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs)) {
+internal fun FieldLabel(label: String, optional: Boolean, readByField: Boolean = false) {
+    // readByField: el campo ya anuncia la etiqueta; se oculta aquí para no leerla dos veces.
+    Row(
+        modifier = if (readByField) Modifier.clearAndSetSemantics {} else Modifier,
+        horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs),
+    ) {
         Text(label, style = BestIdTheme.typography.bodyStrong, color = BestIdTheme.colors.ink)
         if (optional) {
             Text(

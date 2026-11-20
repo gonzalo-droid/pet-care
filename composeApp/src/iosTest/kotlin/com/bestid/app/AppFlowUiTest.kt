@@ -222,8 +222,8 @@ class AppFlowUiTest {
         screenshot("09-salud-cuidados")
 
         onNodeWithText("Peso").performClick()
-        onNodeWithText("Agregar peso de hoy").performScrollTo().performClick()
-        waitForText("Peso en kg")
+        onNodeWithText("Agregar peso").performScrollTo().performClick()
+        waitForText("Guardar peso")
         onNode(hasSetTextAction() and hasContentDescription("Peso en kg")).performTextInput("3,8")
         onNodeWithText("Guardar peso").performClick()
         waitForText("3,8 kg")
@@ -231,8 +231,8 @@ class AppFlowUiTest {
 
         // M4: ficha en PDF desde el carnet
         onNodeWithText("Mascota").performClick()
-        onNodeWithText("Compartir carnet").performScrollTo().performClick()
-        waitForText("Vista previa del PDF")
+        onNodeWithText("Compartir ficha").performScrollTo().performClick()
+        waitForText("Compartir PDF")
         screenshot("11-compartir-ficha")
         onNodeWithText("Compartir PDF").performClick()
         waitUntil(timeoutMillis = 20_000) { shared.any { it.endsWith(".pdf") } }

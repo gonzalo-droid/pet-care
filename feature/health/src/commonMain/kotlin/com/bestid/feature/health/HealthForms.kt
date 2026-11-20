@@ -19,6 +19,8 @@ import com.bestid.core.designsystem.component.ConfirmSheet
 import com.bestid.core.designsystem.component.DateField
 import com.bestid.core.designsystem.component.FieldKind
 import com.bestid.core.designsystem.component.FieldLabelText
+import com.bestid.core.designsystem.component.AlertCard
+import com.bestid.core.designsystem.component.ErrorState
 import com.bestid.core.designsystem.component.FlowScaffold
 import com.bestid.core.designsystem.component.FormField
 import com.bestid.core.designsystem.component.InfoCard
@@ -29,6 +31,8 @@ import com.bestid.core.designsystem.component.SwitchRow
 import com.bestid.core.designsystem.component.TextAction
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
+import com.bestid.core.ui.DeleteFailedCard
+import com.bestid.core.ui.LoadFailedState
 import com.bestid.core.ui.SaveFailedCard
 import com.bestid.core.domain.schedule.CareSchedule
 import com.bestid.core.domain.usecase.RestoreCareTask
@@ -64,7 +68,9 @@ import com.bestid.feature.health.resources.care_form_reminder_help
 import com.bestid.feature.health.resources.care_form_save
 import com.bestid.feature.health.resources.care_form_title
 import com.bestid.feature.health.resources.care_form_title_placeholder
+import com.bestid.feature.health.resources.care_not_found
 import com.bestid.feature.health.resources.health_delete
+import com.bestid.feature.health.resources.health_no_pet
 import com.bestid.feature.health.resources.health_undo
 import com.bestid.feature.health.resources.weight_error_future
 import com.bestid.feature.health.resources.weight_error_range
@@ -107,15 +113,24 @@ fun CareFormScreen(
         title = stringResource(if (state.isEdit) Res.string.care_form_edit else Res.string.care_form_new),
         onClose = onClose,
         closeDescription = stringResource(Res.string.care_form_close),
+        confirmDiscard = state.dirty && !state.done,
         bottomAction = {
             if (state.saveFailed) SaveFailedCard()
-            PrimaryButton(stringResource(Res.string.care_form_save), onClick = viewModel::save, loading = state.saving, enabled = state.loaded)
+            PrimaryButton(
+                stringResource(Res.string.care_form_save),
+                onClick = viewModel::save,
+                loading = state.saving,
+                enabled = state.loaded && state.petId != null,
+            )
         },
     ) {
-        if (!state.loaded) {
-            LoadingState()
-            return@FlowScaffold
+        when {
+            state.loadFailed -> LoadFailedState(onRetry = viewModel::retryLoad)
+            state.notFound -> ErrorState(stringResource(Res.string.care_not_found))
+            !state.loaded -> LoadingState()
+            state.petId == null -> NoPetCard()
         }
+        if (state.loadFailed || state.notFound || !state.loaded || state.petId == null) return@FlowScaffold
         Column(verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs)) {
             FieldLabelText(stringResource(Res.string.care_form_kind))
             FlowRow(
@@ -175,6 +190,7 @@ fun CareFormScreen(
                 Text(stringResource(Res.string.care_form_next, next.formatLong()), style = BestIdTheme.typography.bodyStrong)
             }
         }
+        if (state.deleteFailed) DeleteFailedCard()
         if (state.isEdit) {
             TextAction(stringResource(Res.string.care_form_delete), onClick = { confirmDelete = true }, icon = BestIdIcons.Delete, destructive = true)
         }
@@ -206,11 +222,21 @@ fun WeightFormScreen(onClose: () -> Unit, viewModel: WeightFormViewModel = koinV
         title = stringResource(Res.string.weight_form_title),
         onClose = onClose,
         closeDescription = stringResource(Res.string.weight_form_close),
+        confirmDiscard = state.dirty && !state.done,
         bottomAction = {
             if (state.saveFailed) SaveFailedCard()
-            PrimaryButton(stringResource(Res.string.weight_form_save), onClick = viewModel::save, loading = state.saving)
+            PrimaryButton(
+                stringResource(Res.string.weight_form_save),
+                onClick = viewModel::save,
+                loading = state.saving,
+                enabled = state.loaded && state.petId != null,
+            )
         },
     ) {
+        if (state.loaded && state.petId == null) {
+            NoPetCard()
+            return@FlowScaffold
+        }
         DateField(
             label = stringResource(Res.string.weight_form_date),
             value = state.date?.formatLong(),
@@ -230,4 +256,10 @@ fun WeightFormScreen(onClose: () -> Unit, viewModel: WeightFormViewModel = koinV
             },
         )
     }
+}
+
+/** Sin mascota seleccionada (por ejemplo, se borró mientras el formulario estaba abierto). */
+@Composable
+private fun NoPetCard() {
+    AlertCard { Text(stringResource(Res.string.health_no_pet), style = BestIdTheme.typography.body) }
 }

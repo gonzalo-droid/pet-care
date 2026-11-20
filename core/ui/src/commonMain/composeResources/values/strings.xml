@@ -42,4 +42,5 @@
     <!-- Estados de error (M5) -->
     <string name="state_load_error">No pudimos cargar los datos. Inténtalo de nuevo.</string>
     <string name="state_save_error">No pudimos guardar los cambios. Inténtalo de nuevo.</string>
+    <string name="state_delete_error">No pudimos eliminarlo. Inténtalo de nuevo.</string>
 </resources>

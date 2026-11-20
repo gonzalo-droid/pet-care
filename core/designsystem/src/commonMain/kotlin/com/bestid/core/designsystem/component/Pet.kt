@@ -166,6 +166,8 @@ fun PetSelector(
             color = colors.ink,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
+            // Sin fill: el chip sigue al ancho del nombre, pero un nombre largo no empuja la flecha fuera.
+            modifier = Modifier.weight(1f, fill = false),
         )
         Icon(painterResource(BestIdIcons.ExpandMore), contentDescription = null, tint = colors.muted)
     }

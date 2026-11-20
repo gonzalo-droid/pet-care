@@ -128,7 +128,7 @@ internal suspend fun PetSheet.toPdf(colors: PdfColors, photoPath: (String) -> St
 }
 
 /** Nombre de archivo sin tildes ni espacios, para que llegue igual por WhatsApp o correo. */
-internal fun safeFileName(name: String): String {
+internal fun safeFileName(name: String, fallback: String): String {
     val plain = name.map { c ->
         when (c) {
             'á', 'à', 'ä', 'â' -> 'a'
@@ -146,5 +146,5 @@ internal fun safeFileName(name: String): String {
             else -> c
         }
     }.joinToString("")
-    return plain.replace(Regex("[^A-Za-z0-9]+"), "-").trim('-').ifEmpty { "mascota" }.take(40)
+    return plain.replace(Regex("[^A-Za-z0-9]+"), "-").trim('-').ifEmpty { fallback }.take(40)
 }

@@ -1,5 +1,7 @@
 package com.bestid.feature.cartilla
 
+import com.bestid.core.ui.attempt
+import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bestid.core.domain.port.AppClock
@@ -105,6 +107,10 @@ class VaccineDetailViewModel(
     getPhotos: GetPhotos,
 ) : ViewModel() {
     private val deleted = MutableStateFlow<String?>(null)
+    private val _deleteFailed = MutableStateFlow(false)
+
+    /** No se pudo eliminar: la vacuna sigue y se muestra el aviso. */
+    val deleteFailed: StateFlow<Boolean> = _deleteFailed.asStateFlow()
 
     private val retryDetailState = Retry()
 
@@ -142,8 +148,12 @@ class VaccineDetailViewModel(
 
     fun delete() {
         viewModelScope.launch {
-            deleteRecord(recordId)
-            deleted.update { recordId }
+            attempt { deleteRecord(recordId) }
+                .onSuccess {
+                    _deleteFailed.value = false
+                    deleted.update { recordId }
+                }
+                .onFailure { _deleteFailed.value = true }
         }
     }
 }

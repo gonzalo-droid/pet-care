@@ -23,6 +23,8 @@
     <!-- Contenido del PDF (sección 12) -->
     <string name="pdf_brand">BestID · Ficha de vacunas</string>
     <string name="pdf_file_name">Ficha-%1$s.pdf</string>
+    <!-- Nombre de archivo cuando el de la mascota no tiene letras latinas. Sin tildes ni espacios. -->
+    <string name="pdf_file_fallback">mascota</string>
     <string name="pdf_section_data">Datos</string>
     <string name="pdf_species">Especie</string>
     <string name="pdf_sex">Sexo</string>
@@ -47,5 +49,5 @@
     <string name="pdf_section_weight">Historial de peso</string>
     <string name="pdf_col_weight">Peso</string>
     <string name="pdf_page">Cartilla, página %1$d</string>
-    <string name="pdf_footer">Generado por BestID el %1$s. Los datos fueron registrados por el dueño; verificar con la cartilla original.</string>
+    <string name="pdf_footer">Generado por BestID el %1$s. Los datos fueron registrados por el tutor; verificar con la cartilla original.</string>
 </resources>

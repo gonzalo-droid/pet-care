@@ -39,7 +39,7 @@
     <string name="pet_deleted">Se eliminó a %1$s</string>
     <string name="pet_undo">Deshacer</string>
     <string name="pet_close">Cerrar</string>
-    <string name="pet_share">Compartir carnet</string>
+    <string name="pet_share">Compartir ficha</string>
     <string name="pet_photo_add">Agregar foto</string>
     <string name="pet_photo_change">Cambiar foto</string>
     <string name="pet_photo_sheet">Foto de tu mascota</string>

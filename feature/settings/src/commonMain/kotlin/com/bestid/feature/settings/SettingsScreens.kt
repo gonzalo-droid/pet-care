@@ -1,5 +1,8 @@
 package com.bestid.feature.settings
 
+import com.bestid.core.ui.DeleteFailedCard
+import com.bestid.core.ui.attempt
+import kotlinx.coroutines.flow.asStateFlow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -89,6 +92,10 @@ class SettingsViewModel(
     private val deleteAll: DeleteAllData,
 ) : ViewModel() {
     private val deleted = MutableStateFlow(false)
+    private val _deleteFailed = MutableStateFlow(false)
+
+    /** "Borrar todos los datos" falló: los datos siguen y se muestra el aviso. */
+    val deleteFailed: StateFlow<Boolean> = _deleteFailed.asStateFlow()
 
     val state: StateFlow<SettingsState> = combine(observeTime(), observeLastBackup(), deleted) { time, last, gone ->
         SettingsState(time, last?.toLocalDateTime(TimeZone.currentSystemDefault())?.date, getVersion(), showTools(), gone)
@@ -100,8 +107,9 @@ class SettingsViewModel(
 
     fun deleteEverything() {
         viewModelScope.launch {
-            deleteAll()
-            deleted.value = true
+            attempt { deleteAll() }
+                .onSuccess { deleted.value = true }
+                .onFailure { _deleteFailed.value = true }
         }
     }
 }
@@ -119,6 +127,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val deleteFailed by viewModel.deleteFailed.collectAsStateWithLifecycle()
     var editTime by remember { mutableStateOf(false) }
     var confirmDelete by remember { mutableStateOf(false) }
 
@@ -130,7 +139,7 @@ fun SettingsScreen(
         closeIcon = BestIdIcons.ArrowBack,
         closeDescription = stringResource(Res.string.settings_back),
     ) {
-        PlainCard(onClick = onOpenBackup, onClickLabel = stringResource(Res.string.settings_backup)) {
+        PlainCard(onClick = onOpenBackup, onClickLabel = stringResource(Res.string.settings_backup), showChevron = true) {
             Eyebrow(stringResource(Res.string.settings_backup))
             Text(
                 state.lastBackup?.let { stringResource(Res.string.settings_backup_last, it.formatLong()) }
@@ -140,7 +149,7 @@ fun SettingsScreen(
         }
 
         val time = state.reminderTime
-        PlainCard(onClick = { editTime = true }, onClickLabel = stringResource(Res.string.settings_reminder_time)) {
+        PlainCard(onClick = { editTime = true }, onClickLabel = stringResource(Res.string.settings_reminder_time), showChevron = true) {
             Eyebrow(stringResource(Res.string.settings_reminders))
             ListRow(stringResource(Res.string.settings_reminder_time), time?.let { formatTime(it) }.orEmpty())
             Text(stringResource(Res.string.settings_reminder_time_hint), style = BestIdTheme.typography.support, color = BestIdTheme.colors.muted)
@@ -157,6 +166,7 @@ fun SettingsScreen(
             Text(stringResource(Res.string.settings_version, state.version), style = BestIdTheme.typography.support, color = BestIdTheme.colors.muted)
         }
 
+        if (deleteFailed) DeleteFailedCard()
         TextAction(
             text = stringResource(Res.string.settings_delete_all),
             onClick = { confirmDelete = true },

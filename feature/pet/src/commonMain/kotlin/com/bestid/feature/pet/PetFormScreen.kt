@@ -31,6 +31,8 @@ import com.bestid.core.designsystem.component.SheetOption
 import com.bestid.core.designsystem.component.TextAction
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
+import com.bestid.core.ui.DeleteFailedCard
+import com.bestid.core.ui.LoadFailedState
 import com.bestid.core.ui.SaveFailedCard
 import com.bestid.core.domain.usecase.RestorePet
 import com.bestid.core.domain.validation.PetError
@@ -122,16 +124,21 @@ fun PetFormScreen(
         title = stringResource(if (state.isEdit) Res.string.pet_form_edit_title else Res.string.pet_form_new_title),
         onClose = onClose,
         closeDescription = stringResource(Res.string.pet_close),
+        confirmDiscard = state.dirty && !state.done,
         bottomAction = {
             if (state.saveFailed) SaveFailedCard()
             PrimaryButton(
                 text = stringResource(Res.string.pet_form_save),
                 onClick = viewModel::save,
-                loading = state.saving,
+                loading = state.saving || state.importingPhoto,
                 enabled = state.loaded,
             )
         },
     ) {
+        if (state.loadFailed) {
+            LoadFailedState(onRetry = viewModel::retryLoad)
+            return@FlowScaffold
+        }
         if (!state.loaded) {
             LoadingState()
             return@FlowScaffold
@@ -221,6 +228,7 @@ fun PetFormScreen(
                 optional = true,
             )
         }
+        if (state.deleteFailed) DeleteFailedCard()
         if (state.isEdit) {
             TextAction(
                 text = stringResource(Res.string.pet_form_delete),
