@@ -47,4 +47,10 @@ data class BestIdSizes(
     val statIcon: Dp = 34.dp,
     val actionPill: Dp = 40.dp,
     val rail: Dp = 2.dp,
+    /** Carnet: alto del encabezado verde, cuánto lo monta el avatar, aro del avatar, paso de la trama y muescas. */
+    val idCardHeader: Dp = 96.dp,
+    val idCardAvatarLift: Dp = 44.dp,
+    val idCardRing: Dp = 5.dp,
+    val idCardDots: Dp = 44.dp,
+    val idCardNotch: Dp = 20.dp,
 )

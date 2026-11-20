@@ -81,10 +81,14 @@ object PreviewData {
     const val CONFIRM_ACTION = "Eliminar"
     const val UNDO_MESSAGE = "Vacuna eliminada"
     const val FLOW_TITLE = "Nueva vacuna"
-    const val ID_SPECIES = "Especie"
     const val ID_SEX = "Sexo"
     const val ID_BIRTH = "Nacimiento"
-    const val ID_VACCINES = "2"
-    const val ID_NEXT = "Por confirmar"
+    const val ID_OWNER = "Tutor"
+    const val ID_OWNER_NAME = "Tutor de Prueba"
+    const val ID_SUBTITLE = "Gata · Hembra"
+    const val ID_VACCINES = "2 vacunas"
+    const val ID_NEXT = "31 dic"
+    const val ID_MISSING = "Faltan raza, nacimiento y señas"
+    const val ID_COMPLETE = "Completar"
     val WEIGHT_POINTS = listOf("jul" to 3.6, "ago" to 3.9, "set" to 4.0, "oct" to 4.1, "nov" to 4.2)
 }

@@ -168,12 +168,14 @@ fun ComponentCatalog(title: String, onClose: () -> Unit) {
             Badge(PreviewData.BADGE_NEUTRAL, BadgeTone.NEUTRAL)
         }
         PetIdCard(
-            PreviewData.PET_NAME,
-            null,
-            AvatarSpecies.CAT,
-            listOf(PreviewData.ID_SPECIES to PreviewData.SPECIES.first(), PreviewData.ID_SEX to PreviewData.SEX.first()),
-            PreviewData.ID_VACCINES,
-            PreviewData.ID_NEXT,
+            name = PreviewData.PET_NAME,
+            photo = null,
+            species = AvatarSpecies.CAT,
+            subtitle = PreviewData.ID_SUBTITLE,
+            details = listOf(PreviewData.ID_OWNER to PreviewData.ID_OWNER_NAME),
+            vaccineCount = PreviewData.ID_VACCINES,
+            nextDate = PreviewData.ID_NEXT,
+            completion = { ProgressRow(PreviewData.ID_MISSING, 0.25f, PreviewData.ID_COMPLETE, onClick = {}) },
         )
 
         SectionTitle("Registros y lectura")
