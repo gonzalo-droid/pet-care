@@ -13,6 +13,8 @@
     <string name="pet_missing_marks">señas</string>
     <string name="pet_missing_owner">tutor</string>
     <string name="pet_complete">Completar</string>
+    <string name="pet_edit">Editar datos</string>
+    <string name="pet_next_unconfirmed">! %1$s</string>
     <plurals name="pet_vaccines_count">
         <item quantity="one">%1$d vacuna</item>
         <item quantity="other">%1$d vacunas</item>

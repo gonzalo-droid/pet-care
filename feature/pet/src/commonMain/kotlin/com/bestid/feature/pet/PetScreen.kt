@@ -35,6 +35,8 @@ import com.bestid.feature.pet.resources.Res
 import com.bestid.feature.pet.resources.pet_add
 import com.bestid.feature.pet.resources.pet_add_another
 import com.bestid.feature.pet.resources.pet_complete
+import com.bestid.feature.pet.resources.pet_edit
+import com.bestid.feature.pet.resources.pet_next_unconfirmed
 import com.bestid.feature.pet.resources.pet_missing
 import com.bestid.feature.pet.resources.pet_missing_birth
 import com.bestid.feature.pet.resources.pet_missing_breed
@@ -103,7 +105,10 @@ fun PetScreen(
                 subtitle = pet.speciesAndSex(),
                 details = details,
                 vaccineCount = pluralStringResource(Res.plurals.pet_vaccines_count, state.vaccineCount, state.vaccineCount),
-                nextDate = state.nextDue?.date?.formatLong() ?: stringResource(Res.string.pet_next_none),
+                nextDate = state.nextDue?.let { due ->
+                    val date = due.date.formatLong()
+                    if (due.confirmed) date else stringResource(Res.string.pet_next_unconfirmed, date)
+                } ?: stringResource(Res.string.pet_next_none),
                 completion = if (missing.isEmpty()) null else {
                     {
                         ProgressRow(
@@ -115,6 +120,14 @@ fun PetScreen(
                     }
                 },
             )
+            if (missing.isEmpty()) {
+                TextAction(
+                    text = stringResource(Res.string.pet_edit),
+                    onClick = { onEditPet(pet.id) },
+                    icon = BestIdIcons.Edit,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                )
+            }
             PrimaryButton(text = stringResource(Res.string.pet_share), onClick = onShare, icon = BestIdIcons.Share)
             TextAction(
                 text = stringResource(Res.string.pet_add_another),
