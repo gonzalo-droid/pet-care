@@ -190,7 +190,7 @@ fun ComponentCatalog(title: String, onClose: () -> Unit) {
             review = PreviewData.BADGE_ALERT,
         )
         TimelineItem(date = { DateTile("21", "DIC", "21 de diciembre") }) {
-            VaccineRecordCard(null, PreviewData.VACCINE_TYPES.take(2), onClick = {}, products = PreviewData.RECORD_PRODUCTS)
+            VaccineRecordCard(null, PreviewData.VACCINE_TYPES.take(2), onClick = {}, products = PreviewData.RECORD_PRODUCTS, photos = PreviewData.RECORD_PHOTOS)
         }
         TimelineItem(date = { DateTile("?", "—", "Fecha sin leer", review = true) }) {
             VaccineRecordCard(null, PreviewData.VACCINE_TYPES.take(1), onClick = {}, review = "! Revisa")

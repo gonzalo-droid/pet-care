@@ -3,7 +3,6 @@ package com.bestid.core.ui
 import androidx.compose.runtime.Composable
 import com.bestid.core.ui.resources.Res
 import com.bestid.core.ui.resources.days_count
-import com.bestid.core.ui.resources.vaccines_registered
 import com.bestid.core.ui.resources.months_short
 import com.bestid.core.ui.resources.list_and
 import org.jetbrains.compose.resources.stringResource
@@ -38,11 +37,6 @@ fun daysText(days: Int): String = pluralStringResource(Res.plurals.days_count, d
 
 @Composable
 private fun LocalDate.monthShort(): String = stringArrayResource(Res.array.months_short)[month.number - 1]
-
-/** "1 vacuna registrada", "2 vacunas registradas" */
-@Composable
-fun vaccinesRegisteredText(count: Int): String =
-    pluralStringResource(Res.plurals.vaccines_registered, count, count)
 
 /** "raza, nacimiento y señas" */
 @Composable

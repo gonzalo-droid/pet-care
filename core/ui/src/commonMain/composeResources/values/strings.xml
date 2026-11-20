@@ -8,10 +8,6 @@
         <item quantity="one">%1$d día</item>
         <item quantity="other">%1$d días</item>
     </plurals>
-    <plurals name="vaccines_registered">
-        <item quantity="one">%1$d vacuna registrada</item>
-        <item quantity="other">%1$d vacunas registradas</item>
-    </plurals>
     <string name="species_dog">Perro</string>
     <string name="species_dog_female">Perra</string>
     <string name="species_cat">Gato</string>

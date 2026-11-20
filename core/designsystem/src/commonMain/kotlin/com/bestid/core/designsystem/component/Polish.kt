@@ -181,7 +181,7 @@ private fun PolishPreview() = PreviewSurface {
     }
     ReviewStrip("2 datos por revisar", "Revisar", {})
     TimelineItem({ DateTile("21", "dic", "21 de diciembre") }) {
-        VaccineRecordCard(null, PreviewData.VACCINE_TYPES.take(2), {}, products = PreviewData.RECORD_PRODUCTS)
+        VaccineRecordCard(null, PreviewData.VACCINE_TYPES.take(2), {}, products = PreviewData.RECORD_PRODUCTS, photos = PreviewData.RECORD_PHOTOS)
     }
     ProgressRow("3 de 5 datos completos", 0.6f, "Completar", {})
 }

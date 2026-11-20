@@ -14,6 +14,8 @@ import com.bestid.core.designsystem.theme.isLargeFont
 import com.bestid.core.domain.usecase.groupedByYear
 import com.bestid.core.ui.formatMonthShort
 import com.bestid.feature.cartilla.resources.cartilla_summary
+import com.bestid.feature.cartilla.resources.cartilla_open_record
+import com.bestid.feature.cartilla.resources.cartilla_photos_count
 import com.bestid.feature.cartilla.resources.cartilla_vaccines_count
 import com.bestid.feature.cartilla.resources.cartilla_to_confirm_count
 import com.bestid.feature.cartilla.resources.cartilla_year_to_confirm
@@ -137,6 +139,10 @@ fun CartillaScreen(
                                         record.typeIdsToConfirm.labels(state.types).map { stringResource(Res.string.cartilla_to_confirm, it) },
                                     onClick = { onOpenRecord(record.id) },
                                     products = record.items.productsLine(),
+                                    photos = record.sourcePhotoIds.size.takeIf { it > 0 }?.let {
+                                        pluralStringResource(Res.plurals.cartilla_photos_count, it, it)
+                                    },
+                                    onClickLabel = stringResource(Res.string.cartilla_open_record, date.formatLong()),
                                     modifier = Modifier.padding(bottom = BestIdTheme.spacing.sm),
                                 )
                             }

@@ -52,5 +52,8 @@ data class BestIdSizes(
     val idCardAvatarLift: Dp = 44.dp,
     val idCardRing: Dp = 5.dp,
     val idCardDots: Dp = 44.dp,
+    /** Radio de cada punto de la trama y su distancia al borde de la celda. */
+    val idCardDotRadius: Dp = 7.dp,
+    val idCardDotOffset: Dp = 20.dp,
     val idCardNotch: Dp = 20.dp,
 )

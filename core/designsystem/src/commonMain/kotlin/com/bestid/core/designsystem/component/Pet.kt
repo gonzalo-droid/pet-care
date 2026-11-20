@@ -315,7 +315,6 @@ fun PetIdCard(
     val spacing = BestIdTheme.spacing
     val shape = BestIdTheme.shapes.cardLarge
     val largeFont = isLargeFont()
-    val dot = colors.onPrimary.copy(alpha = 0.08f)
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -330,12 +329,13 @@ fun PetIdCard(
                 .background(colors.primary)
                 .drawBehind {
                     val step = sizes.idCardDots.toPx()
-                    // Trama del prototipo: un círculo de 7/44 del paso, centrado a 20/44 de cada celda.
-                    var y = step * 20 / 44
+                    val start = sizes.idCardDotOffset.toPx()
+                    val radius = sizes.idCardDotRadius.toPx()
+                    var y = start
                     while (y < size.height + step) {
-                        var x = step * 20 / 44
+                        var x = start
                         while (x < size.width + step) {
-                            drawCircle(dot, radius = step * 7 / 44, center = Offset(x, y))
+                            drawCircle(colors.idCardDot, radius = radius, center = Offset(x, y))
                             x += step
                         }
                         y += step

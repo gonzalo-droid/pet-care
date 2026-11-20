@@ -25,6 +25,10 @@
         <item quantity="other">%1$d datos por confirmar</item>
     </plurals>
     <string name="cartilla_open_record">Ver vacuna del %1$s</string>
+    <plurals name="cartilla_photos_count">
+        <item quantity="one">%1$d foto de la cartilla</item>
+        <item quantity="other">%1$d fotos de la cartilla</item>
+    </plurals>
     <string name="cartilla_vaccine_fallback">Vacuna</string>
 
     <string name="detail_title">Vacuna de %1$s</string>

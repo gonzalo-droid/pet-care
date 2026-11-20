@@ -30,6 +30,8 @@ data class BestIdColors(
     val error: Color,
     /** Color de la sombra de las superficies. */
     val shadow: Color,
+    /** Puntos de la trama del encabezado del carnet, sobre primary. */
+    val idCardDot: Color,
 )
 
 val LightBestIdColors = BestIdColors(
@@ -49,6 +51,7 @@ val LightBestIdColors = BestIdColors(
     alertInk = Color(0xFF7A3B1B),
     error = Color(0xFFB3261E),
     shadow = Color(0xFF2B3A36).copy(alpha = 0.18f),
+    idCardDot = Color(0xFFFFFFFF).copy(alpha = 0.08f),
 )
 
 /** Traducción de los tokens al esquema de Material 3, para que sus componentes hereden los colores. */

@@ -82,6 +82,7 @@ object PreviewData {
     const val UNDO_MESSAGE = "Vacuna eliminada"
     const val FLOW_TITLE = "Nueva vacuna"
     const val ID_SEX = "Sexo"
+    const val RECORD_PHOTOS = "1 foto de la cartilla"
     const val ID_BIRTH = "Nacimiento"
     const val ID_OWNER = "Tutor"
     const val ID_OWNER_NAME = "Tutor de Prueba"
