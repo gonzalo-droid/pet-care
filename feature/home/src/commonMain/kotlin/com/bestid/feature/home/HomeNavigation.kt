@@ -11,6 +11,7 @@ import org.koin.dsl.module
 /** Pestaña Inicio. */
 fun NavGraphBuilder.homeGraph(
     onOpenRecord: (String) -> Unit,
+    onEditRecord: (String) -> Unit,
     onAddRecord: () -> Unit,
     onAddPet: () -> Unit,
     onOpenCare: (String) -> Unit,
@@ -20,6 +21,7 @@ fun NavGraphBuilder.homeGraph(
         composable<HomeRoute> {
             HomeScreen(
                 onOpenRecord = onOpenRecord,
+                onEditRecord = onEditRecord,
                 onAddRecord = onAddRecord,
                 onAddPet = onAddPet,
                 onOpenCare = onOpenCare,

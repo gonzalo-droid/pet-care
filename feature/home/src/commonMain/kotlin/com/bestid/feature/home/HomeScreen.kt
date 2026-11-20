@@ -44,7 +44,6 @@ import com.bestid.core.domain.schedule.countdownProgress
 import kotlinx.datetime.LocalDate
 import com.bestid.feature.home.resources.Res
 import com.bestid.feature.home.resources.home_summary
-import com.bestid.feature.home.resources.home_days_overdue_unit
 import com.bestid.feature.home.resources.home_next_a11y
 import com.bestid.feature.home.resources.home_next_a11y_today
 import com.bestid.feature.home.resources.home_next_a11y_unconfirmed
@@ -60,6 +59,7 @@ import com.bestid.feature.home.resources.home_add_weight
 import com.bestid.feature.home.resources.home_permission_body
 import com.bestid.feature.home.resources.home_permission_title
 import com.bestid.feature.home.resources.home_days_unit
+import com.bestid.feature.home.resources.home_days_overdue_unit
 import com.bestid.feature.home.resources.home_empty_body
 import com.bestid.feature.home.resources.home_empty_title
 import com.bestid.feature.home.resources.home_greeting_due
@@ -85,6 +85,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun HomeScreen(
     onOpenRecord: (String) -> Unit,
+    onEditRecord: (String) -> Unit,
     onAddRecord: () -> Unit,
     onAddPet: () -> Unit,
     onOpenCare: (String) -> Unit,
@@ -171,7 +172,7 @@ fun HomeScreen(
                     ReviewStrip(
                         text = stringResource(Res.string.home_year_unreadable),
                         actionText = stringResource(Res.string.home_confirm),
-                        onAction = { onOpenRecord(due.record.id) },
+                        onAction = { onEditRecord(due.record.id) },
                     )
                 }
             } else if (state.vaccineCount > 0) {
@@ -236,10 +237,10 @@ private fun NextDueHero(due: Upcoming, types: Map<String, com.bestid.core.model.
     }
     val ringUnit = when {
         due.daysLeft == 0 -> ""
-        overdue -> stringResource(Res.string.home_days_overdue_unit)
+        overdue -> pluralStringResource(Res.plurals.home_days_overdue_unit, -due.daysLeft)
         else -> pluralStringResource(Res.plurals.home_days_unit, due.daysLeft)
     }
-    val progress = if (overdue) 1f else today?.let { countdownProgress(due.from, due.date, it) }
+    val progress = if (overdue) null else today?.let { countdownProgress(due.from, due.date, it) }
     val unconfirmed = due is Upcoming.Vaccine && !due.record.nextDateConfirmed
     val spoken = when {
         due.daysLeft == 0 -> stringResource(Res.string.home_next_a11y_today, name, longDate)
@@ -261,6 +262,7 @@ private fun NextDueHero(due: Upcoming, types: Map<String, com.bestid.core.model.
         modifier = Modifier.semantics(mergeDescendants = true) { contentDescription = a11y },
         onClick = onClick,
         onClickLabel = stringResource(Res.string.home_open_detail),
+        showChevron = true,
     ) {
         Eyebrow(stringResource(Res.string.home_next), color = if (urgent) BestIdTheme.colors.alertInk else BestIdTheme.colors.primaryInk)
         if (isLargeFont()) {
