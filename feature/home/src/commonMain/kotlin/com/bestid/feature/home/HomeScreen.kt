@@ -47,6 +47,7 @@ import com.bestid.feature.home.resources.home_summary
 import com.bestid.feature.home.resources.home_days_overdue_unit
 import com.bestid.feature.home.resources.home_next_a11y
 import com.bestid.feature.home.resources.home_next_a11y_today
+import com.bestid.feature.home.resources.home_next_a11y_unconfirmed
 import com.bestid.feature.home.resources.home_next_a11y_overdue
 import com.bestid.feature.home.resources.home_year_unreadable
 import com.bestid.feature.home.resources.home_confirm
@@ -239,17 +240,19 @@ private fun NextDueHero(due: Upcoming, types: Map<String, com.bestid.core.model.
         else -> pluralStringResource(Res.plurals.home_days_unit, due.daysLeft)
     }
     val progress = if (overdue) 1f else today?.let { countdownProgress(due.from, due.date, it) }
-    val a11y = when {
+    val unconfirmed = due is Upcoming.Vaccine && !due.record.nextDateConfirmed
+    val spoken = when {
         due.daysLeft == 0 -> stringResource(Res.string.home_next_a11y_today, name, longDate)
         overdue -> stringResource(Res.string.home_next_a11y_overdue, name, longDate, daysText(-due.daysLeft))
         else -> stringResource(Res.string.home_next_a11y, name, longDate, daysText(due.daysLeft))
     }
+    val a11y = if (unconfirmed) stringResource(Res.string.home_next_a11y_unconfirmed, spoken) else spoken
     val ring: @Composable () -> Unit = { CountdownRing(ringValue, ringUnit, progress) }
     val details: @Composable (Modifier) -> Unit = { m ->
         Column(m, verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs)) {
             Text(name, style = BestIdTheme.typography.card, color = BestIdTheme.colors.ink)
             Text(longDate, style = BestIdTheme.typography.body, color = BestIdTheme.colors.muted)
-            if (due is Upcoming.Vaccine && !due.record.nextDateConfirmed) {
+            if (unconfirmed) {
                 Badge(stringResource(Res.string.home_year_to_confirm), BadgeTone.ALERT)
             }
         }

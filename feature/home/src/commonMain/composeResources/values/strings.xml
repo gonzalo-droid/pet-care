@@ -35,11 +35,12 @@
         <item quantity="one">%d dato por confirmar</item>
         <item quantity="other">%d datos por confirmar</item>
     </plurals>
-    <string name="home_year_to_confirm">! año por confirmar</string>
+    <string name="home_year_to_confirm">! Año por confirmar</string>
     <string name="home_days_overdue_unit">días tarde</string>
     <string name="home_next_a11y">Próxima: %1$s, %2$s, en %3$s</string>
     <string name="home_next_a11y_today">Próxima: %1$s, %2$s, hoy</string>
     <string name="home_next_a11y_overdue">Próxima: %1$s, %2$s, atrasada hace %3$s</string>
+    <string name="home_next_a11y_unconfirmed">%1$s. Año por confirmar</string>
     <string name="home_year_unreadable">El año no se lee en la cartilla.</string>
     <string name="home_confirm">Confirmar</string>
 </resources>
