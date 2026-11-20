@@ -5,6 +5,8 @@ import com.bestid.core.ui.resources.Res
 import com.bestid.core.ui.resources.days_count
 import com.bestid.core.ui.resources.vaccines_registered
 import com.bestid.core.ui.resources.months_short
+import com.bestid.core.ui.resources.list_and
+import org.jetbrains.compose.resources.stringResource
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
 import org.jetbrains.compose.resources.pluralStringResource
@@ -17,6 +19,10 @@ fun LocalDate.formatLong(): String = "$day ${monthShort()} $year"
 
 /** "21 dic 2025" fuera de la composición (por ejemplo, al armar el PDF en un ViewModel). */
 suspend fun LocalDate.formatLongText(): String = "$day ${getStringArray(Res.array.months_short)[month.number - 1]} $year"
+
+/** "DIC", para el mosaico de fecha. */
+@Composable
+fun LocalDate.formatMonthShort(): String = monthShort().uppercase()
 
 /** "31 dic" */
 @Composable
@@ -37,3 +43,8 @@ private fun LocalDate.monthShort(): String = stringArrayResource(Res.array.month
 @Composable
 fun vaccinesRegisteredText(count: Int): String =
     pluralStringResource(Res.plurals.vaccines_registered, count, count)
+
+/** "raza, nacimiento y señas" */
+@Composable
+fun List<String>.joinWithAnd(): String =
+    if (size < 2) joinToString() else stringResource(Res.string.list_and, dropLast(1).joinToString(", "), last())

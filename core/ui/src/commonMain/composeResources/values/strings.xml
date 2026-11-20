@@ -22,6 +22,7 @@
     <string name="species_other">Otra especie</string>
     <string name="sex_female">Hembra</string>
     <string name="sex_male">Macho</string>
+    <string name="list_and">%1$s y %2$s</string>
     <string name="separator_dot">%1$s · %2$s</string>
     <string name="care_deworm_internal">Desparasitación interna</string>
     <string name="care_deworm_external">Desparasitación externa</string>
