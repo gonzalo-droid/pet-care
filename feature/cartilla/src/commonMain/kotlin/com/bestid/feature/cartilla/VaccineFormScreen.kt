@@ -24,6 +24,7 @@ import com.bestid.core.designsystem.component.ExpandableSection
 import com.bestid.core.designsystem.component.FieldError
 import com.bestid.core.designsystem.component.FieldKind
 import com.bestid.core.designsystem.component.FieldLabelText
+import com.bestid.core.designsystem.component.ErrorState
 import com.bestid.core.designsystem.component.FlowScaffold
 import com.bestid.core.designsystem.component.FormField
 import com.bestid.core.designsystem.component.LoadingState
@@ -34,6 +35,7 @@ import com.bestid.core.designsystem.component.SectionTitle
 import com.bestid.core.designsystem.component.TextAction
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
+import com.bestid.core.ui.LoadFailedState
 import com.bestid.core.ui.SaveFailedCard
 import com.bestid.core.domain.validation.VaccineError
 import com.bestid.core.platform.date.rememberDatePickerLauncher
@@ -54,6 +56,7 @@ import com.bestid.feature.cartilla.resources.form_pages_title
 import com.bestid.feature.cartilla.resources.form_sticker_photo
 import com.bestid.feature.cartilla.resources.photo_page_description
 import com.bestid.feature.cartilla.resources.photo_sticker_description
+import com.bestid.feature.cartilla.resources.detail_not_found
 import com.bestid.feature.cartilla.resources.form_close
 import com.bestid.feature.cartilla.resources.form_date
 import com.bestid.feature.cartilla.resources.form_edit_title
@@ -142,18 +145,21 @@ fun VaccineFormScreen(
         title = stringResource(if (state.isEdit) Res.string.form_edit_title else Res.string.form_new_title),
         onClose = onClose,
         closeDescription = stringResource(Res.string.form_close),
+        confirmDiscard = state.dirty && !state.done,
         bottomAction = {
             if (state.saveFailed) SaveFailedCard()
             PrimaryButton(
                 text = stringResource(Res.string.form_save),
                 onClick = viewModel::save,
-                loading = state.saving,
+                loading = state.saving || state.importing,
                 enabled = state.loaded && state.pet != null,
             )
         },
     ) {
         val pet = state.pet
         when {
+            state.loadFailed -> LoadFailedState(onRetry = viewModel::retryLoad)
+            state.notFound -> ErrorState(stringResource(Res.string.detail_not_found))
             !state.loaded -> LoadingState()
             pet == null -> AlertCard { Text(stringResource(Res.string.form_no_pet), style = BestIdTheme.typography.body) }
             else -> {

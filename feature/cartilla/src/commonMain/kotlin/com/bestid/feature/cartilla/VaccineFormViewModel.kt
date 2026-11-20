@@ -79,6 +79,12 @@ data class VaccineFormState(
     val errors: List<VaccineError> = emptyList(),
     val warnings: List<VaccineWarning> = emptyList(),
     val saving: Boolean = false,
+    /** Hay cambios sin guardar: cerrar pregunta antes de descartar. */
+    val dirty: Boolean = false,
+    /** No se pudieron leer los datos del formulario. */
+    val loadFailed: Boolean = false,
+    /** Se pidió editar una vacuna que ya no existe (por ejemplo, desde un aviso viejo). */
+    val notFound: Boolean = false,
     val done: Boolean = false,
     /** Primer logro: mostrar la pantalla de permiso de avisos (O5) al cerrar. */
     val askPermission: Boolean = false,
@@ -128,31 +134,56 @@ class VaccineFormViewModel(
     val vets: StateFlow<List<Vet>> = observeVets().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     init {
+        load()
+    }
+
+    fun retryLoad() {
+        _state.update { it.copy(loadFailed = false) }
+        load()
+    }
+
+    /** Cambio hecho por la persona: desde ahora, cerrar pregunta antes de descartar. */
+    private fun edit(transform: (VaccineFormState) -> VaccineFormState) = _state.update { transform(it).copy(dirty = true) }
+
+    private fun load() {
         viewModelScope.launch {
-            val types = observeTypes().first()
-            val record = recordId?.let { observeRecord(it).first() }
-            if (record == null) {
-                _state.value = VaccineFormState(loaded = true, pet = observeSelectedPet().first(), types = types, pages = getPhotos(photoIds))
-                return@launch
-            }
-            val vet = record.vetId?.let { getVet(it) }
-            _state.value = VaccineFormState(
+            attempt { loadState() }
+                .onSuccess { _state.value = it }
+                .onFailure { _state.update { it.copy(loadFailed = true) } }
+        }
+    }
+
+    private suspend fun loadState(): VaccineFormState {
+        val types = observeTypes().first()
+        val record = recordId?.let { observeRecord(it).first() }
+        if (recordId != null && record == null) return VaccineFormState(loaded = true, notFound = true)
+        if (record == null) {
+            // Páginas ya fotografiadas en la captura: cuentan como trabajo sin guardar.
+            return VaccineFormState(
                 loaded = true,
-                isEdit = true,
-                pet = observePet(record.petId).first(),
+                pet = observeSelectedPet().first(),
                 types = types,
-                selectedTypeIds = record.typeIds.toSet(),
-                applicationDate = record.applicationDate,
-                nextDate = record.nextDate,
-                nextDateLabel = record.nextDateLabel,
-                stickers = record.items.map { StickerForm(it.productName.orEmpty(), it.lot.orEmpty(), it.manufactureDate, it.expiryDate) }
-                    .ifEmpty { listOf(StickerForm()) },
-                vetName = vet?.name.orEmpty(),
-                vetContact = vet?.contact.orEmpty(),
-                pages = getPhotos(record.sourcePhotoIds),
-                stickerPhoto = record.stickerPhotoId?.let { getPhotos(listOf(it)).firstOrNull() },
+                pages = getPhotos(photoIds),
+                dirty = photoIds.isNotEmpty(),
             )
         }
+        val vet = record.vetId?.let { getVet(it) }
+        return VaccineFormState(
+            loaded = true,
+            isEdit = true,
+            pet = observePet(record.petId).first(),
+            types = types,
+            selectedTypeIds = record.typeIds.toSet(),
+            applicationDate = record.applicationDate,
+            nextDate = record.nextDate,
+            nextDateLabel = record.nextDateLabel,
+            stickers = record.items.map { StickerForm(it.productName.orEmpty(), it.lot.orEmpty(), it.manufactureDate, it.expiryDate) }
+                .ifEmpty { listOf(StickerForm()) },
+            vetName = vet?.name.orEmpty(),
+            vetContact = vet?.contact.orEmpty(),
+            pages = getPhotos(record.sourcePhotoIds),
+            stickerPhoto = record.stickerPhotoId?.let { getPhotos(listOf(it)).firstOrNull() },
+        )
     }
 
     fun onPhotoPicked(target: PhotoTarget, result: ImagePickerResult) {
@@ -166,7 +197,7 @@ class VaccineFormViewModel(
                 viewModelScope.launch {
                     val picked = images
                     val imported = attempt { importPhotos(picked) }.getOrElse { ImportedPhotos(emptyList(), picked.size) }
-                    _state.update { s ->
+                    edit { s ->
                         when (target) {
                             PhotoTarget.PAGE -> s.copy(pages = s.pages + imported.photos)
                             PhotoTarget.STICKER -> s.copy(stickerPhoto = imported.photos.firstOrNull() ?: s.stickerPhoto)
@@ -177,26 +208,26 @@ class VaccineFormViewModel(
         }
     }
 
-    fun removePage(id: String) = _state.update { s -> s.copy(pages = s.pages.filterNot { it.id == id }) }
-    fun removeStickerPhoto() = _state.update { it.copy(stickerPhoto = null) }
+    fun removePage(id: String) = edit { s -> s.copy(pages = s.pages.filterNot { it.id == id }) }
+    fun removeStickerPhoto() = edit { it.copy(stickerPhoto = null) }
 
-    fun toggleType(id: String, selected: Boolean) = _state.update {
+    fun toggleType(id: String, selected: Boolean) = edit {
         it.copy(selectedTypeIds = if (selected) it.selectedTypeIds + id else it.selectedTypeIds - id, errors = it.errors - VaccineError.NoType)
     }
 
     fun toggleShowAll() = _state.update { it.copy(showAllTypes = !it.showAllTypes) }
     fun showCustomInput() = _state.update { it.copy(customInputVisible = true) }
-    fun onCustomInput(value: String) = _state.update { it.copy(customInput = value) }
+    fun onCustomInput(value: String) = edit { it.copy(customInput = value) }
 
-    fun addCustomLabel() = _state.update {
+    fun addCustomLabel() = edit {
         val label = it.customInput.trim()
         if (label.isEmpty()) it
         else it.copy(customLabels = it.customLabels + label, customInput = "", customInputVisible = false, errors = it.errors - VaccineError.NoType)
     }
 
-    fun removeCustomLabel(label: String) = _state.update { it.copy(customLabels = it.customLabels - label) }
+    fun removeCustomLabel(label: String) = edit { it.copy(customLabels = it.customLabels - label) }
 
-    fun onDate(target: DateTarget, date: LocalDate) = _state.update { s ->
+    fun onDate(target: DateTarget, date: LocalDate) = edit { s ->
         when (target) {
             DateTarget.Application -> s.copy(applicationDate = date)
             DateTarget.Next -> s.copy(nextDate = date)
@@ -205,17 +236,17 @@ class VaccineFormViewModel(
         }.copy(errors = emptyList(), warnings = emptyList())
     }
 
-    fun clearNextDate() = _state.update { it.copy(nextDate = null) }
+    fun clearNextDate() = edit { it.copy(nextDate = null) }
 
-    fun onSticker(index: Int, sticker: StickerForm) = _state.update { it.copy(stickers = it.stickers.updated(index) { sticker }) }
-    fun addSticker() = _state.update { it.copy(stickers = it.stickers + StickerForm()) }
-    fun removeSticker(index: Int) = _state.update {
+    fun onSticker(index: Int, sticker: StickerForm) = edit { it.copy(stickers = it.stickers.updated(index) { sticker }) }
+    fun addSticker() = edit { it.copy(stickers = it.stickers + StickerForm()) }
+    fun removeSticker(index: Int) = edit {
         it.copy(stickers = it.stickers.filterIndexed { i, _ -> i != index }.ifEmpty { listOf(StickerForm()) })
     }
 
-    fun onVetName(value: String) = _state.update { it.copy(vetName = value) }
-    fun onVetContact(value: String) = _state.update { it.copy(vetContact = value) }
-    fun pickVet(vet: Vet) = _state.update { it.copy(vetName = vet.name, vetContact = vet.contact.orEmpty()) }
+    fun onVetName(value: String) = edit { it.copy(vetName = value) }
+    fun onVetContact(value: String) = edit { it.copy(vetContact = value) }
+    fun pickVet(vet: Vet) = edit { it.copy(vetName = vet.name, vetContact = vet.contact.orEmpty()) }
 
     fun save() {
         val s = _state.value

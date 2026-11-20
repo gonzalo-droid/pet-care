@@ -30,6 +30,7 @@ import com.bestid.core.designsystem.component.PermissionCard
 import com.bestid.core.designsystem.component.PetAvatar
 import com.bestid.core.designsystem.component.PlainCard
 import com.bestid.core.designsystem.component.PrimaryButton
+import com.bestid.core.designsystem.component.AdaptivePair
 import com.bestid.core.designsystem.component.StatCard
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.theme.BestIdTheme
@@ -55,6 +56,7 @@ import com.bestid.feature.home.resources.home_empty_title
 import com.bestid.feature.home.resources.home_greeting_due
 import com.bestid.feature.home.resources.home_greeting_ok
 import com.bestid.feature.home.resources.home_greeting_overdue
+import com.bestid.feature.home.resources.home_greeting_overdue_care
 import com.bestid.feature.home.resources.home_greeting_start
 import com.bestid.feature.home.resources.home_last_vaccine
 import com.bestid.feature.home.resources.home_next
@@ -62,6 +64,8 @@ import com.bestid.feature.home.resources.home_next_line
 import com.bestid.feature.home.resources.home_no_next
 import com.bestid.feature.home.resources.home_no_next_body
 import com.bestid.feature.home.resources.home_none
+import com.bestid.feature.home.resources.home_open_detail
+import com.bestid.feature.home.resources.home_open_vaccine
 import com.bestid.feature.home.resources.home_overdue_days
 import com.bestid.feature.home.resources.home_today
 import com.bestid.feature.home.resources.home_vaccine_fallback
@@ -108,9 +112,11 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.sm),
         ) {
             val due = state.upcoming
+            val overdue = state.overdue
             val greeting = when {
                 state.vaccineCount == 0 -> Res.string.home_greeting_start
-                due != null && due.daysLeft < 0 -> Res.string.home_greeting_overdue
+                overdue is Upcoming.Vaccine -> Res.string.home_greeting_overdue
+                overdue is Upcoming.Care -> Res.string.home_greeting_overdue_care
                 due != null && due.daysLeft <= 7 -> Res.string.home_greeting_due
                 else -> Res.string.home_greeting_ok
             }
@@ -162,26 +168,30 @@ fun HomeScreen(
                 }
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.sm)) {
-                val last = state.lastRecord
-                StatCard(
-                    label = stringResource(Res.string.home_last_vaccine),
-                    value = last?.applicationDate?.formatLong() ?: stringResource(Res.string.home_none),
-                    detail = last?.typeIds?.mapNotNull { state.types[it]?.label }?.joinToString(", "),
-                    onClick = last?.let { { onOpenRecord(it.id) } },
-                    modifier = Modifier.weight(1f),
-                )
-                val weight = state.lastWeight
-                StatCard(
-                    label = stringResource(Res.string.home_weight),
-                    value = weight?.let { formatWeight(it.grams) } ?: stringResource(Res.string.home_none),
-                    detail = weight?.date?.formatLong(),
-                    actionText = if (weight == null) stringResource(Res.string.home_add_weight) else null,
-                    onAction = if (weight == null) onAddWeight else null,
-                    onClick = weight?.let { { onAddWeight() } },
-                    modifier = Modifier.weight(1f),
-                )
-            }
+            val last = state.lastRecord
+            val weight = state.lastWeight
+            AdaptivePair(
+                first = { cardModifier ->
+                    StatCard(
+                        label = stringResource(Res.string.home_last_vaccine),
+                        value = last?.applicationDate?.formatLong() ?: stringResource(Res.string.home_none),
+                        detail = last?.typeIds?.mapNotNull { state.types[it]?.label }?.joinToString(", "),
+                        onClick = last?.let { { onOpenRecord(it.id) } },
+                        onClickLabel = stringResource(Res.string.home_open_vaccine),
+                        modifier = cardModifier,
+                    )
+                },
+                second = { cardModifier ->
+                    StatCard(
+                        label = stringResource(Res.string.home_weight),
+                        value = weight?.let { formatWeight(it.grams) } ?: stringResource(Res.string.home_none),
+                        detail = weight?.date?.formatLong(),
+                        actionText = if (weight == null) stringResource(Res.string.home_add_weight) else null,
+                        onAction = if (weight == null) onAddWeight else null,
+                        modifier = cardModifier,
+                    )
+                },
+            )
 
             PrimaryButton(
                 text = stringResource(Res.string.home_add_vaccine),
@@ -219,5 +229,10 @@ private fun NextDueHero(due: Upcoming, types: Map<String, com.bestid.core.model.
         }
         Text(stringResource(Res.string.home_next_line, name, due.date.formatDayMonth()), style = BestIdTheme.typography.card, color = BestIdTheme.colors.ink)
     }
-    if (urgent) AlertCard(onClick = onClick) { content() } else InfoCard(icon = null, onClick = onClick) { content() }
+    val label = stringResource(Res.string.home_open_detail)
+    if (urgent) {
+        AlertCard(onClick = onClick, onClickLabel = label) { content() }
+    } else {
+        InfoCard(icon = null, onClick = onClick, onClickLabel = label) { content() }
+    }
 }

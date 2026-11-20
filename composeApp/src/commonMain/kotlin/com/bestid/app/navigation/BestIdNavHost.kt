@@ -1,5 +1,16 @@
 package com.bestid.app.navigation
 
+import com.bestid.core.designsystem.theme.BestIdTheme
+import com.bestid.core.designsystem.component.UndoSnackbar
+import androidx.compose.ui.Alignment
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
+import androidx.compose.runtime.remember
+import androidx.navigation.NavOptionsBuilder
+import androidx.lifecycle.Lifecycle
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -57,37 +68,45 @@ import org.koin.compose.viewmodel.koinViewModel
 
 /** Acciones de navegación que comparten las pestañas. */
 private class AppActions(private val nav: NavHostController) {
-    val openRecord: (String) -> Unit = { nav.navigate(VaccineDetailRoute(it)) }
+    /** Navega solo si la pantalla actual ya está activa: dos toques rápidos no apilan dos destinos. */
+    private fun go(route: Any, builder: NavOptionsBuilder.() -> Unit = {}) {
+        if (nav.currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED) nav.navigate(route, builder)
+    }
+
+    val openRecord: (String) -> Unit = { go(VaccineDetailRoute(it)) }
 
     /** "Agregar vacuna" empieza por las fotos de la cartilla (O2), que también deja seguir a mano. */
-    val addRecord: () -> Unit = { nav.navigate(CardCaptureRoute) }
-    val editRecord: (String) -> Unit = { nav.navigate(VaccineEditRoute(it)) }
-    val addPet: () -> Unit = { nav.navigate(PetEditRoute()) }
+    val addRecord: () -> Unit = { go(CardCaptureRoute) }
+    val editRecord: (String) -> Unit = { go(VaccineEditRoute(it)) }
+    val addPet: () -> Unit = { go(PetEditRoute()) }
 
     /** Primer uso con la cartilla (O1): mascota → fotos → vacuna. */
-    val startWithCard: () -> Unit = { nav.navigate(PetEditRoute(thenCapture = true)) }
+    val startWithCard: () -> Unit = { go(PetEditRoute(thenCapture = true)) }
 
     /** Reemplaza el formulario de mascota por la captura, para que "atrás" no vuelva al formulario. */
     val captureAfterPet: () -> Unit = {
-        nav.navigate(CardCaptureRoute) { popUpTo<PetEditRoute> { inclusive = true } }
+        go(CardCaptureRoute) { popUpTo<PetEditRoute> { inclusive = true } }
     }
 
     /** Reemplaza la captura por el formulario de vacuna con las páginas elegidas. */
     val captured: (List<String>) -> Unit = { ids ->
-        nav.navigate(VaccineEditRoute(photoIds = ids.joinToString(",").ifEmpty { null })) {
+        go(VaccineEditRoute(photoIds = ids.joinToString(",").ifEmpty { null })) {
             popUpTo<CardCaptureRoute> { inclusive = true }
         }
     }
-    val openPhoto: (String) -> Unit = { nav.navigate(PhotoViewerRoute(it)) }
-    val share: () -> Unit = { nav.navigate(ShareRoute) }
-    val openBackup: () -> Unit = { nav.navigate(BackupRoute) }
+    val openPhoto: (String) -> Unit = { go(PhotoViewerRoute(it)) }
+    val share: () -> Unit = { go(ShareRoute) }
+    val openBackup: () -> Unit = { go(BackupRoute()) }
+
+    /** "Tengo un respaldo" (Bienvenida): la misma pantalla, con Importar como acción principal. */
+    val restoreBackup: () -> Unit = { go(BackupRoute(restore = true)) }
 
     /** Tras "Borrar todos los datos" se vuelve a la raíz, que muestra la Bienvenida. */
     val deletedAll: () -> Unit = { nav.popBackStack(MainRoute, inclusive = false) }
-    val editPet: (String) -> Unit = { nav.navigate(PetEditRoute(it)) }
-    val addCare: () -> Unit = { nav.navigate(CareEditRoute()) }
-    val openCare: (String) -> Unit = { nav.navigate(CareEditRoute(it)) }
-    val addWeight: () -> Unit = { nav.navigate(WeightNewRoute) }
+    val editPet: (String) -> Unit = { go(PetEditRoute(it)) }
+    val addCare: () -> Unit = { go(CareEditRoute()) }
+    val openCare: (String) -> Unit = { go(CareEditRoute(it)) }
+    val addWeight: () -> Unit = { go(WeightNewRoute) }
     val back: () -> Unit = { nav.popBackStack() }
 
     /** Cierra el formulario y muestra el permiso de avisos (O5). */
@@ -109,7 +128,7 @@ private class AppActions(private val nav: NavHostController) {
  */
 @Composable
 fun BestIdNavHost(navController: NavHostController = rememberNavController()) {
-    val actions = AppActions(navController)
+    val actions = remember(navController) { AppActions(navController) }
     val mainViewModel: MainViewModel = koinViewModel()
     val tap by ReminderTaps.events.collectAsStateWithLifecycle()
     LaunchedEffect(tap) {
@@ -122,8 +141,15 @@ fun BestIdNavHost(navController: NavHostController = rememberNavController()) {
         composable<MainRoute> {
             val main by mainViewModel.state.collectAsStateWithLifecycle()
             when {
-                !main.loaded -> Unit
-                main.showWelcome -> WelcomeScreen(onStartWithCard = actions.startWithCard, onStartWithoutCard = actions.addPet, onRestore = actions.openBackup)
+                !main.loaded -> Box(Modifier.fillMaxSize().background(BestIdTheme.colors.bg))
+                // El "Deshacer" de eliminar la última mascota se muestra sobre la Bienvenida.
+                main.showWelcome -> Box(Modifier.fillMaxSize()) {
+                    WelcomeScreen(onStartWithCard = actions.startWithCard, onStartWithoutCard = actions.addPet, onRestore = actions.restoreBackup)
+                    SnackbarHost(
+                        LocalUndoController.current.hostState,
+                        modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding(),
+                    ) { UndoSnackbar(it) }
+                }
                 else -> MainTabs(actions = actions, onOpenSettings = { navController.navigate(SettingsRoute) }, viewModel = mainViewModel)
             }
         }

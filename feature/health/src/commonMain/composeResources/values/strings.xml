@@ -23,7 +23,7 @@
 
     <string name="health_weight_empty_title">Aún no hay pesos</string>
     <string name="health_weight_empty_body">Registra el peso y mira su evolución en un gráfico.</string>
-    <string name="health_add_weight">Agregar peso de hoy</string>
+    <string name="health_add_weight">Agregar peso</string>
     <string name="health_last_weight">Último peso · %1$s</string>
     <string name="health_weight_same">Igual que la vez anterior</string>
     <string name="health_weight_up">+%1$s desde el %2$s</string>
@@ -34,7 +34,8 @@
     <string name="health_delete">Eliminar</string>
     <string name="health_weight_deleted">Peso eliminado</string>
     <string name="health_undo">Deshacer</string>
-    <string name="health_weight_row">%1$s: %2$s. Toca para eliminar</string>
+    <string name="health_weight_delete_row">Eliminar el peso del %1$s: %2$s</string>
+    <string name="health_care_edit">Editar cuidado</string>
 
     <string name="care_form_new">Nuevo cuidado</string>
     <string name="care_form_edit">Editar cuidado</string>
@@ -70,4 +71,6 @@
     <string name="weight_error_required">Escribe el peso, por ejemplo 4,2</string>
     <string name="weight_error_range">El peso debe estar entre 0,05 y 150 kg</string>
     <string name="weight_error_future">La fecha no puede ser futura</string>
+    <string name="health_no_pet">Agrega una mascota antes de registrar sus cuidados y su peso.</string>
+    <string name="care_not_found">Este cuidado ya no existe.</string>
 </resources>

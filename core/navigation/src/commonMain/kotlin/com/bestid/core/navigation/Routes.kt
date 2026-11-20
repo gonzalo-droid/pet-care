@@ -22,8 +22,11 @@ sealed interface Route
 /** Ajustes (A1). */
 @Serializable data object SettingsRoute : Route
 
-/** Respaldo (A2): exportar, importar y fecha del último respaldo. */
-@Serializable data object BackupRoute : Route
+/**
+ * Respaldo (A2): exportar, importar y fecha del último respaldo. Con [restore] (desde la
+ * Bienvenida), Importar es la acción principal y al terminar se ofrece "Continuar".
+ */
+@Serializable data class BackupRoute(val restore: Boolean = false) : Route
 
 /** Compartir ficha en PDF (SH1) de la mascota seleccionada. */
 @Serializable data object ShareRoute : Route

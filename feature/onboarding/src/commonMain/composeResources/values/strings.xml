@@ -16,7 +16,7 @@
 
     <!-- Bienvenida (O1) -->
     <string name="welcome_title">La cartilla de tu mascota, siempre a la mano</string>
-    <string name="welcome_body">Toma una foto de su cartilla de vacunas y te avisamos cuándo le toca.</string>
+    <string name="welcome_body">Guarda las fotos de su cartilla, anota sus vacunas y te avisamos cuándo le toca.</string>
     <string name="welcome_scan">Empezar con su cartilla</string>
     <string name="welcome_without_card">Empezar sin cartilla</string>
     <string name="welcome_restore">Tengo un respaldo</string>

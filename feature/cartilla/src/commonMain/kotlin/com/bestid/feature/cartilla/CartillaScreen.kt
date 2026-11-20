@@ -41,6 +41,7 @@ import com.bestid.feature.cartilla.resources.cartilla_empty_body
 import com.bestid.feature.cartilla.resources.cartilla_empty_title
 import com.bestid.feature.cartilla.resources.cartilla_in_days
 import com.bestid.feature.cartilla.resources.cartilla_next
+import com.bestid.feature.cartilla.resources.cartilla_open_vaccine
 import com.bestid.feature.cartilla.resources.cartilla_next_line
 import com.bestid.feature.cartilla.resources.cartilla_no_pet_body
 import com.bestid.feature.cartilla.resources.cartilla_no_pet_title
@@ -142,10 +143,11 @@ internal fun NextDueCard(due: NextDue, types: Map<String, VaccineType>, onClick:
         Text(stringResource(Res.string.cartilla_next_line, name, due.date.formatDayMonth()), style = BestIdTheme.typography.card)
         Text(whenText, style = BestIdTheme.typography.body)
     }
+    val label = stringResource(Res.string.cartilla_open_vaccine)
     if (due.daysLeft <= 7) {
-        AlertCard(onClick = onClick) { content() }
+        AlertCard(onClick = onClick, onClickLabel = label) { content() }
     } else {
-        InfoCard(icon = BestIdIcons.Calendar, onClick = onClick) { content() }
+        InfoCard(icon = BestIdIcons.Calendar, onClick = onClick, onClickLabel = label) { content() }
     }
 }
 

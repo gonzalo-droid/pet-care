@@ -2,14 +2,11 @@ package com.bestid.feature.onboarding
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.bestid.core.designsystem.component.CelebrationBadge
 import com.bestid.core.designsystem.component.NotificationPreview
+import com.bestid.core.designsystem.component.FillScrollColumn
 import com.bestid.core.designsystem.component.PrimaryButton
 import com.bestid.core.designsystem.component.TextAction
 import com.bestid.core.designsystem.theme.BestIdTheme
@@ -84,16 +82,24 @@ fun NotificationPermissionScreen(onDone: () -> Unit, viewModel: NotificationPerm
     val requester = rememberNotificationPermissionRequester { onDone() }
     val name = state.pet?.name ?: stringResource(Res.string.permission_pet_fallback)
 
-    Column(
+    FillScrollColumn(
+        bottom = {
+            PrimaryButton(stringResource(Res.string.permission_accept), onClick = requester::request)
+            TextAction(stringResource(Res.string.permission_later), onClick = onDone)
+            Text(
+                stringResource(Res.string.permission_footnote),
+                style = BestIdTheme.typography.support,
+                color = BestIdTheme.colors.muted,
+                textAlign = TextAlign.Center,
+            )
+        },
         modifier = Modifier
             .fillMaxSize()
             .background(BestIdTheme.colors.bg)
             .statusBarsPadding()
-            .navigationBarsPadding()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = BestIdTheme.spacing.screen, vertical = BestIdTheme.spacing.xl),
+            .navigationBarsPadding(),
+        contentPadding = PaddingValues(horizontal = BestIdTheme.spacing.screen, vertical = BestIdTheme.spacing.xl),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.md),
     ) {
         CelebrationBadge(
             if (state.vaccineCount > 0) {
@@ -117,15 +123,6 @@ fun NotificationPermissionScreen(onDone: () -> Unit, viewModel: NotificationPerm
         NotificationPreview(
             title = stringResource(Res.string.permission_example_title, name),
             body = stringResource(Res.string.permission_example_body, name),
-        )
-        Spacer(Modifier.weight(1f, fill = false))
-        PrimaryButton(stringResource(Res.string.permission_accept), onClick = requester::request)
-        TextAction(stringResource(Res.string.permission_later), onClick = onDone)
-        Text(
-            stringResource(Res.string.permission_footnote),
-            style = BestIdTheme.typography.support,
-            color = BestIdTheme.colors.muted,
-            textAlign = TextAlign.Center,
         )
     }
 }

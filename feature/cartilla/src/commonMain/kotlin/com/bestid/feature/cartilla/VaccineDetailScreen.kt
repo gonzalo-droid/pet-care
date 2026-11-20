@@ -1,5 +1,6 @@
 package com.bestid.feature.cartilla
 
+import com.bestid.core.ui.DeleteFailedCard
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -90,6 +91,7 @@ fun VaccineDetailScreen(
     viewModel: VaccineDetailViewModel = koinViewModel(key = "vaccine-detail-$recordId") { parametersOf(recordId) },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val deleteFailed by viewModel.deleteFailed.collectAsStateWithLifecycle()
     val undo = LocalUndoController.current
     val restore = koinInject<RestoreVaccineRecord>()
     val deletedMessage = stringResource(Res.string.detail_deleted)
@@ -118,6 +120,7 @@ fun VaccineDetailScreen(
             state.failed -> ErrorState(stringResource(UiRes.string.state_load_error), onRetry = viewModel::retry)
             record == null -> ErrorState(stringResource(Res.string.detail_not_found))
             else -> {
+                if (deleteFailed) DeleteFailedCard()
                 state.pet?.let {
                     Text(stringResource(Res.string.detail_title, it.name), style = BestIdTheme.typography.body, color = BestIdTheme.colors.muted)
                 }

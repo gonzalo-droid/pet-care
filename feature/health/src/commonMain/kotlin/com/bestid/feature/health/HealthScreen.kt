@@ -1,5 +1,15 @@
 package com.bestid.feature.health
 
+import com.bestid.feature.health.resources.health_weight_delete_row
+import com.bestid.feature.health.resources.health_care_edit
+import com.bestid.core.ui.SaveFailedCard
+import com.bestid.core.designsystem.component.IconAction
+import org.jetbrains.compose.resources.painterResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,7 +33,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bestid.core.designsystem.component.ConfirmSheet
-import com.bestid.core.designsystem.component.DashedButton
 import com.bestid.core.designsystem.component.EmptyState
 import com.bestid.core.designsystem.component.InfoCard
 import com.bestid.core.designsystem.component.ErrorState
@@ -82,7 +91,6 @@ import com.bestid.feature.health.resources.health_weight_deleted
 import com.bestid.feature.health.resources.health_weight_down
 import com.bestid.feature.health.resources.health_weight_empty_body
 import com.bestid.feature.health.resources.health_weight_empty_title
-import com.bestid.feature.health.resources.health_weight_row
 import com.bestid.feature.health.resources.health_weight_same
 import com.bestid.feature.health.resources.health_weight_up
 import kotlinx.datetime.LocalDate
@@ -102,6 +110,7 @@ fun HealthScreen(
     viewModel: HealthViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val actionFailed by viewModel.actionFailed.collectAsStateWithLifecycle()
     var segment by rememberSaveable { mutableIntStateOf(0) }
     val undo = LocalUndoController.current
     val restoreWeight = koinInject<RestoreWeight>()
@@ -146,6 +155,7 @@ fun HealthScreen(
                 selectedIndex = segment,
                 onSelect = { segment = it },
             )
+            if (actionFailed) SaveFailedCard()
             if (segment == 0) {
                 if (state.permission == NotificationPermission.DENIED && state.cares.any { it.reminderEnabled }) {
                     PermissionCard(
@@ -155,7 +165,7 @@ fun HealthScreen(
                     )
                 }
                 CaresSection(state.cares, state.today, onOpenCare, viewModel::setReminder)
-                DashedButton(stringResource(Res.string.health_add_care), onClick = onAddCare)
+                PrimaryButton(stringResource(Res.string.health_add_care), onClick = onAddCare, icon = BestIdIcons.Add)
                 if (state.cares.isNotEmpty()) {
                     InfoCard(icon = BestIdIcons.Notifications) {
                         Text(stringResource(Res.string.health_offline_note), style = BestIdTheme.typography.body)
@@ -184,10 +194,24 @@ private fun CaresSection(
         )
         return
     }
+    val editLabel = stringResource(Res.string.health_care_edit)
     cares.forEach { care ->
-        PlainCard(onClick = { onOpen(care.id) }) {
-            Text(care.displayName(), style = BestIdTheme.typography.card)
-            Text(careLine(care, today), style = BestIdTheme.typography.body, color = BestIdTheme.colors.muted)
+        // Solo la parte de arriba abre el cuidado: el interruptor queda aparte, sin toques cruzados.
+        PlainCard {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = BestIdTheme.sizes.minTouch)
+                    .clickable(onClickLabel = editLabel, role = Role.Button) { onOpen(care.id) }
+                    .semantics(mergeDescendants = true) {},
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xxs)) {
+                    Text(care.displayName(), style = BestIdTheme.typography.card)
+                    Text(careLine(care, today), style = BestIdTheme.typography.body, color = BestIdTheme.colors.muted)
+                }
+                Icon(painterResource(BestIdIcons.ChevronRight), contentDescription = null, tint = BestIdTheme.colors.muted)
+            }
             SwitchRow(
                 title = stringResource(Res.string.health_care_reminder),
                 checked = care.reminderEnabled,
@@ -255,10 +279,17 @@ private fun WeightSection(petName: String, weights: List<WeightEntry>, onDelete:
     weights.asReversed().forEach { entry ->
         val weight = formatWeight(entry.grams)
         val date = entry.date.formatLong()
-        PlainCard(onClick = { toDelete = entry }, onClickLabel = stringResource(Res.string.health_weight_row, date, weight)) {
-            Row {
-                Text(date, style = BestIdTheme.typography.body, color = BestIdTheme.colors.muted, modifier = Modifier.weight(1f))
-                Text(weight, style = BestIdTheme.typography.bodyStrong)
+        PlainCard {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.sm)) {
+                Row(modifier = Modifier.weight(1f).semantics(mergeDescendants = true) {}) {
+                    Text(date, style = BestIdTheme.typography.body, color = BestIdTheme.colors.muted, modifier = Modifier.weight(1f))
+                    Text(weight, style = BestIdTheme.typography.bodyStrong)
+                }
+                IconAction(
+                    icon = BestIdIcons.Delete,
+                    contentDescription = stringResource(Res.string.health_weight_delete_row, date, weight),
+                    onClick = { toDelete = entry },
+                )
             }
         }
     }

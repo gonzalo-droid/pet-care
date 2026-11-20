@@ -15,6 +15,7 @@ import com.bestid.core.domain.usecase.PetDraft
 import com.bestid.core.domain.usecase.SavePet
 import com.bestid.core.domain.usecase.SavePetResult
 import com.bestid.core.domain.validation.PetError
+import com.bestid.core.domain.validation.PetValidation
 import com.bestid.core.model.DatePrecision
 import com.bestid.core.model.Pet
 import com.bestid.core.model.Sex
@@ -92,6 +93,12 @@ data class PetFormState(
     val nameError: PetError? = null,
     val speciesMissing: Boolean = false,
     val saving: Boolean = false,
+    /** Hay cambios sin guardar: cerrar pregunta antes de descartar. */
+    val dirty: Boolean = false,
+    /** No se pudo leer la mascota a editar. */
+    val loadFailed: Boolean = false,
+    /** No se pudo eliminar. */
+    val deleteFailed: Boolean = false,
     /** Se cerró el formulario: guardado o eliminado. */
     val done: Boolean = false,
     val deletedPet: Pet? = null,
@@ -109,9 +116,21 @@ class PetFormViewModel(
     val state: StateFlow<PetFormState> = _state.asStateFlow()
 
     init {
+        load()
+    }
+
+    fun retryLoad() {
+        _state.update { it.copy(loadFailed = false) }
+        load()
+    }
+
+    private fun load() {
         if (petId != null) {
             viewModelScope.launch {
-                val pet = observePet(petId).first()
+                val pet = attempt { observePet(petId).first() }.getOrElse {
+                    _state.update { it.copy(loadFailed = true) }
+                    return@launch
+                }
                 _state.value = if (pet == null) {
                     PetFormState(loaded = true, done = true)
                 } else {
@@ -134,15 +153,15 @@ class PetFormViewModel(
         }
     }
 
-    fun onName(value: String) = _state.update { it.copy(name = value, nameError = null) }
-    fun onSpecies(value: Species) = _state.update { it.copy(species = value, speciesMissing = false) }
-    fun onSex(value: Sex) = _state.update { it.copy(sex = value) }
-    fun onBirthDate(value: LocalDate) = _state.update { it.copy(birthDate = value) }
-    fun onBirthApproximate(value: Boolean) = _state.update { it.copy(birthApproximate = value) }
-    fun onBreed(value: String) = _state.update { it.copy(breed = value) }
-    fun onMarks(value: String) = _state.update { it.copy(marks = value) }
-    fun onOwner(value: String) = _state.update { it.copy(owner = value) }
-    fun onAddress(value: String) = _state.update { it.copy(address = value) }
+    fun onName(value: String) = _state.update { it.copy(name = value, nameError = null, dirty = true) }
+    fun onSpecies(value: Species) = _state.update { it.copy(species = value, speciesMissing = false, dirty = true) }
+    fun onSex(value: Sex) = _state.update { it.copy(sex = value, dirty = true) }
+    fun onBirthDate(value: LocalDate) = _state.update { it.copy(birthDate = value, dirty = true) }
+    fun onBirthApproximate(value: Boolean) = _state.update { it.copy(birthApproximate = value, dirty = true) }
+    fun onBreed(value: String) = _state.update { it.copy(breed = value, dirty = true) }
+    fun onMarks(value: String) = _state.update { it.copy(marks = value, dirty = true) }
+    fun onOwner(value: String) = _state.update { it.copy(owner = value, dirty = true) }
+    fun onAddress(value: String) = _state.update { it.copy(address = value, dirty = true) }
 
     /** Foto elegida en la cámara o la galería: se procesa y se guarda ya; se asocia al guardar. */
     fun onPhotoPicked(result: ImagePickerResult) {
@@ -158,6 +177,7 @@ class PetFormViewModel(
                             importingPhoto = false,
                             photoPath = imported.photos.firstOrNull()?.path ?: s.photoPath,
                             photoFailed = imported.failed,
+                            dirty = s.dirty || imported.photos.isNotEmpty(),
                         )
                     }
                 }
@@ -165,13 +185,16 @@ class PetFormViewModel(
         }
     }
 
-    fun removePhoto() = _state.update { it.copy(photoPath = null, photoFailed = 0) }
+    fun removePhoto() = _state.update { it.copy(photoPath = null, photoFailed = 0, dirty = true) }
 
     fun save() {
         val s = _state.value
         if (s.saving || s.importingPhoto) return
-        val species = s.species ?: run {
-            _state.update { it.copy(speciesMissing = true) }
+        // Todos los errores juntos, no de a uno.
+        val nameError = PetValidation.validateName(s.name)
+        val species = s.species
+        if (nameError != null || species == null) {
+            _state.update { it.copy(nameError = nameError, speciesMissing = species == null) }
             return
         }
         _state.update { it.copy(saving = true, saveFailed = false) }
@@ -206,9 +229,13 @@ class PetFormViewModel(
     fun delete() {
         val id = petId ?: return
         viewModelScope.launch {
-            val pet = observePet(id).first()
-            deletePet(id)
-            _state.update { it.copy(done = true, deletedPet = pet) }
+            _state.update { it.copy(deleteFailed = false) }
+            attempt {
+                val pet = observePet(id).first()
+                deletePet(id)
+                pet
+            }.onSuccess { pet -> _state.update { it.copy(done = true, deletedPet = pet) } }
+                .onFailure { _state.update { it.copy(deleteFailed = true) } }
         }
     }
 }

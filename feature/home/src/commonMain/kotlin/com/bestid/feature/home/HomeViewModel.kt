@@ -45,6 +45,8 @@ data class HomeState(
     val pet: Pet? = null,
     val vaccineCount: Int = 0,
     val upcoming: Upcoming? = null,
+    /** Lo más atrasado (vacuna o cuidado), aunque [upcoming] muestre lo que viene: decide el saludo. */
+    val overdue: Upcoming? = null,
     val lastRecord: VaccineRecord? = null,
     val lastWeight: WeightEntry? = null,
     val types: Map<String, VaccineType> = emptyMap(),
@@ -83,6 +85,7 @@ class HomeViewModel(
                             pet = pet,
                             vaccineCount = records.size,
                             upcoming = listOfNotNull(vaccine, care).sortedWith(upcomingOrder).firstOrNull(),
+                            overdue = listOfNotNull(vaccine, care).filter { it.daysLeft < 0 }.minByOrNull { it.daysLeft },
                             lastRecord = records.firstOrNull(),
                             lastWeight = weights.lastOrNull(),
                             types = types.associateBy { it.id },
