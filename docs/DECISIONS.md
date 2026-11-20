@@ -2,6 +2,11 @@
 
 Registro de decisiones tomadas durante el desarrollo que cambian o precisan `SYSTEM_DESIGN.md`. La más reciente va arriba. Cada una dice quién la tomó y en qué hito.
 
+## 2026-11-20 · Pulido visual
+
+### D44. Pulido visual sobre la base del prototipo `[Decidido por Gonzalo]`
+Cambia la sección 7 y las decisiones 1 y 3 de la sección 6, sin tocar la paleta, la fuente ni la navegación: las tarjetas de superficie usan una sombra suave en lugar del borde de 2 dp, el durazno marca solo el dato dudoso (franja o chip con "!"), hay componentes nuevos (`DateTile`, `CountdownRing`, `TimelineItem`, `ProgressRow`) e Inicio, Cartilla y el carnet se reordenan. Diseño completo en `docs/superpowers/specs/2026-11-20-pulido-visual-design.md`.
+
 ## 2026-11-19 · Auditoría UX/UI
 
 Ver `docs/ux-audit-2026-11-19.md`.
