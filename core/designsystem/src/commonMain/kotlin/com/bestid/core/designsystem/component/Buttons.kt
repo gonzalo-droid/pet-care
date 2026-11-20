@@ -33,7 +33,10 @@ import com.bestid.core.designsystem.theme.BestIdTheme
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
-/** Acción principal de una pantalla. Alto 58, crece con el texto grande. */
+/**
+ * Acción principal de una pantalla. Alto 58, crece con el texto grande.
+ * [destructive] la pinta en `error` (confirmar un borrado; contraste 6,5:1 con `onPrimary`).
+ */
 @Composable
 fun PrimaryButton(
     text: String,
@@ -42,6 +45,7 @@ fun PrimaryButton(
     icon: DrawableResource? = null,
     enabled: Boolean = true,
     loading: Boolean = false,
+    destructive: Boolean = false,
 ) {
     val colors = BestIdTheme.colors
     Button(
@@ -50,7 +54,7 @@ fun PrimaryButton(
         modifier = modifier.fillMaxWidth().heightIn(min = BestIdTheme.sizes.primaryButton),
         shape = BestIdTheme.shapes.button,
         colors = ButtonDefaults.buttonColors(
-            containerColor = colors.primary,
+            containerColor = if (destructive) colors.error else colors.primary,
             contentColor = colors.onPrimary,
             disabledContainerColor = colors.track,
             disabledContentColor = colors.muted,

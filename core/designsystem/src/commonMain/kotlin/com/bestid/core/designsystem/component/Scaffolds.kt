@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -31,7 +32,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
@@ -39,12 +43,20 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import com.bestid.core.designsystem.icon.BestIdIcons
 import com.bestid.core.designsystem.preview.PreviewData
 import com.bestid.core.designsystem.resources.Res
 import com.bestid.core.designsystem.resources.ds_close
+import com.bestid.core.designsystem.resources.ds_discard_body
+import com.bestid.core.designsystem.resources.ds_discard_confirm
+import com.bestid.core.designsystem.resources.ds_discard_keep
+import com.bestid.core.designsystem.resources.ds_discard_title
 import com.bestid.core.designsystem.theme.AppTheme
 import com.bestid.core.designsystem.theme.BestIdTheme
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -153,6 +165,44 @@ fun MainScaffold(
     )
 }
 
+/**
+ * Pantalla con scroll que ocupa al menos todo el alto: [content] arriba y [bottom] (los botones) al
+ * pie cuando sobra espacio. Con letra grande todo queda en una sola columna desplazable, sin cortes.
+ */
+@Composable
+fun FillScrollColumn(
+    bottom: @Composable ColumnScope.() -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    spacing: Dp = BestIdTheme.spacing.md,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    BoxWithConstraints(modifier = modifier) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .heightIn(min = maxHeight)
+                .padding(contentPadding),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = horizontalAlignment,
+                verticalArrangement = Arrangement.spacedBy(spacing),
+                content = content,
+            )
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(top = spacing),
+                horizontalAlignment = horizontalAlignment,
+                verticalArrangement = Arrangement.spacedBy(spacing),
+                content = bottom,
+            )
+        }
+    }
+}
+
 /** Botón de ícono con alto táctil de 48 y descripción obligatoria. */
 @Composable
 fun IconAction(icon: DrawableResource, contentDescription: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
@@ -170,7 +220,8 @@ fun IconAction(icon: DrawableResource, contentDescription: String, onClick: () -
 
 /**
  * Estructura de flujos modales y formularios: título, botón para cerrar, contenido desplazable
- * y acción principal fija al pie (sube con el teclado).
+ * y acción principal fija al pie (sube con el teclado). Con [confirmDiscard] (hay cambios sin
+ * guardar), la X y el gesto atrás preguntan antes de descartar.
  */
 @Composable
 fun FlowScaffold(
@@ -182,9 +233,31 @@ fun FlowScaffold(
     actions: @Composable RowScope.() -> Unit = {},
     bottomAction: (@Composable () -> Unit)? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    confirmDiscard: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = BestIdTheme.colors
+    var askDiscard by remember { mutableStateOf(false) }
+    val close = { if (confirmDiscard) askDiscard = true else onClose() }
+    NavigationBackHandler(
+        state = rememberNavigationEventState(NavigationEventInfo.None),
+        isBackEnabled = confirmDiscard,
+        onBackCompleted = { askDiscard = true },
+    )
+    if (askDiscard) {
+        ConfirmSheet(
+            title = stringResource(Res.string.ds_discard_title),
+            body = stringResource(Res.string.ds_discard_body),
+            confirmText = stringResource(Res.string.ds_discard_confirm),
+            dismissText = stringResource(Res.string.ds_discard_keep),
+            destructive = true,
+            onConfirm = {
+                askDiscard = false
+                onClose()
+            },
+            onDismiss = { askDiscard = false },
+        )
+    }
     Scaffold(
         modifier = modifier,
         containerColor = colors.bg,
@@ -197,7 +270,7 @@ fun FlowScaffold(
                     .padding(horizontal = BestIdTheme.spacing.xs, vertical = BestIdTheme.spacing.xxs),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconAction(closeIcon, closeDescription ?: stringResource(Res.string.ds_close), onClose)
+                IconAction(closeIcon, closeDescription ?: stringResource(Res.string.ds_close), close)
                 Box(modifier = Modifier.weight(1f).padding(horizontal = BestIdTheme.spacing.sm)) {
                     if (title != null) {
                         Text(

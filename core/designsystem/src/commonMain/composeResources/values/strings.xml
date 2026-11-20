@@ -10,6 +10,10 @@
     <string name="ds_more_details">Más detalles</string>
     <string name="ds_close">Cerrar</string>
     <string name="ds_cancel">Cancelar</string>
+    <string name="ds_discard_title">¿Salir sin guardar?</string>
+    <string name="ds_discard_body">Perderás lo que escribiste en este formulario.</string>
+    <string name="ds_discard_confirm">Salir sin guardar</string>
+    <string name="ds_discard_keep">Seguir editando</string>
     <string name="ds_accept">Aceptar</string>
     <string name="ds_change_pet">Cambiar de mascota. Seleccionada: %1$s</string>
     <string name="ds_pets_title">Tus mascotas</string>
@@ -33,8 +37,8 @@
     <string name="ds_id_card_vaccines">Vacunas</string>
     <string name="ds_id_card_next">Próxima</string>
     <string name="ds_state_ok">Al día</string>
-    <string name="ds_selected_state">seleccionado</string>
-    <string name="ds_not_selected_state">no seleccionado</string>
+    <string name="ds_on_state">activado</string>
+    <string name="ds_off_state">desactivado</string>
     <string name="ds_expanded_state">desplegado</string>
     <string name="ds_collapsed_state">plegado</string>
 </resources>
