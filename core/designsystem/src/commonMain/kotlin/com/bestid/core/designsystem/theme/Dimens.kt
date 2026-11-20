@@ -18,6 +18,10 @@ data class BestIdSpacing(
     val screen: Dp = 20.dp,
 )
 
+/** Elevación de las superficies: sombra suave en lugar de borde. */
+@Immutable
+data class BestIdElevation(val card: Dp = 6.dp)
+
 /** Tamaños de la sección 7: alto táctil mínimo 48, botón principal 58, secundario 52, íconos 24. */
 @Immutable
 data class BestIdSizes(

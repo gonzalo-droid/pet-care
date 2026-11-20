@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -150,9 +151,9 @@ fun PetSelector(
     Row(
         modifier = modifier
             .heightIn(min = BestIdTheme.sizes.secondaryButton)
+            .shadow(BestIdTheme.elevation.card, BestIdTheme.shapes.pill, ambientColor = colors.shadow, spotColor = colors.shadow)
             .clip(BestIdTheme.shapes.pill)
             .background(colors.surface, BestIdTheme.shapes.pill)
-            .border(BorderStroke(BestIdTheme.sizes.border, colors.line), BestIdTheme.shapes.pill)
             .clickable(role = Role.Button, onClick = { open = true })
             .semantics { contentDescription = description }
             .padding(start = BestIdTheme.spacing.xxs, end = BestIdTheme.spacing.sm, top = BestIdTheme.spacing.xxs, bottom = BestIdTheme.spacing.xxs),
@@ -304,9 +305,9 @@ fun PetIdCard(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .shadow(BestIdTheme.elevation.card, shape, ambientColor = colors.shadow, spotColor = colors.shadow)
             .clip(shape)
-            .background(colors.surface, shape)
-            .border(BorderStroke(BestIdTheme.sizes.border, colors.line), shape),
+            .background(colors.surface, shape),
     ) {
         Row(
             modifier = Modifier

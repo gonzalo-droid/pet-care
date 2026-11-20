@@ -1,9 +1,7 @@
 package com.bestid.core.designsystem.component
 
 import com.bestid.core.designsystem.theme.isLargeFont
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +19,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
@@ -34,7 +33,7 @@ import com.bestid.core.designsystem.theme.BestIdTheme
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
-/** Tarjeta base de superficie blanca con borde `line`. Tocable si recibe [onClick]. */
+/** Tarjeta base de superficie blanca con sombra suave. Tocable si recibe [onClick]. */
 @Composable
 fun PlainCard(
     modifier: Modifier = Modifier,
@@ -48,7 +47,7 @@ fun PlainCard(
     BaseCard(
         container = colors.surface,
         contentColor = colors.ink,
-        border = colors.line,
+        elevated = true,
         modifier = modifier,
         onClick = onClick,
         onClickLabel = onClickLabel,
@@ -67,7 +66,7 @@ fun InfoCard(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = BestIdTheme.colors
-    BaseCard(colors.primarySoft, colors.primaryInk, null, modifier, onClick, onClickLabel, BestIdTheme.shapes.cardLarge) {
+    BaseCard(colors.primarySoft, colors.primaryInk, false, modifier, onClick, onClickLabel, BestIdTheme.shapes.cardLarge) {
         IconRow(icon = icon, tint = colors.primaryInk, content = content)
     }
 }
@@ -82,7 +81,7 @@ fun AlertCard(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = BestIdTheme.colors
-    BaseCard(colors.alert, colors.alertInk, null, modifier, onClick, onClickLabel) {
+    BaseCard(colors.alert, colors.alertInk, false, modifier, onClick, onClickLabel) {
         IconRow(icon = icon, tint = colors.alertInk, content = content)
     }
 }
@@ -203,7 +202,7 @@ fun SectionTitle(text: String, modifier: Modifier = Modifier) {
 internal fun BaseCard(
     container: Color,
     contentColor: Color,
-    border: Color?,
+    elevated: Boolean,
     modifier: Modifier,
     onClick: (() -> Unit)?,
     onClickLabel: String?,
@@ -214,9 +213,9 @@ internal fun BaseCard(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .then(if (elevated) Modifier.shadow(BestIdTheme.elevation.card, shape, ambientColor = BestIdTheme.colors.shadow, spotColor = BestIdTheme.colors.shadow) else Modifier)
             .clip(shape)
             .background(container, shape)
-            .then(if (border != null) Modifier.border(BorderStroke(BestIdTheme.sizes.border, border), shape) else Modifier)
             .then(
                 if (onClick != null) {
                     Modifier
