@@ -221,7 +221,7 @@ Elevación (D44): las tarjetas de superficie (`PlainCard` y las que se construye
 | VaccineRecordCard | record, onClick | Fecha, productos, chips de tipos, veterinaria |
 | DateTile | day, month, contentDescription, review? | Mosaico de día y mes; primarySoft, o alert con review cuando la fecha está por confirmar. Crece con la letra (D44) |
 | CountdownRing | value, unit, progress? | Anillo de cuenta regresiva de Inicio; crece con la letra y se lee junto al texto que acompaña |
-| ReviewStrip | text, actionText, onAction | Franja alert con "!" para un dato dudoso; toque de 48 dp o más |
+| ReviewStrip | text, actionText, onAction | Franja alert con ícono de advertencia (Warning) para un dato dudoso; toque de 48 dp o más |
 | TimelineItem | date, content | Riel con mosaico de fecha a la izquierda y la tarjeta al lado; con letra grande se apila (D43) |
 | ProgressRow | text, progress, actionText, onClick | Barra de avance con acción ("Faltan raza y tutor · Completar") en el carnet |
 | ReviewRecordBlock | draft, onChange, included, onToggleIncluded | Bloque de O4 con campos dudosos en durazno |
