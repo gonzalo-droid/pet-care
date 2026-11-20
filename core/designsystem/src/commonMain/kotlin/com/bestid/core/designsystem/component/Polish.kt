@@ -91,28 +91,21 @@ fun CountdownRing(value: String, unit: String, progress: Float?, modifier: Modif
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(value, style = BestIdTheme.typography.hero, color = colors.ink)
-            Text(unit, style = BestIdTheme.typography.support, color = colors.muted)
+            if (unit.isNotBlank()) Text(unit, style = BestIdTheme.typography.support, color = colors.muted)
         }
     }
 }
 
-/** Franja de aviso "hay datos por revisar": toda la fila es tocable; la pastilla refuerza la acción. */
+/** Franja de aviso "hay datos por revisar": toda la fila es tocable; la pastilla refuerza la acción. Con letra grande se apila. */
 @Composable
 fun ReviewStrip(text: String, actionText: String, onAction: () -> Unit, modifier: Modifier = Modifier) {
     val colors = BestIdTheme.colors
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(BestIdTheme.shapes.field)
-            .background(colors.alert, BestIdTheme.shapes.field)
-            .heightIn(min = BestIdTheme.sizes.minTouch)
-            .clickable(role = Role.Button, onClick = onAction)
-            .padding(horizontal = BestIdTheme.spacing.md, vertical = BestIdTheme.spacing.xs),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.sm),
-    ) {
+    val large = isLargeFont()
+    val gap = Arrangement.spacedBy(BestIdTheme.spacing.sm)
+    val icon: @Composable () -> Unit = {
         Icon(painterResource(BestIdIcons.Warning), contentDescription = null, tint = colors.alertInk)
-        Text(text, style = BestIdTheme.typography.bodyStrong, color = colors.alertInk, modifier = Modifier.weight(1f))
+    }
+    val pill: @Composable () -> Unit = {
         Box(
             modifier = Modifier
                 .heightIn(min = BestIdTheme.sizes.actionPill)
@@ -121,6 +114,28 @@ fun ReviewStrip(text: String, actionText: String, onAction: () -> Unit, modifier
             contentAlignment = Alignment.Center,
         ) {
             Text(actionText, style = BestIdTheme.typography.chip, color = colors.alertInk, textAlign = TextAlign.Center)
+        }
+    }
+    val strip = modifier
+        .fillMaxWidth()
+        .clip(BestIdTheme.shapes.field)
+        .background(colors.alert, BestIdTheme.shapes.field)
+        .heightIn(min = BestIdTheme.sizes.minTouch)
+        .clickable(role = Role.Button, onClick = onAction)
+        .padding(horizontal = BestIdTheme.spacing.md, vertical = BestIdTheme.spacing.xs)
+    if (large) {
+        Column(strip, verticalArrangement = gap) {
+            Row(horizontalArrangement = gap) {
+                icon()
+                Text(text, style = BestIdTheme.typography.bodyStrong, color = colors.alertInk, modifier = Modifier.weight(1f))
+            }
+            pill()
+        }
+    } else {
+        Row(strip, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = gap) {
+            icon()
+            Text(text, style = BestIdTheme.typography.bodyStrong, color = colors.alertInk, modifier = Modifier.weight(1f))
+            pill()
         }
     }
 }
@@ -152,10 +167,11 @@ fun ProgressRow(text: String, progress: Float, actionText: String, onClick: () -
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .clip(BestIdTheme.shapes.field)
             .background(colors.bg)
             .heightIn(min = BestIdTheme.sizes.minTouch)
             .clickable(role = Role.Button, onClick = onClick)
-            .padding(vertical = BestIdTheme.spacing.xs),
+            .padding(horizontal = BestIdTheme.spacing.sm, vertical = BestIdTheme.spacing.xs),
         verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xxs),
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.sm)) {
