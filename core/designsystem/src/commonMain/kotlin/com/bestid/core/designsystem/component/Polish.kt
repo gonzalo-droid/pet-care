@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.draw.clip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
@@ -25,6 +27,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -51,9 +54,9 @@ fun DateTile(
     val (container, content) = if (review) colors.alert to colors.alertInk else colors.primarySoft to colors.primaryInk
     Column(
         modifier = modifier
-            .width(BestIdTheme.sizes.dateTile)
+            .widthIn(min = BestIdTheme.sizes.dateTile)
             .background(container, BestIdTheme.shapes.field)
-            .padding(vertical = BestIdTheme.spacing.xs)
+            .padding(horizontal = BestIdTheme.spacing.xxs, vertical = BestIdTheme.spacing.xs)
             .clearAndSetSemantics { this.contentDescription = description },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -71,7 +74,8 @@ fun CountdownRing(value: String, unit: String, progress: Float?, modifier: Modif
     val colors = BestIdTheme.colors
     val stroke = BestIdTheme.sizes.ringStroke
     Box(
-        modifier = modifier.size(BestIdTheme.sizes.ring).clearAndSetSemantics {},
+        // El anillo crece con la letra para que el valor y la unidad nunca toquen el trazo.
+        modifier = modifier.size(BestIdTheme.sizes.ring * LocalDensity.current.fontScale.coerceAtLeast(1f)).clearAndSetSemantics {},
         contentAlignment = Alignment.Center,
     ) {
         Canvas(Modifier.fillMaxSize()) {
@@ -99,6 +103,7 @@ fun ReviewStrip(text: String, actionText: String, onAction: () -> Unit, modifier
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clip(BestIdTheme.shapes.field)
             .background(colors.alert, BestIdTheme.shapes.field)
             .heightIn(min = BestIdTheme.sizes.minTouch)
             .clickable(role = Role.Button, onClick = onAction)
@@ -197,6 +202,7 @@ private fun PolishProgressPreview() = PreviewSurface {
 @Composable
 private fun PolishLongTextPreview() = PreviewSurface {
     DateTile("21", "dic", "21 de diciembre", review = true)
+    CountdownRing("128", "días", 0.6f)
     ReviewStrip(PreviewData.LONG_TEXT, "Revisar", {})
     TimelineItem({ DateTile("21", "dic", "21 de diciembre") }) {
         VaccineRecordCard(null, PreviewData.VACCINE_TYPES, {}, products = PreviewData.LONG_TEXT)
