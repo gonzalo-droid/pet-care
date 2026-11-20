@@ -17,12 +17,12 @@
     <string name="cartilla_year_to_confirm">! Confirma el año</string>
     <string name="cartilla_summary">%1$s · %2$s</string>
     <plurals name="cartilla_vaccines_count">
-        <item quantity="one">%d vacuna registrada</item>
-        <item quantity="other">%d vacunas registradas</item>
+        <item quantity="one">%1$d vacuna registrada</item>
+        <item quantity="other">%1$d vacunas registradas</item>
     </plurals>
     <plurals name="cartilla_to_confirm_count">
-        <item quantity="one">%d dato por confirmar</item>
-        <item quantity="other">%d datos por confirmar</item>
+        <item quantity="one">%1$d dato por confirmar</item>
+        <item quantity="other">%1$d datos por confirmar</item>
     </plurals>
     <string name="cartilla_open_record">Ver vacuna del %1$s</string>
     <string name="cartilla_vaccine_fallback">Vacuna</string>
