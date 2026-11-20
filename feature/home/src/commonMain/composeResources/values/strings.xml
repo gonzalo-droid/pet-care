@@ -28,12 +28,12 @@
     <string name="home_open_detail">Ver detalle</string>
     <string name="home_summary">%1$s · %2$s</string>
     <plurals name="home_vaccines_count">
-        <item quantity="one">%d vacuna registrada</item>
-        <item quantity="other">%d vacunas registradas</item>
+        <item quantity="one">%1$d vacuna registrada</item>
+        <item quantity="other">%1$d vacunas registradas</item>
     </plurals>
     <plurals name="home_to_confirm_count">
-        <item quantity="one">%d dato por confirmar</item>
-        <item quantity="other">%d datos por confirmar</item>
+        <item quantity="one">%1$d dato por confirmar</item>
+        <item quantity="other">%1$d datos por confirmar</item>
     </plurals>
     <string name="home_year_to_confirm">! Año por confirmar</string>
     <string name="home_days_overdue_unit">días tarde</string>
