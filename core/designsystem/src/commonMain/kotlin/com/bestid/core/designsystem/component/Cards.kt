@@ -4,6 +4,7 @@ import com.bestid.core.designsystem.theme.isLargeFont
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -97,8 +98,17 @@ fun StatCard(
     onClickLabel: String? = null,
     actionText: String? = null,
     onAction: (() -> Unit)? = null,
+    icon: DrawableResource? = null,
 ) {
     PlainCard(modifier = modifier, onClick = onClick, onClickLabel = onClickLabel, showChevron = onClick != null) {
+        if (icon != null) {
+            Box(
+                Modifier.size(BestIdTheme.sizes.statIcon).background(BestIdTheme.colors.primarySoft, BestIdTheme.shapes.field),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(painterResource(icon), contentDescription = null, tint = BestIdTheme.colors.primaryInk, modifier = Modifier.size(BestIdTheme.sizes.iconSmall))
+            }
+        }
         Text(label, style = BestIdTheme.typography.support, color = BestIdTheme.colors.muted)
         Text(value, style = BestIdTheme.typography.card, color = BestIdTheme.colors.ink)
         if (detail != null) Text(detail, style = BestIdTheme.typography.support, color = BestIdTheme.colors.muted)

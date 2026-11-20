@@ -14,8 +14,6 @@
         <item quantity="other">días</item>
     </plurals>
     <string name="home_today">Hoy</string>
-    <string name="home_overdue_days">Atrasada hace %1$s</string>
-    <string name="home_next_line">%1$s · %2$s</string>
     <string name="home_no_next">Sin próximas vacunas registradas</string>
     <string name="home_no_next_body">Al registrar una vacuna con su próxima fecha, verás aquí cuántos días faltan.</string>
     <string name="home_last_vaccine">Última vacuna</string>
@@ -28,4 +26,20 @@
     <string name="home_permission_body">Actívalos en los ajustes del teléfono para saber cuándo le toca la próxima vacuna o cuidado.</string>
     <string name="home_open_vaccine">Ver la vacuna</string>
     <string name="home_open_detail">Ver detalle</string>
+    <string name="home_summary">%1$s · %2$s</string>
+    <plurals name="home_vaccines_count">
+        <item quantity="one">%d vacuna registrada</item>
+        <item quantity="other">%d vacunas registradas</item>
+    </plurals>
+    <plurals name="home_to_confirm_count">
+        <item quantity="one">%d dato por confirmar</item>
+        <item quantity="other">%d datos por confirmar</item>
+    </plurals>
+    <string name="home_year_to_confirm">! año por confirmar</string>
+    <string name="home_days_overdue_unit">días tarde</string>
+    <string name="home_next_a11y">Próxima: %1$s, %2$s, en %3$s</string>
+    <string name="home_next_a11y_today">Próxima: %1$s, %2$s, hoy</string>
+    <string name="home_next_a11y_overdue">Próxima: %1$s, %2$s, atrasada hace %3$s</string>
+    <string name="home_year_unreadable">El año no se lee en la cartilla.</string>
+    <string name="home_confirm">Confirmar</string>
 </resources>

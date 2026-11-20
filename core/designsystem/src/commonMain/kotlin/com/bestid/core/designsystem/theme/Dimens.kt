@@ -43,6 +43,8 @@ data class BestIdSizes(
     val ring: Dp = 112.dp,
     val ringStroke: Dp = 10.dp,
     val dateTile: Dp = 52.dp,
+    /** Cuadro con el ícono de una StatCard. */
+    val statIcon: Dp = 34.dp,
     val actionPill: Dp = 40.dp,
     val rail: Dp = 2.dp,
 )
