@@ -49,7 +49,8 @@ fun VaccineRecordCard(
     onClickLabel: String? = null,
 ) {
     val colors = BestIdTheme.colors
-    PlainCard(modifier = modifier, onClick = onClick, onClickLabel = onClickLabel) {
+    // Sin fecha propia (dentro de un timeline) el chevron va centrado a la derecha de toda la tarjeta.
+    PlainCard(modifier = modifier, onClick = onClick, onClickLabel = onClickLabel, showChevron = date == null) {
         if (date != null) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(date, style = BestIdTheme.typography.subtitle, color = colors.ink, modifier = Modifier.weight(1f))
@@ -62,13 +63,7 @@ fun VaccineRecordCard(
                 verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xxs),
             ) { types.forEach { Badge(it, BadgeTone.OK) } }
         }
-        if (products != null || date == null) {
-            // Sin fecha propia (dentro de un timeline) el chevron acompaña a los productos.
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(products.orEmpty(), style = BestIdTheme.typography.support, color = colors.muted, modifier = Modifier.weight(1f))
-                if (date == null) Icon(painterResource(BestIdIcons.ChevronRight), contentDescription = null, tint = colors.muted)
-            }
-        }
+        if (products != null) Text(products, style = BestIdTheme.typography.support, color = colors.muted)
         if (photos != null) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xxs)) {
                 Icon(painterResource(BestIdIcons.Image), contentDescription = null, tint = colors.muted, modifier = Modifier.size(BestIdTheme.sizes.iconSmall))
