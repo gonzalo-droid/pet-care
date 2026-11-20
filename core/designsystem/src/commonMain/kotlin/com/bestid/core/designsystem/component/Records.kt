@@ -35,7 +35,7 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun VaccineRecordCard(
-    date: String,
+    date: String?,
     types: List<String>,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -45,9 +45,11 @@ fun VaccineRecordCard(
 ) {
     val colors = BestIdTheme.colors
     PlainCard(modifier = modifier, onClick = onClick) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(date, style = BestIdTheme.typography.subtitle, color = colors.ink, modifier = Modifier.weight(1f))
-            Icon(painterResource(BestIdIcons.ChevronRight), contentDescription = null, tint = colors.muted)
+        if (date != null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(date, style = BestIdTheme.typography.subtitle, color = colors.ink, modifier = Modifier.weight(1f))
+                Icon(painterResource(BestIdIcons.ChevronRight), contentDescription = null, tint = colors.muted)
+            }
         }
         if (types.isNotEmpty()) {
             FlowRow(
@@ -55,7 +57,13 @@ fun VaccineRecordCard(
                 verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xxs),
             ) { types.forEach { Badge(it, BadgeTone.OK) } }
         }
-        if (products != null) Text(products, style = BestIdTheme.typography.support, color = colors.muted)
+        if (products != null || date == null) {
+            // Sin fecha propia (dentro de un timeline) el chevron acompaña a los productos.
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(products.orEmpty(), style = BestIdTheme.typography.support, color = colors.muted, modifier = Modifier.weight(1f))
+                if (date == null) Icon(painterResource(BestIdIcons.ChevronRight), contentDescription = null, tint = colors.muted)
+            }
+        }
         if (vet != null) Text(vet, style = BestIdTheme.typography.support, color = colors.muted)
         if (review != null) Badge(review, BadgeTone.ALERT)
     }
@@ -128,6 +136,12 @@ private fun RecordsPreview() = PreviewSurface {
         onClick = {},
         products = PreviewData.RECORD_PRODUCTS,
         vet = PreviewData.RECORD_VET,
+    )
+    VaccineRecordCard(
+        date = null,
+        types = PreviewData.VACCINE_TYPES.take(2),
+        onClick = {},
+        products = PreviewData.RECORD_PRODUCTS,
     )
     ReviewRecordBlock(PreviewData.REVIEW_TITLE, included = true, onToggleIncluded = {}) {
         DateField(PreviewData.DATE_LABEL, PreviewData.DATE_VALUE, onClick = {})

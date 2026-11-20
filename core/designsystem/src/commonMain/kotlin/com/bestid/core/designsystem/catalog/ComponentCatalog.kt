@@ -16,6 +16,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.Modifier
 import com.bestid.core.designsystem.component.AlertCard
+import com.bestid.core.designsystem.component.CountdownRing
+import com.bestid.core.designsystem.component.DateTile
+import com.bestid.core.designsystem.component.ProgressRow
+import com.bestid.core.designsystem.component.ReviewStrip
+import com.bestid.core.designsystem.component.TimelineItem
 import com.bestid.core.designsystem.component.AvatarSize
 import com.bestid.core.designsystem.component.AvatarSpecies
 import com.bestid.core.designsystem.component.Badge
@@ -182,6 +187,18 @@ fun ComponentCatalog(title: String, onClose: () -> Unit) {
             vet = PreviewData.RECORD_VET,
             review = PreviewData.BADGE_ALERT,
         )
+        TimelineItem(date = { DateTile("21", "DIC", "21 de diciembre") }) {
+            VaccineRecordCard(null, PreviewData.VACCINE_TYPES.take(2), onClick = {}, products = PreviewData.RECORD_PRODUCTS)
+        }
+        TimelineItem(date = { DateTile("?", "—", "Fecha sin leer", review = true) }) {
+            VaccineRecordCard(null, PreviewData.VACCINE_TYPES.take(1), onClick = {}, review = "! Revisa")
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.md)) {
+            CountdownRing("12", "días", 0.6f)
+            CountdownRing("?", "días", null)
+        }
+        ReviewStrip("2 datos por revisar", "Revisar", onAction = {})
+        ProgressRow("3 de 5 datos completos", 0.6f, "Completar", onClick = {})
         ReviewRecordBlock(PreviewData.REVIEW_TITLE, included, { included = it }) {
             ReviewField(PreviewData.REVIEW_REASON) {
                 Text(PreviewData.REVIEW_QUESTION, style = BestIdTheme.typography.body)

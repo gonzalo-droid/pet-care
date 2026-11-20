@@ -40,4 +40,9 @@ data class BestIdSizes(
     val illustration: Dp = 120.dp,
     val border: Dp = 2.dp,
     val chartHeight: Dp = 200.dp,
+    val ring: Dp = 112.dp,
+    val ringStroke: Dp = 10.dp,
+    val dateTile: Dp = 52.dp,
+    val actionPill: Dp = 40.dp,
+    val rail: Dp = 2.dp,
 )
