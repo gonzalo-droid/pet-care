@@ -11,11 +11,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -90,7 +92,7 @@ fun AlertCard(
     }
 }
 
-/** Dato destacado (última vacuna, último peso) con acción opcional. */
+/** Dato destacado (última vacuna, último peso). La acción opcional es un botón + en la esquina inferior derecha; [actionText] es su nombre para lectores de pantalla. */
 @Composable
 fun StatCard(
     label: String,
@@ -116,7 +118,16 @@ fun StatCard(
         Text(value, style = BestIdTheme.typography.card, color = BestIdTheme.colors.ink)
         if (detail != null) Text(detail, style = BestIdTheme.typography.support, color = BestIdTheme.colors.muted)
         if (actionText != null && onAction != null) {
-            TextAction(text = actionText, onClick = onAction, icon = BestIdIcons.Add)
+            // Empuja el + a la esquina inferior derecha cuando la tarjeta es más alta que su contenido.
+            Spacer(Modifier.weight(1f))
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomEnd) {
+                IconButton(
+                    onClick = onAction,
+                    modifier = Modifier.size(BestIdTheme.sizes.minTouch).background(BestIdTheme.colors.primary, BestIdTheme.shapes.pill),
+                ) {
+                    Icon(painterResource(BestIdIcons.Add), contentDescription = actionText, tint = BestIdTheme.colors.onPrimary)
+                }
+            }
         }
     }
 }

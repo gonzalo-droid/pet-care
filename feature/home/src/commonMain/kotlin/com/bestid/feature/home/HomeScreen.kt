@@ -193,6 +193,8 @@ fun HomeScreen(
                         detail = last?.typeIds?.mapNotNull { state.types[it]?.label }?.joinToString(", "),
                         onClick = last?.let { { onOpenRecord(it.id) } },
                         onClickLabel = stringResource(Res.string.home_open_vaccine),
+                        actionText = if (last == null) stringResource(Res.string.home_add_vaccine) else null,
+                        onAction = if (last == null) onAddRecord else null,
                         modifier = cardModifier,
                     )
                 },
