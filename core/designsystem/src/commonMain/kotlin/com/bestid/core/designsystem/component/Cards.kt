@@ -6,6 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -151,8 +154,8 @@ fun ListRow(label: String, value: String, modifier: Modifier = Modifier) {
 }
 
 /**
- * Dos tarjetas lado a lado (por ejemplo, "Última vacuna" y "Peso" en Inicio). Con letra grande se
- * apilan, para que ninguna parta palabras.
+ * Dos tarjetas lado a lado (por ejemplo, "Última vacuna" y "Peso" en Inicio), del mismo alto. Con
+ * letra grande se apilan, para que ninguna parta palabras.
  */
 @Composable
 fun AdaptivePair(
@@ -167,9 +170,9 @@ fun AdaptivePair(
             second(Modifier.fillMaxWidth())
         }
     } else {
-        Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = spacing) {
-            first(Modifier.weight(1f))
-            second(Modifier.weight(1f))
+        Row(modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = spacing) {
+            first(Modifier.weight(1f).fillMaxHeight())
+            second(Modifier.weight(1f).fillMaxHeight())
         }
     }
 }
