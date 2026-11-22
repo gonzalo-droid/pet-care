@@ -16,6 +16,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.Modifier
 import com.bestid.core.designsystem.component.AlertCard
+import com.bestid.core.designsystem.component.CountdownRing
+import com.bestid.core.designsystem.component.DateTile
+import com.bestid.core.designsystem.component.ProgressRow
+import com.bestid.core.designsystem.component.ReviewStrip
+import com.bestid.core.designsystem.component.TimelineItem
 import com.bestid.core.designsystem.component.AvatarSize
 import com.bestid.core.designsystem.component.AvatarSpecies
 import com.bestid.core.designsystem.component.Badge
@@ -163,12 +168,14 @@ fun ComponentCatalog(title: String, onClose: () -> Unit) {
             Badge(PreviewData.BADGE_NEUTRAL, BadgeTone.NEUTRAL)
         }
         PetIdCard(
-            PreviewData.PET_NAME,
-            null,
-            AvatarSpecies.CAT,
-            listOf(PreviewData.ID_SPECIES to PreviewData.SPECIES.first(), PreviewData.ID_SEX to PreviewData.SEX.first()),
-            PreviewData.ID_VACCINES,
-            PreviewData.ID_NEXT,
+            name = PreviewData.PET_NAME,
+            photo = null,
+            species = AvatarSpecies.CAT,
+            subtitle = PreviewData.ID_SUBTITLE,
+            details = listOf(PreviewData.ID_OWNER to PreviewData.ID_OWNER_NAME),
+            vaccineCount = PreviewData.ID_VACCINES,
+            nextDate = PreviewData.ID_NEXT,
+            completion = { ProgressRow(PreviewData.ID_MISSING, 0.25f, PreviewData.ID_COMPLETE, onClick = {}) },
         )
 
         SectionTitle("Registros y lectura")
@@ -182,6 +189,18 @@ fun ComponentCatalog(title: String, onClose: () -> Unit) {
             vet = PreviewData.RECORD_VET,
             review = PreviewData.BADGE_ALERT,
         )
+        TimelineItem(date = { DateTile("21", "DIC", "21 de diciembre") }) {
+            VaccineRecordCard(null, PreviewData.VACCINE_TYPES.take(2), onClick = {}, products = PreviewData.RECORD_PRODUCTS, photos = PreviewData.RECORD_PHOTOS)
+        }
+        TimelineItem(date = { DateTile("?", "—", "Fecha sin leer", review = true) }) {
+            VaccineRecordCard(null, PreviewData.VACCINE_TYPES.take(1), onClick = {}, review = "! Revisa")
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.md)) {
+            CountdownRing("12", "días", 0.6f)
+            CountdownRing("?", "días", null)
+        }
+        ReviewStrip("2 datos por revisar", "Revisar", onAction = {})
+        ProgressRow("3 de 5 datos completos", 0.6f, "Completar", onClick = {})
         ReviewRecordBlock(PreviewData.REVIEW_TITLE, included, { included = it }) {
             ReviewField(PreviewData.REVIEW_REASON) {
                 Text(PreviewData.REVIEW_QUESTION, style = BestIdTheme.typography.body)

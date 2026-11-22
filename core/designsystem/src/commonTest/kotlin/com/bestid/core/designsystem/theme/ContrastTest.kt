@@ -1,6 +1,7 @@
 package com.bestid.core.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.luminance
 import kotlin.math.max
 import kotlin.math.min
@@ -43,6 +44,11 @@ class ContrastTest {
             Triple("surface sobre ink (snackbar)", c.surface, c.ink),
         )
         pairs.forEach { (name, fg, bg) -> assertContrast(name, fg, bg, 4.5) }
+    }
+
+    @Test
+    fun cardTextOverDotPatternReachesAA() {
+        assertContrast("onPrimary sobre primary con trama", c.onPrimary, c.idCardDot.compositeOver(c.primary), 4.5)
     }
 
     @Test

@@ -15,6 +15,7 @@ private val LocalBestIdTypography = staticCompositionLocalOf<BestIdTypography> {
 private val LocalBestIdShapes = staticCompositionLocalOf { BestIdShapes() }
 private val LocalBestIdSpacing = staticCompositionLocalOf { BestIdSpacing() }
 private val LocalBestIdSizes = staticCompositionLocalOf { BestIdSizes() }
+private val LocalBestIdElevation = staticCompositionLocalOf { BestIdElevation() }
 
 /**
  * Aplica tokens, fuente Nunito y formas. Tema claro siempre: el tema oscuro está fuera del MVP.
@@ -32,6 +33,7 @@ fun AppTheme(content: @Composable () -> Unit) {
         LocalBestIdShapes provides shapes,
         LocalBestIdSpacing provides BestIdSpacing(),
         LocalBestIdSizes provides BestIdSizes(),
+        LocalBestIdElevation provides BestIdElevation(),
     ) {
         MaterialTheme(
             colorScheme = colors.toMaterialColorScheme(),
@@ -55,4 +57,6 @@ object BestIdTheme {
         @Composable @ReadOnlyComposable get() = LocalBestIdSpacing.current
     val sizes: BestIdSizes
         @Composable @ReadOnlyComposable get() = LocalBestIdSizes.current
+    val elevation: BestIdElevation
+        @Composable @ReadOnlyComposable get() = LocalBestIdElevation.current
 }

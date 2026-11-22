@@ -1,7 +1,6 @@
 package com.bestid.core.designsystem.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -38,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -211,8 +211,8 @@ fun IconAction(icon: DrawableResource, contentDescription: String, onClick: () -
         onClick = onClick,
         modifier = modifier
             .size(BestIdTheme.sizes.minTouch)
-            .background(colors.surface, BestIdTheme.shapes.pill)
-            .border(androidx.compose.foundation.BorderStroke(BestIdTheme.sizes.border, colors.line), BestIdTheme.shapes.pill),
+            .shadow(BestIdTheme.elevation.card, BestIdTheme.shapes.pill, ambientColor = colors.shadow, spotColor = colors.shadow)
+            .background(colors.surface, BestIdTheme.shapes.pill),
     ) {
         Icon(painterResource(icon), contentDescription = contentDescription, tint = colors.ink)
     }

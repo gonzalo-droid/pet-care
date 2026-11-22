@@ -221,6 +221,7 @@ private fun MainTabs(
         ) {
             homeGraph(
                 onOpenRecord = actions.openRecord,
+                onEditRecord = actions.editRecord,
                 onAddRecord = actions.addRecord,
                 onAddPet = actions.addPet,
                 onOpenCare = actions.openCare,

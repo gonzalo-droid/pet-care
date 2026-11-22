@@ -30,12 +30,11 @@
     <string name="ds_weight_chart_description">Gráfico de peso. Último registro: %1$s</string>
     <string name="ds_notification_app">BestID</string>
     <string name="ds_notification_now">ahora</string>
-    <string name="ds_id_card_brand">BestID</string>
+    <string name="ds_id_card_title">CARNET DE MASCOTA</string>
     <string name="ds_brand_best">Best</string>
     <string name="ds_brand_id">ID</string>
     <string name="ds_brand_name">BestID</string>
-    <string name="ds_id_card_vaccines">Vacunas</string>
-    <string name="ds_id_card_next">Próxima</string>
+    <string name="ds_id_card_next">Próxima: %1$s</string>
     <string name="ds_state_ok">Al día</string>
     <string name="ds_on_state">activado</string>
     <string name="ds_off_state">desactivado</string>

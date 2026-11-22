@@ -279,7 +279,7 @@ fun ExpandableSection(
             .fillMaxWidth()
             .clip(shape)
             .background(colors.surface, shape)
-            .border(BorderStroke(BestIdTheme.sizes.border, colors.line), shape),
+            .border(BorderStroke(BestIdTheme.sizes.border, colors.outlineStrong), shape),
     ) {
         Row(
             modifier = Modifier

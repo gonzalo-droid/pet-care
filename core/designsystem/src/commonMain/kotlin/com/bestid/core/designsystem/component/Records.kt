@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,19 +36,26 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun VaccineRecordCard(
-    date: String,
+    date: String?,
     types: List<String>,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     products: String? = null,
     vet: String? = null,
     review: String? = null,
+    /** "2 fotos de la cartilla", con el ícono de imagen. */
+    photos: String? = null,
+    /** Qué abre al tocar ("Ver vacuna del 21 dic 2025"): necesario si no se muestra [date]. */
+    onClickLabel: String? = null,
 ) {
     val colors = BestIdTheme.colors
-    PlainCard(modifier = modifier, onClick = onClick) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(date, style = BestIdTheme.typography.subtitle, color = colors.ink, modifier = Modifier.weight(1f))
-            Icon(painterResource(BestIdIcons.ChevronRight), contentDescription = null, tint = colors.muted)
+    // Sin fecha propia (dentro de un timeline) el chevron va centrado a la derecha de toda la tarjeta.
+    PlainCard(modifier = modifier, onClick = onClick, onClickLabel = onClickLabel, showChevron = date == null) {
+        if (date != null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(date, style = BestIdTheme.typography.subtitle, color = colors.ink, modifier = Modifier.weight(1f))
+                Icon(painterResource(BestIdIcons.ChevronRight), contentDescription = null, tint = colors.muted)
+            }
         }
         if (types.isNotEmpty()) {
             FlowRow(
@@ -56,6 +64,12 @@ fun VaccineRecordCard(
             ) { types.forEach { Badge(it, BadgeTone.OK) } }
         }
         if (products != null) Text(products, style = BestIdTheme.typography.support, color = colors.muted)
+        if (photos != null) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xxs)) {
+                Icon(painterResource(BestIdIcons.Image), contentDescription = null, tint = colors.muted, modifier = Modifier.size(BestIdTheme.sizes.iconSmall))
+                Text(photos, style = BestIdTheme.typography.support, color = colors.muted)
+            }
+        }
         if (vet != null) Text(vet, style = BestIdTheme.typography.support, color = colors.muted)
         if (review != null) Badge(review, BadgeTone.ALERT)
     }
@@ -129,6 +143,13 @@ private fun RecordsPreview() = PreviewSurface {
         products = PreviewData.RECORD_PRODUCTS,
         vet = PreviewData.RECORD_VET,
     )
+    VaccineRecordCard(
+        date = null,
+        types = PreviewData.VACCINE_TYPES.take(2),
+        onClick = {},
+        products = PreviewData.RECORD_PRODUCTS,
+        photos = PreviewData.RECORD_PHOTOS,
+    )
     ReviewRecordBlock(PreviewData.REVIEW_TITLE, included = true, onToggleIncluded = {}) {
         DateField(PreviewData.DATE_LABEL, PreviewData.DATE_VALUE, onClick = {})
         ReviewField(PreviewData.REVIEW_REASON) {
@@ -161,6 +182,7 @@ private fun RecordsLongTextPreview() = PreviewSurface {
         onClick = {},
         products = PreviewData.LONG_TEXT,
         vet = PreviewData.LONG_TEXT,
+        photos = PreviewData.LONG_TEXT,
     )
     ReviewField(PreviewData.LONG_TEXT) {
         FormField(PreviewData.DATE_LABEL, "", {}, placeholder = PreviewData.DATE_VALUE)

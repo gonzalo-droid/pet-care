@@ -4,6 +4,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasContentDescription
@@ -165,12 +168,13 @@ class AppFlowUiTest {
 
         // Cartilla
         onNodeWithText("Cartilla").performClick()
-        waitForText("21 dic 2025")
-        onNodeWithText("29 jun 2024").assertExistsSafely()
+        // La cartilla muestra la fecha en un mosaico (DateTile) que se lee como la fecha larga
+        waitForDescription("21 dic 2025")
+        onNode(hasContentDescription("29 jun 2024")).assertExistsSafely()
         screenshot("03-cartilla-lilith")
 
         // Las páginas quedan en el detalle de la vacuna y se abren en el visor
-        onNodeWithText("29 jun 2024").performClick()
+        onNode(hasClickLabel("Ver vacuna del 29 jun 2024")).performScrollTo().performClick()
         waitForText("FOTOS")
         screenshot("03b-detalle-con-fotos")
         onNode(hasContentDescription("Página 1 de la cartilla")).performScrollTo().performClick()
@@ -180,7 +184,7 @@ class AppFlowUiTest {
         screenshot("03c-visor")
         onAllNodes(hasContentDescription("Cerrar"))[0].performClick()
         onNode(hasContentDescription("Volver", substring = true)).performClick()
-        waitForText("21 dic 2025")
+        waitForDescription("21 dic 2025")
         // 1 foto de la mascota + 2 páginas, procesadas y guardadas en el directorio de la app
         check(NSFileManager.defaultManager.contentsOfDirectoryAtPath("$dir/photos", null).orEmpty().size == 3)
 
@@ -196,12 +200,13 @@ class AppFlowUiTest {
         onNode(hasContentDescription("Cambiar de mascota. Seleccionada: Toby")).performClick()
         waitForText("Tus mascotas")
         onAllNodesWithText("Lilith")[0].performClick()
-        waitForText("21 dic 2025")
+        waitForDescription("21 dic 2025")
         screenshot("05-cartilla-lilith-de-nuevo")
 
-        // Carnet
+        // Carnet: sin raza, nacimiento, señas ni tutor, muestra el avance con "Completar"
         onNodeWithText("Mascota").performClick()
-        waitForText("Completar datos")
+        waitForText("Faltan raza, nacimiento, señas y tutor")
+        onNodeWithText("Completar").assertExistsSafely()
         screenshot("06-carnet-lilith")
 
         // M2: un cuidado con aviso (primer logro → pantalla de permiso) y un peso
@@ -320,6 +325,14 @@ class AppFlowUiTest {
     private fun ComposeUiTest.waitForText(text: String) {
         waitUntil(timeoutMillis = 10_000) { onAllNodes(hasText(text, substring = true)).fetchSemanticsNodes().isNotEmpty() }
     }
+
+    private fun ComposeUiTest.waitForDescription(text: String) {
+        waitUntil(timeoutMillis = 10_000) { onAllNodes(hasContentDescription(text)).fetchSemanticsNodes().isNotEmpty() }
+    }
+
+    /** Tarjeta que se abre con la etiqueta de toque [label] (la que anuncia el lector de pantalla). */
+    private fun hasClickLabel(label: String) =
+        SemanticsMatcher("onClickLabel = $label") { it.config.getOrNull(SemanticsActions.OnClick)?.label == label }
 
     private fun SemanticsNodeInteraction.assertExistsSafely() {
         fetchSemanticsNode()

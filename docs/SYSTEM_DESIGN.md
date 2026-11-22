@@ -198,6 +198,8 @@ Tema oscuro: fuera del MVP. La app fuerza tema claro en ambas plataformas `[Deci
 
 Base: Material 3 de Compose Multiplatform con un `ColorScheme`, `Typography` y `Shapes` propios construidos con los tokens. Ninguna pantalla define colores, tamaños o radios sueltos.
 
+Elevación (D44): las tarjetas de superficie (`PlainCard` y las que se construyen sobre ella, y `PetIdCard`), el `PetSelector` y el `IconAction` usan una sombra suave (`BestIdElevation.card`, 6 dp, color `shadow`: ink al 18 %) en lugar del borde de 2 dp. Los controles (botón secundario y punteado, campos, chips) conservan el borde `outlineStrong`, porque delimitan algo que se toca. El durazno (`alert`) marca solo el dato dudoso.
+
 | Componente | Props principales | Notas |
 |---|---|---|
 | AppTheme | content | Aplica tokens, fuente y formas |
@@ -217,11 +219,16 @@ Base: Material 3 de Compose Multiplatform con un `ColorScheme`, `Typography` y `
 | InfoCard, AlertCard, PlainCard | content | Fondo primarySoft, alert o surface |
 | StatCard | label, value, action? | Última vacuna, último peso |
 | VaccineRecordCard | record, onClick | Fecha, productos, chips de tipos, veterinaria |
+| DateTile | day, month, contentDescription, review? | Mosaico de día y mes; primarySoft, o alert con review cuando la fecha está por confirmar. Crece con la letra (D44) |
+| CountdownRing | value, unit, progress? | Anillo de cuenta regresiva de Inicio; crece con la letra y se lee junto al texto que acompaña |
+| ReviewStrip | text, actionText, onAction | Franja alert con ícono de advertencia (Warning) para un dato dudoso; toque de 48 dp o más |
+| TimelineItem | date, content | Riel con mosaico de fecha a la izquierda y la tarjeta al lado; con letra grande se apila (D43) |
+| ProgressRow | text, progress, actionText, onClick | Barra de avance con acción ("Faltan raza y tutor · Completar") en el carnet |
 | ReviewRecordBlock | draft, onChange, included, onToggleIncluded | Bloque de O4 con campos dudosos en durazno |
 | ListRow | label, value | Dos columnas |
 | Badge | text, tone (ok, alert, neutral) | |
 | PetAvatar | photo?, species, size | Placeholder por especie |
-| PetIdCard | pet, vaccineCount, nextDate | Carnet de la pestaña Mascota y base de la ficha en PDF |
+| PetIdCard | name, photo, species, subtitle, details, vaccineCount, nextDate, completion? | Carnet de la pestaña Mascota (encabezado con trama, avatar montado, datos llenos y ProgressRow si faltan, D44) y base de la ficha en PDF |
 | ReviewField | reason, content | Fondo alert, ícono y la palabra "Revisa"; contiene una pregunta (ChipChoice) o un campo |
 | NotificationPreview | title, body | Ejemplo de aviso en la pantalla de permiso |
 | CelebrationBadge | text | Confirmación tierna tras guardar ("Lilith y sus 2 vacunas guardadas") |

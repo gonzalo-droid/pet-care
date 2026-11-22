@@ -4,15 +4,27 @@
     <string name="pet_empty_body">Agrega a tu mascota para ver su carnet con sus datos y vacunas.</string>
     <string name="pet_add">Agregar mascota</string>
     <string name="pet_add_another">Agregar otra mascota</string>
-    <string name="pet_complete_data">Completar datos</string>
-    <string name="pet_row_species">Especie</string>
-    <string name="pet_row_sex">Sexo</string>
+    <plurals name="pet_missing">
+        <item quantity="one">Falta %1$s</item>
+        <item quantity="other">Faltan %1$s</item>
+    </plurals>
+    <string name="pet_missing_breed">raza</string>
+    <string name="pet_missing_birth">nacimiento</string>
+    <string name="pet_missing_marks">señas</string>
+    <string name="pet_missing_owner">tutor</string>
+    <string name="pet_complete">Completar</string>
+    <string name="pet_edit">Editar datos</string>
+    <string name="pet_next_unconfirmed">! %1$s</string>
+    <plurals name="pet_vaccines_count">
+        <item quantity="one">%1$d vacuna</item>
+        <item quantity="other">%1$d vacunas</item>
+    </plurals>
     <string name="pet_row_breed">Raza</string>
     <string name="pet_row_birth">Nacimiento</string>
     <string name="pet_row_birth_approx">%1$s (aprox.)</string>
     <string name="pet_row_marks">Señas</string>
     <string name="pet_row_owner">Tutor</string>
-    <string name="pet_next_none">Sin fecha</string>
+    <string name="pet_next_none">sin fecha</string>
     <string name="pet_form_new_title">Nueva mascota</string>
     <string name="pet_form_edit_title">Editar mascota</string>
     <string name="pet_form_name">Nombre</string>
