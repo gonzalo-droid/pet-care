@@ -26,10 +26,8 @@ import platform.UIKit.UIDatePicker
 import platform.UIKit.UIDatePickerMode
 import platform.UIKit.UIDatePickerStyle
 import platform.UIKit.UINavigationController
-import platform.UIKit.UISheetPresentationControllerDetent
 import platform.UIKit.UIViewController
 import platform.UIKit.navigationItem
-import platform.UIKit.sheetPresentationController
 import platform.UIKit.systemBackgroundColor
 
 @Composable
@@ -41,10 +39,8 @@ internal actual fun rememberPlatformDatePickerLauncher(onPicked: (LocalDate) -> 
                 val presenter = topViewController() ?: return
                 val picker = DatePickerViewController(initial, max) { callback(it) }
                 val navigation = UINavigationController(rootViewController = picker)
-                navigation.sheetPresentationController?.detents = listOf(
-                    UISheetPresentationControllerDetent.mediumDetent(),
-                    UISheetPresentationControllerDetent.largeDetent(),
-                )
+                // Sin detent medio: el calendario inline en media hoja entra en un ciclo de layout que
+                // congela el hilo principal y iOS cierra la app (TestFlight 0.5.0 (1)). La hoja va completa.
                 presenter.presentViewController(navigation, animated = true, completion = null)
             }
         }
@@ -58,7 +54,7 @@ private fun topViewController(): UIViewController? {
 
 /** Hoja con un `UIDatePicker` en calendario, "Cancelar" y "Listo", en español de Perú. */
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-private class DatePickerViewController(
+internal class DatePickerViewController(
     private val initial: LocalDate?,
     private val max: LocalDate?,
     private val onDone: (LocalDate) -> Unit,
