@@ -136,20 +136,23 @@ fun HomeScreen(
                 modifier = Modifier.semantics { heading() },
             )
 
-            val vaccines = pluralStringResource(Res.plurals.home_vaccines_count, state.vaccineCount, state.vaccineCount)
-            Text(
-                if (state.toConfirm > 0) {
-                    stringResource(
-                        Res.string.home_summary,
-                        vaccines,
-                        pluralStringResource(Res.plurals.home_to_confirm_count, state.toConfirm, state.toConfirm),
-                    )
-                } else {
-                    vaccines
-                },
-                style = BestIdTheme.typography.body,
-                color = BestIdTheme.colors.muted,
-            )
+            // Con 0 vacunas el saludo ya pide registrarlas; el contador "0 vacunas" sobraba.
+            if (state.vaccineCount > 0) {
+                val vaccines = pluralStringResource(Res.plurals.home_vaccines_count, state.vaccineCount, state.vaccineCount)
+                Text(
+                    if (state.toConfirm > 0) {
+                        stringResource(
+                            Res.string.home_summary,
+                            vaccines,
+                            pluralStringResource(Res.plurals.home_to_confirm_count, state.toConfirm, state.toConfirm),
+                        )
+                    } else {
+                        vaccines
+                    },
+                    style = BestIdTheme.typography.body,
+                    color = BestIdTheme.colors.muted,
+                )
+            }
 
             if (state.remindersBlocked) {
                 PermissionCard(
