@@ -66,6 +66,7 @@ import com.bestid.feature.home.resources.home_greeting_due
 import com.bestid.feature.home.resources.home_greeting_ok
 import com.bestid.feature.home.resources.home_greeting_overdue
 import com.bestid.feature.home.resources.home_greeting_overdue_care
+import com.bestid.feature.home.resources.home_greeting_review
 import com.bestid.feature.home.resources.home_greeting_start
 import com.bestid.feature.home.resources.home_last_vaccine
 import com.bestid.feature.home.resources.home_next
@@ -125,6 +126,7 @@ fun HomeScreen(
                 state.vaccineCount == 0 -> Res.string.home_greeting_start
                 overdue is Upcoming.Vaccine -> Res.string.home_greeting_overdue
                 overdue is Upcoming.Care -> Res.string.home_greeting_overdue_care
+                due is Upcoming.Vaccine && !due.record.nextDateConfirmed -> Res.string.home_greeting_review
                 due != null && due.daysLeft <= 7 -> Res.string.home_greeting_due
                 else -> Res.string.home_greeting_ok
             }

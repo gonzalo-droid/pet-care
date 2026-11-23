@@ -7,6 +7,7 @@
     <string name="home_greeting_due">¡Hola! A %1$s le toca pronto</string>
     <string name="home_greeting_overdue">¡Hola! %1$s tiene una vacuna pendiente</string>
     <string name="home_greeting_overdue_care">¡Hola! %1$s tiene un cuidado atrasado</string>
+    <string name="home_greeting_review">¡Hola! Confirma la próxima fecha de %1$s</string>
     <string name="home_greeting_start">¡Hola! Registra las vacunas de %1$s</string>
     <string name="home_next">Próximo</string>
     <plurals name="home_days_unit">
