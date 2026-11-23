@@ -584,7 +584,7 @@ Las fotos originales las tiene Gonzalo; pedírselas para el conjunto de pruebas.
 
 | # | Pregunta | Valor por defecto mientras tanto |
 |---|---|---|
-| 1 | Revisión de marca de BestID en INDECOPI, dominio y redes | "BestID: cartilla de tu mascota". ID de la app: `com.bestid.app` `[Decidido]` |
+| 1 | Revisión de marca de BestID en INDECOPI, dominio y redes | "BestID: cartilla de tu mascota". ID de la app: `com.nekodojo.bestid` `[Decidido]` (D45) |
 | 2 | Confirmar Firebase AI Logic con Gemini y presupuesto mensual de lectura | Firebase AI Logic; decidir el modelo tras la prueba con 10 cartillas |
 | 3 | A nombre de quién van las cuentas de Google Play, Apple y Firebase | Gonzalo |
 | 4 | Herramienta de analítica | Sin analítica por ahora `[Decidido]` |

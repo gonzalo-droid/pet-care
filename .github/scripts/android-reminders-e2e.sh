@@ -6,7 +6,7 @@
 set -euo pipefail
 OUT="${1:-build/android-e2e}"
 mkdir -p "$OUT"
-PKG=com.bestid.app
+PKG=com.nekodojo.bestid
 APK=androidApp/build/outputs/apk/debug/androidApp-debug.apk
 
 tags() { adb shell dumpsys notification --noredact | grep -o "pkg=$PKG[^|]*tag=test:[0-9]*" | grep -o 'test:[0-9]*' | sort -u || true; }
@@ -37,12 +37,12 @@ wait_boot() {
 
 adb install -r "$APK"
 adb shell pm grant "$PKG" android.permission.POST_NOTIFICATIONS
-adb shell am start -W -n "$PKG/.MainActivity"
+adb shell am start -W -n "$PKG/com.bestid.app.MainActivity"
 sleep 5
 
 echo "== 1. Aviso con la app cerrada"
 seen="$(tags)"
-adb shell am broadcast -n "$PKG/.DebugTestReminderReceiver" --el seconds 60
+adb shell am broadcast -n "$PKG/com.bestid.app.DebugTestReminderReceiver" --el seconds 60
 sleep 5
 echo "Alarmas de la app: $(adb shell dumpsys alarm | grep -c "$PKG" || true)"
 adb shell input keyevent KEYCODE_HOME
@@ -68,7 +68,7 @@ fi
 
 echo "== 2. Aviso después de reiniciar"
 seen="$(tags)"
-adb shell am broadcast -n "$PKG/.DebugTestReminderReceiver" --el seconds 240
+adb shell am broadcast -n "$PKG/com.bestid.app.DebugTestReminderReceiver" --el seconds 240
 sleep 5
 adb reboot
 wait_boot

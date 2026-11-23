@@ -34,7 +34,7 @@ En tu Mac, con la rama al día:
    ```
    Queda en `androidApp/build/outputs/bundle/release/androidApp-release.aab`.
 4. En Play Console:
-   1. Crear la app `com.bestid.app` con la ficha de `docs/store/google-play.md`.
+   1. Crear la app `com.nekodojo.bestid` con la ficha de `docs/store/google-play.md`.
    2. Activar la firma de apps de Google Play (Google guarda la llave final y tú la de subida).
    3. Completar "Seguridad de los datos" y "Contenido de la app".
    4. En **Pruebas → Prueba interna**: subir el `.aab`, crear la lista de testers (correos de Gmail) y compartir el enlace de participación.
@@ -45,7 +45,7 @@ En tu Mac, con la rama al día:
    - completar `TEAM_ID`;
    - subir `CURRENT_PROJECT_VERSION` en cada subida;
    - `MARKETING_VERSION` es la versión visible.
-2. En App Store Connect, crear la app con el bundle `com.bestid.app` y la ficha de `docs/store/app-store.md`.
+2. En App Store Connect, crear la app con el bundle `com.nekodojo.bestid` y la ficha de `docs/store/app-store.md`.
 3. En Xcode:
    1. Elegir **Any iOS Device (arm64)**.
    2. Ir a **Product → Archive** y luego **Distribute App → App Store Connect → Upload**. La primera compilación de Kotlin/Native tarda varios minutos.

@@ -8,7 +8,7 @@ Borrador para App Store Connect. Mercado: solo Perú (sección 20). Idioma princ
 |---|---|
 | Nombre (máx. 30) | BestID: cartilla de tu mascota |
 | Subtítulo (máx. 30) | Vacunas y avisos de tu mascota |
-| Bundle ID | `com.bestid.app` (en `iosApp/Configuration/Config.xcconfig`) |
+| Bundle ID | `com.nekodojo.bestid` (en `iosApp/Configuration/Config.xcconfig`) |
 | Categoría principal | Estilo de vida; secundaria: Medicina |
 | Precio | Gratis |
 | Clasificación por edad | 4+ |

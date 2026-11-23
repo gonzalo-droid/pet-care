@@ -21,7 +21,7 @@ android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.bestid.app"
+        applicationId = "com.nekodojo.bestid"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         // Sube versionCode en cada subida a Google Play: ./gradlew :androidApp:bundleRelease -Pbestid.versionCode=2

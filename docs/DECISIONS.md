@@ -2,6 +2,11 @@
 
 Registro de decisiones tomadas durante el desarrollo que cambian o precisan `SYSTEM_DESIGN.md`. La más reciente va arriba. Cada una dice quién la tomó y en qué hito.
 
+## 2026-11-23 · ID de la app
+
+### D45. ID de la app `com.nekodojo.bestid` `[Decidido por Gonzalo]`
+Reemplaza a D11 (`com.bestid.app`). Es el `applicationId` de Android, el `BUNDLE_ID` de iOS y el prefijo de la tarea en segundo plano de iOS (`com.nekodojo.bestid.refresh`). El paquete de Kotlin y el `namespace` de Android siguen siendo `com.bestid.*`, así que en `adb` la actividad se nombra completa: `com.nekodojo.bestid/com.bestid.app.MainActivity`. Las apps con el ID anterior no se actualizan: son otra app.
+
 ## 2026-11-20 · Pulido visual
 
 ### D44. Pulido visual sobre la base del prototipo `[Decidido por Gonzalo]`
@@ -206,7 +211,7 @@ El modelo devuelve `{"id": "custom", "label": "..."}`. Al confirmar en O4 se bus
 ### D10. Fuente Nunito estática `[Propuesta]`
 Google Fonts publica Nunito solo como fuente variable. Se generaron instancias estáticas 500, 700 y 800 con `fonttools varLib.instancer` para que el peso se vea igual en Android e iOS. Licencia OFL en `docs/licenses/`.
 
-### D11. ID de la app `com.bestid.app` `[Decidido por Gonzalo]`
+### D11. ID de la app `com.bestid.app` `[Decidido por Gonzalo]` · reemplazada por D45
 Android `applicationId` y `BUNDLE_ID` de iOS. Reemplaza el valor por defecto `pe.<dominio>.bestid` de la sección 20.
 
 ### D12. Sentry fuera de M0 `[Decidido por Gonzalo]`

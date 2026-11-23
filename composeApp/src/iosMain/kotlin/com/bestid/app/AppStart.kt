@@ -15,7 +15,7 @@ import platform.BackgroundTasks.BGTaskScheduler
 import platform.Foundation.NSDate
 import platform.Foundation.dateWithTimeIntervalSinceNow
 
-private const val REFRESH_TASK_ID = "com.bestid.app.refresh"
+private const val REFRESH_TASK_ID = "com.nekodojo.bestid.refresh"
 private const val REFRESH_INTERVAL_SECONDS = 12.0 * 60 * 60
 private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
