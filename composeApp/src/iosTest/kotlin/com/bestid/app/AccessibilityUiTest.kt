@@ -108,6 +108,16 @@ class AccessibilityUiTest {
         waitUntil(timeoutMillis = 10_000) { onAllNodes(hasText(text, substring = true)).fetchSemanticsNodes().isNotEmpty() }
     }
 
+    /**
+     * Corte real: se sale en alto, alguna línea lleva elipsis o el texto sin salto de línea es más ancho que su caja.
+     * No basta `hasVisualOverflow`: con `TextAlign.Center` y ancho ajustado al contenido (los botones),
+     * el párrafo se arma al ancho máximo y queda "más ancho" que el texto aunque se vea completo.
+     */
+    private fun TextLayoutResult.isCut(): Boolean =
+        didOverflowHeight ||
+            (0 until lineCount).any { isLineEllipsized(it) } ||
+            (!layoutInput.softWrap && multiParagraph.intrinsics.maxIntrinsicWidth > size.width)
+
     private fun ComposeUiTest.checkScreen(screen: String) {
         waitForIdle()
         val problems = mutableListOf<String>()
@@ -116,7 +126,7 @@ class AccessibilityUiTest {
         onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsActions.GetTextLayoutResult)).fetchSemanticsNodes().forEach { node ->
             val layouts = mutableListOf<TextLayoutResult>()
             node.config.getOrNull(SemanticsActions.GetTextLayoutResult)?.action?.invoke(layouts)
-            layouts.filter { it.hasVisualOverflow }.forEach {
+            layouts.filter { it.isCut() }.forEach {
                 problems += "texto cortado: \"${it.layoutInput.text}\""
             }
         }
