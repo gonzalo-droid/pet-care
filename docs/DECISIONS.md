@@ -2,6 +2,14 @@
 
 Registro de decisiones tomadas durante el desarrollo que cambian o precisan `SYSTEM_DESIGN.md`. La más reciente va arriba. Cada una dice quién la tomó y en qué hito.
 
+## 2026-11-23 · Bienvenida en tres páginas y transiciones
+
+### D46. Bienvenida (O1) en tres páginas `[Decidido por Gonzalo]`
+Cambia O1 de la sección 4: en lugar de una sola pantalla, tres páginas deslizables con indicador. 1) Qué es: "La cartilla de tu mascota, siempre a la mano". 2) Qué guarda: vacunas, desparasitaciones y peso, sin internet, ficha en PDF. 3) Avisos, con un aviso de ejemplo, y las acciones de siempre ("Empezar con su cartilla", "Empezar sin cartilla", "Tengo un respaldo"). Las dos primeras tienen "Siguiente" y "Saltar" (va a la tercera). Se muestra siempre que no hay mascotas, también después de "Borrar todos los datos". No promete la lectura automática de la cartilla (D29).
+
+### D47. Transiciones `[Propuesta]`
+Entre pestañas, fundido corto (sale en 90 ms y la nueva entra en 210 ms), sin desplazamiento: el predeterminado de Navigation en iOS es el "push" con sombra, pensado para entrar a un detalle. Los formularios y detalles mantienen el predeterminado de cada plataforma. La barra inferior no muestra el recuadro de pulsación: la respuesta es el fondo de la pestaña, que aparece con un fundido.
+
 ## 2026-11-23 · ID de la app
 
 ### D45. ID de la app `com.nekodojo.bestid` `[Decidido por Gonzalo]`
