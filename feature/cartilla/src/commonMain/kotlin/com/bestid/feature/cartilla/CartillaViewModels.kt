@@ -1,5 +1,7 @@
 package com.bestid.feature.cartilla
 
+import com.bestid.core.ui.attempt
+import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bestid.core.domain.port.AppClock
@@ -43,6 +45,8 @@ data class CartillaState(
     val records: List<VaccineRecord> = emptyList(),
     val types: Map<String, VaccineType> = emptyMap(),
     val nextDue: NextDue? = null,
+    /** Registros con la fecha próxima o algún tipo sin confirmar (igual que Inicio). */
+    val toConfirm: Int = 0,
 )
 
 /** Cartilla (C1): registros de la mascota seleccionada, del más reciente al más antiguo. */
@@ -68,6 +72,7 @@ class CartillaViewModel(
                             records = records,
                             types = types.associateBy { it.id },
                             nextDue = NextDueCalculator.nextDue(records, clock.today()),
+                            toConfirm = records.count { (it.nextDate != null && !it.nextDateConfirmed) || it.typeIdsToConfirm.isNotEmpty() },
                         )
                     }
                 }
@@ -105,6 +110,10 @@ class VaccineDetailViewModel(
     getPhotos: GetPhotos,
 ) : ViewModel() {
     private val deleted = MutableStateFlow<String?>(null)
+    private val _deleteFailed = MutableStateFlow(false)
+
+    /** No se pudo eliminar: la vacuna sigue y se muestra el aviso. */
+    val deleteFailed: StateFlow<Boolean> = _deleteFailed.asStateFlow()
 
     private val retryDetailState = Retry()
 
@@ -142,8 +151,12 @@ class VaccineDetailViewModel(
 
     fun delete() {
         viewModelScope.launch {
-            deleteRecord(recordId)
-            deleted.update { recordId }
+            attempt { deleteRecord(recordId) }
+                .onSuccess {
+                    _deleteFailed.value = false
+                    deleted.update { recordId }
+                }
+                .onFailure { _deleteFailed.value = true }
         }
     }
 }

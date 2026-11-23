@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -49,9 +50,15 @@ import com.bestid.core.designsystem.preview.PreviewSurface
 import com.bestid.core.designsystem.resources.Res
 import com.bestid.core.designsystem.resources.ds_add_pet
 import com.bestid.core.designsystem.resources.ds_change_pet
-import com.bestid.core.designsystem.resources.ds_id_card_brand
+import com.bestid.core.designsystem.resources.ds_id_card_title
 import com.bestid.core.designsystem.resources.ds_id_card_next
-import com.bestid.core.designsystem.resources.ds_id_card_vaccines
+import com.bestid.core.designsystem.theme.isLargeFont
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.text.style.TextAlign
+import org.jetbrains.compose.resources.DrawableResource
 import com.bestid.core.designsystem.resources.ds_pet_photo
 import com.bestid.core.designsystem.resources.ds_pets_title
 import com.bestid.core.designsystem.theme.BestIdTheme
@@ -150,9 +157,9 @@ fun PetSelector(
     Row(
         modifier = modifier
             .heightIn(min = BestIdTheme.sizes.secondaryButton)
+            .shadow(BestIdTheme.elevation.card, BestIdTheme.shapes.pill, ambientColor = colors.shadow, spotColor = colors.shadow)
             .clip(BestIdTheme.shapes.pill)
             .background(colors.surface, BestIdTheme.shapes.pill)
-            .border(BorderStroke(BestIdTheme.sizes.border, colors.line), BestIdTheme.shapes.pill)
             .clickable(role = Role.Button, onClick = { open = true })
             .semantics { contentDescription = description }
             .padding(start = BestIdTheme.spacing.xxs, end = BestIdTheme.spacing.sm, top = BestIdTheme.spacing.xxs, bottom = BestIdTheme.spacing.xxs),
@@ -166,6 +173,8 @@ fun PetSelector(
             color = colors.ink,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
+            // Sin fill: el chip sigue al ancho del nombre, pero un nombre largo no empuja la flecha fuera.
+            modifier = Modifier.weight(1f, fill = false),
         )
         Icon(painterResource(BestIdIcons.ExpandMore), contentDescription = null, tint = colors.muted)
     }
@@ -284,67 +293,168 @@ fun PetPhotoPicker(
 }
 
 /**
- * Carnet BestID de la pestaña Mascota (y base de la ficha en PDF): encabezado verde con la marca,
- * foto, datos y franja con número de vacunas y próxima fecha.
+ * Carnet BestID de la pestaña Mascota: encabezado verde con trama de puntos y la marca, foto que lo
+ * monta con aro blanco, nombre y [subtitle] ("Gata · Hembra"), [details] en dos columnas (una con
+ * letra grande), [completion] opcional (por ejemplo, la fila "Faltan…"), separador perforado y pie
+ * con [vaccineCount] ("2 vacunas") y la próxima fecha.
  */
 @Composable
 fun PetIdCard(
     name: String,
     photo: String?,
     species: AvatarSpecies,
+    subtitle: String,
     details: List<Pair<String, String>>,
     vaccineCount: String,
     nextDate: String,
+    completion: (@Composable () -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val colors = BestIdTheme.colors
+    val sizes = BestIdTheme.sizes
+    val spacing = BestIdTheme.spacing
     val shape = BestIdTheme.shapes.cardLarge
+    val largeFont = isLargeFont()
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .shadow(BestIdTheme.elevation.card, shape, ambientColor = colors.shadow, spotColor = colors.shadow)
             .clip(shape)
-            .background(colors.surface, shape)
-            .border(BorderStroke(BestIdTheme.sizes.border, colors.line), shape),
+            .background(colors.surface, shape),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .heightIn(min = sizes.idCardHeader)
                 .background(colors.primary)
-                .padding(horizontal = BestIdTheme.spacing.lg, vertical = BestIdTheme.spacing.sm),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs),
+                .drawBehind {
+                    val step = sizes.idCardDots.toPx()
+                    val start = sizes.idCardDotOffset.toPx()
+                    val radius = sizes.idCardDotRadius.toPx()
+                    var y = start
+                    while (y < size.height + step) {
+                        var x = start
+                        while (x < size.width + step) {
+                            drawCircle(colors.idCardDot, radius = radius, center = Offset(x, y))
+                            x += step
+                        }
+                        y += step
+                    }
+                }
+                .padding(horizontal = spacing.lg, vertical = spacing.sm),
+            horizontalArrangement = Arrangement.spacedBy(spacing.sm),
         ) {
-            Icon(painterResource(BestIdIcons.PetsFilled), contentDescription = null, tint = colors.onPrimary)
-            Text(stringResource(Res.string.ds_id_card_brand), style = BestIdTheme.typography.card, color = colors.onPrimary)
+            BrandLogo(style = BestIdTheme.typography.subtitle, onPrimary = true)
+            Text(
+                stringResource(Res.string.ds_id_card_title),
+                style = BestIdTheme.typography.eyebrow,
+                color = colors.onPrimary,
+                textAlign = TextAlign.End,
+                modifier = Modifier.weight(1f).padding(top = spacing.xxs),
+            )
         }
-        Row(
-            modifier = Modifier.padding(BestIdTheme.spacing.lg),
-            horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.md),
+        Column(
+            modifier = Modifier.padding(start = spacing.lg, end = spacing.lg, bottom = spacing.md),
+            verticalArrangement = Arrangement.spacedBy(spacing.sm),
         ) {
-            PetAvatar(photo, species, name, size = AvatarSize.LARGE)
-            Column(modifier = Modifier.weight(1f)) {
-                Text(name, style = BestIdTheme.typography.title, color = colors.ink, modifier = Modifier.semantics { heading() })
-                details.forEach { (label, value) -> ListRow(label, value) }
+            val avatar: @Composable () -> Unit = {
+                Box(Modifier.background(colors.surface, BestIdTheme.shapes.pill).padding(sizes.idCardRing)) {
+                    PetAvatar(photo, species, name, size = AvatarSize.LARGE)
+                }
             }
+            val identity: @Composable (Modifier) -> Unit = { m ->
+                Column(m.padding(bottom = spacing.xxs)) {
+                    Text(name, style = BestIdTheme.typography.title, color = colors.ink, modifier = Modifier.semantics { heading() })
+                    Text(subtitle, style = BestIdTheme.typography.body, color = colors.muted)
+                }
+            }
+            if (largeFont) {
+                Box(Modifier.liftBy(sizes.idCardAvatarLift)) { avatar() }
+                identity(Modifier)
+            } else {
+                Row(
+                    modifier = Modifier.liftBy(sizes.idCardAvatarLift),
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.spacedBy(spacing.md),
+                ) {
+                    avatar()
+                    identity(Modifier.weight(1f))
+                }
+            }
+            val columns = if (largeFont) 1 else 2
+            details.chunked(columns).forEach { row ->
+                Row(horizontalArrangement = Arrangement.spacedBy(spacing.md)) {
+                    row.forEach { (label, value) ->
+                        Column(Modifier.weight(1f).semantics(mergeDescendants = true) {}) {
+                            Eyebrow(label)
+                            Text(value, style = BestIdTheme.typography.bodyStrong, color = colors.ink)
+                        }
+                    }
+                    repeat(columns - row.size) { Box(Modifier.weight(1f)) }
+                }
+            }
+            completion?.invoke()
         }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(colors.primarySoft)
-                .padding(horizontal = BestIdTheme.spacing.lg, vertical = BestIdTheme.spacing.sm),
-            horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.md),
-        ) {
-            IdStripItem(stringResource(Res.string.ds_id_card_vaccines), vaccineCount, Modifier.weight(1f))
-            IdStripItem(stringResource(Res.string.ds_id_card_next), nextDate, Modifier.weight(1f))
+        PerforatedDivider()
+        val next = stringResource(Res.string.ds_id_card_next, nextDate)
+        val footer: @Composable (Modifier, Modifier) -> Unit = { first, second ->
+            IdFooterItem(BestIdIcons.CheckCircle, vaccineCount, first)
+            IdFooterItem(BestIdIcons.Calendar, next, second)
+        }
+        if (largeFont) {
+            Column(Modifier.padding(horizontal = spacing.lg, vertical = spacing.md), verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
+                footer(Modifier, Modifier)
+            }
+        } else {
+            Row(Modifier.padding(horizontal = spacing.lg, vertical = spacing.md), horizontalArrangement = Arrangement.spacedBy(spacing.md)) {
+                footer(Modifier.weight(1f), Modifier.weight(1f))
+            }
         }
     }
 }
 
+/** Sube el contenido [lift] sin dejar el hueco abajo (el avatar monta el encabezado). */
+private fun Modifier.liftBy(lift: Dp): Modifier = layout { measurable, constraints ->
+    val placeable = measurable.measure(constraints)
+    val px = lift.roundToPx()
+    layout(placeable.width, (placeable.height - px).coerceAtLeast(0)) { placeable.place(0, -px) }
+}
+
+/** Línea punteada de borde a borde con dos muescas del color del fondo, como un boleto. */
 @Composable
-private fun IdStripItem(label: String, value: String, modifier: Modifier) {
-    Column(modifier = modifier) {
-        Text(label, style = BestIdTheme.typography.label, color = BestIdTheme.colors.primaryInk)
-        Text(value, style = BestIdTheme.typography.body, color = BestIdTheme.colors.primaryInk)
+private fun PerforatedDivider() {
+    val colors = BestIdTheme.colors
+    val stroke = BestIdTheme.sizes.border
+    val dash = BestIdTheme.spacing.xs
+    val gap = BestIdTheme.spacing.xxs
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .height(BestIdTheme.sizes.idCardNotch)
+            .drawBehind {
+                val mid = size.height / 2
+                drawLine(
+                    colors.line,
+                    Offset(0f, mid),
+                    Offset(size.width, mid),
+                    strokeWidth = stroke.toPx(),
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(dash.toPx(), gap.toPx())),
+                )
+                drawCircle(colors.bg, radius = mid, center = Offset(0f, mid))
+                drawCircle(colors.bg, radius = mid, center = Offset(size.width, mid))
+            },
+    )
+}
+
+@Composable
+private fun IdFooterItem(icon: DrawableResource, text: String, modifier: Modifier) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs),
+    ) {
+        Icon(painterResource(icon), contentDescription = null, tint = BestIdTheme.colors.primary, modifier = Modifier.size(BestIdTheme.sizes.iconSmall))
+        Text(text, style = BestIdTheme.typography.bodyStrong, color = BestIdTheme.colors.ink)
     }
 }
 
@@ -367,12 +477,11 @@ private fun PetPreview() = PreviewSurface {
         name = PreviewData.PET_NAME,
         photo = null,
         species = AvatarSpecies.CAT,
-        details = listOf(
-            PreviewData.ID_SPECIES to PreviewData.SPECIES.first(),
-            PreviewData.ID_SEX to PreviewData.SEX.first(),
-        ),
+        subtitle = PreviewData.ID_SUBTITLE,
+        details = listOf(PreviewData.ID_OWNER to PreviewData.ID_OWNER_NAME),
         vaccineCount = PreviewData.ID_VACCINES,
         nextDate = PreviewData.ID_NEXT,
+        completion = { ProgressRow(PreviewData.ID_MISSING, 0.25f, PreviewData.ID_COMPLETE, onClick = {}) },
     )
 }
 
@@ -389,7 +498,9 @@ private fun PetLongTextPreview() = PreviewSurface {
         name = PreviewData.LONG_TEXT,
         photo = null,
         species = AvatarSpecies.DOG,
-        details = listOf(PreviewData.ID_BIRTH to PreviewData.LONG_TEXT),
+        subtitle = PreviewData.LONG_TEXT,
+        details = listOf(PreviewData.ID_BIRTH to PreviewData.LONG_TEXT, PreviewData.ID_OWNER to PreviewData.ID_OWNER_NAME),
+        completion = { ProgressRow(PreviewData.ID_MISSING, 0.5f, PreviewData.ID_COMPLETE, onClick = {}) },
         vaccineCount = PreviewData.ID_VACCINES,
         nextDate = PreviewData.LONG_TEXT,
     )

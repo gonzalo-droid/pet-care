@@ -6,6 +6,7 @@
     <string name="home_greeting_ok">¡Hola! %1$s está al día</string>
     <string name="home_greeting_due">¡Hola! A %1$s le toca pronto</string>
     <string name="home_greeting_overdue">¡Hola! %1$s tiene una vacuna pendiente</string>
+    <string name="home_greeting_overdue_care">¡Hola! %1$s tiene un cuidado atrasado</string>
     <string name="home_greeting_start">¡Hola! Registra las vacunas de %1$s</string>
     <string name="home_next">Próximo</string>
     <plurals name="home_days_unit">
@@ -13,8 +14,6 @@
         <item quantity="other">días</item>
     </plurals>
     <string name="home_today">Hoy</string>
-    <string name="home_overdue_days">Atrasada hace %1$s</string>
-    <string name="home_next_line">%1$s · %2$s</string>
     <string name="home_no_next">Sin próximas vacunas registradas</string>
     <string name="home_no_next_body">Al registrar una vacuna con su próxima fecha, verás aquí cuántos días faltan.</string>
     <string name="home_last_vaccine">Última vacuna</string>
@@ -25,4 +24,26 @@
     <string name="home_add_weight">Agregar peso</string>
     <string name="home_permission_title">Los avisos están desactivados</string>
     <string name="home_permission_body">Actívalos en los ajustes del teléfono para saber cuándo le toca la próxima vacuna o cuidado.</string>
+    <string name="home_open_vaccine">Ver la vacuna</string>
+    <string name="home_open_detail">Ver detalle</string>
+    <string name="home_summary">%1$s · %2$s</string>
+    <plurals name="home_vaccines_count">
+        <item quantity="one">%1$d vacuna registrada</item>
+        <item quantity="other">%1$d vacunas registradas</item>
+    </plurals>
+    <plurals name="home_to_confirm_count">
+        <item quantity="one">%1$d dato por confirmar</item>
+        <item quantity="other">%1$d datos por confirmar</item>
+    </plurals>
+    <string name="home_year_to_confirm">! Año por confirmar</string>
+    <plurals name="home_days_overdue_unit">
+        <item quantity="one">día tarde</item>
+        <item quantity="other">días tarde</item>
+    </plurals>
+    <string name="home_next_a11y">Próxima: %1$s, %2$s, en %3$s</string>
+    <string name="home_next_a11y_today">Próxima: %1$s, %2$s, hoy</string>
+    <string name="home_next_a11y_overdue">Próxima: %1$s, %2$s, atrasada hace %3$s</string>
+    <string name="home_next_a11y_unconfirmed">%1$s. Año por confirmar</string>
+    <string name="home_year_unreadable">Revisa el año de la próxima dosis.</string>
+    <string name="home_confirm">Confirmar</string>
 </resources>

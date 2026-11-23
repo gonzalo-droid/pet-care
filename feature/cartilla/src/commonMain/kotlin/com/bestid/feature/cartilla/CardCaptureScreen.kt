@@ -132,6 +132,7 @@ fun CardCaptureScreen(
         title = stringResource(Res.string.capture_title),
         onClose = onClose,
         closeDescription = stringResource(Res.string.form_close),
+        confirmDiscard = state.pages.isNotEmpty(),
         bottomAction = {
             Column(verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs)) {
                 if (state.pages.isNotEmpty()) {

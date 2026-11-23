@@ -18,6 +18,10 @@ data class BestIdSpacing(
     val screen: Dp = 20.dp,
 )
 
+/** Elevación de las superficies: sombra suave en lugar de borde. */
+@Immutable
+data class BestIdElevation(val card: Dp = 6.dp)
+
 /** Tamaños de la sección 7: alto táctil mínimo 48, botón principal 58, secundario 52, íconos 24. */
 @Immutable
 data class BestIdSizes(
@@ -36,4 +40,20 @@ data class BestIdSizes(
     val illustration: Dp = 120.dp,
     val border: Dp = 2.dp,
     val chartHeight: Dp = 200.dp,
+    val ring: Dp = 112.dp,
+    val ringStroke: Dp = 10.dp,
+    val dateTile: Dp = 52.dp,
+    /** Cuadro con el ícono de una StatCard. */
+    val statIcon: Dp = 34.dp,
+    val actionPill: Dp = 40.dp,
+    val rail: Dp = 2.dp,
+    /** Carnet: alto del encabezado verde, cuánto lo monta el avatar, aro del avatar, paso de la trama y muescas. */
+    val idCardHeader: Dp = 96.dp,
+    val idCardAvatarLift: Dp = 44.dp,
+    val idCardRing: Dp = 5.dp,
+    val idCardDots: Dp = 44.dp,
+    /** Radio de cada punto de la trama y su distancia al borde de la celda. */
+    val idCardDotRadius: Dp = 7.dp,
+    val idCardDotOffset: Dp = 20.dp,
+    val idCardNotch: Dp = 20.dp,
 )

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -21,21 +22,29 @@ import org.jetbrains.compose.resources.stringResource
 
 /** Marca "Best ID" del prototipo: "Best" en tinta e "ID" en una pastilla verde (Bienvenida). */
 @Composable
-fun BrandLogo(modifier: Modifier = Modifier) {
+fun BrandLogo(
+    modifier: Modifier = Modifier,
+    style: TextStyle = BestIdTheme.typography.display,
+    /** Sobre fondo verde (carnet): "Best" en blanco y la pastilla "ID" blanca con texto verde. */
+    onPrimary: Boolean = false,
+) {
     val colors = BestIdTheme.colors
+    val ink = if (onPrimary) colors.onPrimary else colors.ink
+    val pill = if (onPrimary) colors.onPrimary else colors.primary
+    val pillText = if (onPrimary) colors.primary else colors.onPrimary
     val name = stringResource(Res.string.ds_brand_name)
     Row(
         modifier = modifier.clearAndSetSemantics { contentDescription = name },
         horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(stringResource(Res.string.ds_brand_best), style = BestIdTheme.typography.display, color = colors.ink)
+        Text(stringResource(Res.string.ds_brand_best), style = style, color = ink)
         Text(
             stringResource(Res.string.ds_brand_id),
-            style = BestIdTheme.typography.display,
-            color = colors.onPrimary,
+            style = style,
+            color = pillText,
             modifier = Modifier
-                .background(colors.primary, BestIdTheme.shapes.field)
+                .background(pill, BestIdTheme.shapes.field)
                 .padding(horizontal = BestIdTheme.spacing.xs),
         )
     }

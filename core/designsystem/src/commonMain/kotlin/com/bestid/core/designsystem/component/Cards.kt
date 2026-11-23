@@ -1,18 +1,23 @@
 package com.bestid.core.designsystem.component
 
-import androidx.compose.foundation.BorderStroke
+import com.bestid.core.designsystem.theme.isLargeFont
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +25,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
@@ -33,22 +39,25 @@ import com.bestid.core.designsystem.theme.BestIdTheme
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
-/** Tarjeta base de superficie blanca con borde `line`. Tocable si recibe [onClick]. */
+/** Tarjeta base de superficie blanca con sombra suave. Tocable si recibe [onClick]. */
 @Composable
 fun PlainCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     onClickLabel: String? = null,
+    /** Chevron a la derecha: distingue una tarjeta que abre otra pantalla de una informativa. */
+    showChevron: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = BestIdTheme.colors
     BaseCard(
         container = colors.surface,
         contentColor = colors.ink,
-        border = colors.line,
+        elevated = true,
         modifier = modifier,
         onClick = onClick,
         onClickLabel = onClickLabel,
+        showChevron = showChevron,
         content = content,
     )
 }
@@ -59,10 +68,11 @@ fun InfoCard(
     modifier: Modifier = Modifier,
     icon: DrawableResource? = BestIdIcons.Info,
     onClick: (() -> Unit)? = null,
+    onClickLabel: String? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = BestIdTheme.colors
-    BaseCard(colors.primarySoft, colors.primaryInk, null, modifier, onClick, null, BestIdTheme.shapes.cardLarge) {
+    BaseCard(colors.primarySoft, colors.primaryInk, false, modifier, onClick, onClickLabel, BestIdTheme.shapes.cardLarge) {
         IconRow(icon = icon, tint = colors.primaryInk, content = content)
     }
 }
@@ -73,15 +83,16 @@ fun AlertCard(
     modifier: Modifier = Modifier,
     icon: DrawableResource = BestIdIcons.Warning,
     onClick: (() -> Unit)? = null,
+    onClickLabel: String? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = BestIdTheme.colors
-    BaseCard(colors.alert, colors.alertInk, null, modifier, onClick, null) {
+    BaseCard(colors.alert, colors.alertInk, false, modifier, onClick, onClickLabel) {
         IconRow(icon = icon, tint = colors.alertInk, content = content)
     }
 }
 
-/** Dato destacado (última vacuna, último peso) con acción opcional. */
+/** Dato destacado (última vacuna, último peso). La acción opcional es un botón + en la esquina inferior derecha; [actionText] es su nombre para lectores de pantalla. */
 @Composable
 fun StatCard(
     label: String,
@@ -89,15 +100,34 @@ fun StatCard(
     modifier: Modifier = Modifier,
     detail: String? = null,
     onClick: (() -> Unit)? = null,
+    onClickLabel: String? = null,
     actionText: String? = null,
     onAction: (() -> Unit)? = null,
+    icon: DrawableResource? = null,
 ) {
-    PlainCard(modifier = modifier, onClick = onClick) {
+    PlainCard(modifier = modifier, onClick = onClick, onClickLabel = onClickLabel, showChevron = onClick != null) {
+        if (icon != null) {
+            Box(
+                Modifier.size(BestIdTheme.sizes.statIcon).background(BestIdTheme.colors.primarySoft, BestIdTheme.shapes.field),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(painterResource(icon), contentDescription = null, tint = BestIdTheme.colors.primaryInk, modifier = Modifier.size(BestIdTheme.sizes.iconSmall))
+            }
+        }
         Text(label, style = BestIdTheme.typography.support, color = BestIdTheme.colors.muted)
         Text(value, style = BestIdTheme.typography.card, color = BestIdTheme.colors.ink)
         if (detail != null) Text(detail, style = BestIdTheme.typography.support, color = BestIdTheme.colors.muted)
         if (actionText != null && onAction != null) {
-            TextAction(text = actionText, onClick = onAction, icon = BestIdIcons.Add)
+            // Empuja el + a la esquina inferior derecha cuando la tarjeta es más alta que su contenido.
+            Spacer(Modifier.weight(1f))
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomEnd) {
+                IconButton(
+                    onClick = onAction,
+                    modifier = Modifier.size(BestIdTheme.sizes.minTouch).background(BestIdTheme.colors.primary, BestIdTheme.shapes.pill),
+                ) {
+                    Icon(painterResource(BestIdIcons.Add), contentDescription = actionText, tint = BestIdTheme.colors.onPrimary)
+                }
+            }
         }
     }
 }
@@ -108,13 +138,21 @@ fun Eyebrow(text: String, modifier: Modifier = Modifier, color: Color = BestIdTh
     Text(text.uppercase(), style = BestIdTheme.typography.eyebrow, color = color, modifier = modifier)
 }
 
-/** Fila de dos columnas: etiqueta y valor. El valor crece en varias líneas si hace falta. */
+/**
+ * Fila de dos columnas: etiqueta y valor. El valor crece en varias líneas si hace falta; con letra
+ * grande la etiqueta va encima del valor para no partir palabras. Se lee como una sola unidad.
+ */
 @Composable
 fun ListRow(label: String, value: String, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier.fillMaxWidth().padding(vertical = BestIdTheme.spacing.xxs),
-        horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.sm),
-    ) {
+    val rowModifier = modifier.fillMaxWidth().padding(vertical = BestIdTheme.spacing.xxs).semantics(mergeDescendants = true) {}
+    if (isLargeFont()) {
+        Column(modifier = rowModifier) {
+            Text(label, style = BestIdTheme.typography.body, color = BestIdTheme.colors.muted)
+            Text(value, style = BestIdTheme.typography.bodyStrong, color = BestIdTheme.colors.ink)
+        }
+        return
+    }
+    Row(modifier = rowModifier, horizontalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.sm)) {
         Text(label, style = BestIdTheme.typography.body, color = BestIdTheme.colors.muted, modifier = Modifier.weight(1f))
         Text(
             value,
@@ -123,6 +161,30 @@ fun ListRow(label: String, value: String, modifier: Modifier = Modifier) {
             textAlign = TextAlign.End,
             modifier = Modifier.weight(1.4f),
         )
+    }
+}
+
+/**
+ * Dos tarjetas lado a lado (por ejemplo, "Última vacuna" y "Peso" en Inicio), del mismo alto. Con
+ * letra grande se apilan, para que ninguna parta palabras.
+ */
+@Composable
+fun AdaptivePair(
+    first: @Composable (Modifier) -> Unit,
+    second: @Composable (Modifier) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val spacing = Arrangement.spacedBy(BestIdTheme.spacing.sm)
+    if (isLargeFont()) {
+        Column(modifier = modifier.fillMaxWidth(), verticalArrangement = spacing) {
+            first(Modifier.fillMaxWidth())
+            second(Modifier.fillMaxWidth())
+        }
+    } else {
+        Row(modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = spacing) {
+            first(Modifier.weight(1f).fillMaxHeight())
+            second(Modifier.weight(1f).fillMaxHeight())
+        }
     }
 }
 
@@ -164,19 +226,20 @@ fun SectionTitle(text: String, modifier: Modifier = Modifier) {
 internal fun BaseCard(
     container: Color,
     contentColor: Color,
-    border: Color?,
+    elevated: Boolean,
     modifier: Modifier,
     onClick: (() -> Unit)?,
     onClickLabel: String?,
     shape: androidx.compose.ui.graphics.Shape = BestIdTheme.shapes.card,
+    showChevron: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .then(if (elevated) Modifier.shadow(BestIdTheme.elevation.card, shape, ambientColor = BestIdTheme.colors.shadow, spotColor = BestIdTheme.colors.shadow) else Modifier)
             .clip(shape)
             .background(container, shape)
-            .then(if (border != null) Modifier.border(BorderStroke(BestIdTheme.sizes.border, border), shape) else Modifier)
             .then(
                 if (onClick != null) {
                     Modifier
@@ -187,7 +250,20 @@ internal fun BaseCard(
             .padding(BestIdTheme.spacing.md),
         verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs),
     ) {
-        CompositionLocalProvider(LocalContentColor provides contentColor) { content() }
+        CompositionLocalProvider(LocalContentColor provides contentColor) {
+            if (showChevron) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.xs),
+                        content = content,
+                    )
+                    Icon(painterResource(BestIdIcons.ChevronRight), contentDescription = null, tint = BestIdTheme.colors.muted)
+                }
+            } else {
+                content()
+            }
+        }
     }
 }
 

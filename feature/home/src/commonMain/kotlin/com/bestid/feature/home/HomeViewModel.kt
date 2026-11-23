@@ -33,9 +33,15 @@ import kotlinx.datetime.LocalDate
 sealed interface Upcoming {
     val date: LocalDate
     val daysLeft: Int
+    /** Desde cuándo corre la cuenta regresiva (la aplicación o el último cuidado). */
+    val from: LocalDate?
 
-    data class Vaccine(val record: VaccineRecord, override val date: LocalDate, override val daysLeft: Int) : Upcoming
-    data class Care(val task: CareTask, override val date: LocalDate, override val daysLeft: Int) : Upcoming
+    data class Vaccine(val record: VaccineRecord, override val date: LocalDate, override val daysLeft: Int) : Upcoming {
+        override val from: LocalDate get() = record.applicationDate
+    }
+    data class Care(val task: CareTask, override val date: LocalDate, override val daysLeft: Int) : Upcoming {
+        override val from: LocalDate? get() = task.lastDate
+    }
 }
 
 data class HomeState(
@@ -44,7 +50,12 @@ data class HomeState(
     val failed: Boolean = false,
     val pet: Pet? = null,
     val vaccineCount: Int = 0,
+    /** Registros con la fecha próxima o algún tipo sin confirmar. */
+    val toConfirm: Int = 0,
+    val today: LocalDate? = null,
     val upcoming: Upcoming? = null,
+    /** Lo más atrasado (vacuna o cuidado), aunque [upcoming] muestre lo que viene: decide el saludo. */
+    val overdue: Upcoming? = null,
     val lastRecord: VaccineRecord? = null,
     val lastWeight: WeightEntry? = null,
     val types: Map<String, VaccineType> = emptyMap(),
@@ -82,7 +93,10 @@ class HomeViewModel(
                             loading = false,
                             pet = pet,
                             vaccineCount = records.size,
+                            toConfirm = records.count { (it.nextDate != null && !it.nextDateConfirmed) || it.typeIdsToConfirm.isNotEmpty() },
+                            today = today,
                             upcoming = listOfNotNull(vaccine, care).sortedWith(upcomingOrder).firstOrNull(),
+                            overdue = listOfNotNull(vaccine, care).filter { it.daysLeft < 0 }.minByOrNull { it.daysLeft },
                             lastRecord = records.firstOrNull(),
                             lastWeight = weights.lastOrNull(),
                             types = types.associateBy { it.id },

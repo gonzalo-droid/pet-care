@@ -142,6 +142,7 @@ fun ConfirmSheet(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     destructive: Boolean = false,
+    dismissText: String? = null,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -149,7 +150,7 @@ fun ConfirmSheet(
         containerColor = BestIdTheme.colors.bg,
         shape = BestIdTheme.shapes.sheet,
     ) {
-        ConfirmContent(title, body, confirmText, destructive, onConfirm, onDismiss)
+        ConfirmContent(title, body, confirmText, destructive, onConfirm, onDismiss, dismissText)
     }
 }
 
@@ -161,6 +162,7 @@ private fun ConfirmContent(
     destructive: Boolean,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
+    dismissText: String? = null,
 ) {
     Column(
         modifier = Modifier
@@ -175,8 +177,9 @@ private fun ConfirmContent(
             text = confirmText,
             onClick = onConfirm,
             icon = if (destructive) BestIdIcons.Delete else null,
+            destructive = destructive,
         )
-        SecondaryButton(text = stringResource(Res.string.ds_cancel), onClick = onDismiss)
+        SecondaryButton(text = dismissText ?: stringResource(Res.string.ds_cancel), onClick = onDismiss)
     }
 }
 
@@ -225,11 +228,14 @@ fun OptionsSheet(title: String, options: List<SheetOption>, onDismiss: () -> Uni
     }
 }
 
-/** Duración del snackbar "Deshacer" (sección 4). */
-const val UNDO_DURATION_MS: Long = 5_000
+/**
+ * Duración del snackbar "Deshacer". La sección 4 pedía 5 s; se sube a 10 s para que alcance con
+ * lector de pantalla (WCAG 2.2.1). Ver D41.
+ */
+const val UNDO_DURATION_MS: Long = 10_000
 
 /**
- * Muestra un snackbar con "Deshacer" durante 5 segundos.
+ * Muestra un snackbar con "Deshacer" durante [UNDO_DURATION_MS].
  * Devuelve `true` si la persona tocó "Deshacer".
  */
 suspend fun SnackbarHostState.showUndo(message: String, undoLabel: String): Boolean = try {

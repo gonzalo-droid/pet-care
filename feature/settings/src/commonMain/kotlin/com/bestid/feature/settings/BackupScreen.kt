@@ -9,6 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.bestid.core.designsystem.component.AlertCard
 import com.bestid.core.designsystem.component.FlowScaffold
 import com.bestid.core.designsystem.component.InfoCard
@@ -52,6 +53,9 @@ import com.bestid.feature.settings.resources.backup_importing
 import com.bestid.feature.settings.resources.backup_last
 import com.bestid.feature.settings.resources.backup_never
 import com.bestid.feature.settings.resources.backup_share_title
+import com.bestid.feature.settings.resources.backup_continue
+import com.bestid.feature.settings.resources.backup_restore_body
+import com.bestid.feature.settings.resources.backup_restore_title
 import com.bestid.feature.settings.resources.backup_title
 import com.bestid.feature.settings.resources.settings_back
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -128,7 +132,7 @@ class BackupViewModel(
 }
 
 @Composable
-fun BackupScreen(onClose: () -> Unit, viewModel: BackupViewModel = koinViewModel()) {
+fun BackupScreen(onClose: () -> Unit, restore: Boolean = false, viewModel: BackupViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val shareSheet = rememberShareSheet()
     val filePicker = rememberFilePicker(viewModel::importBackup)
@@ -141,30 +145,48 @@ fun BackupScreen(onClose: () -> Unit, viewModel: BackupViewModel = koinViewModel
         }
     }
 
+    val imported = state.message is BackupMessage.Imported
     FlowScaffold(
-        title = stringResource(Res.string.backup_title),
+        title = stringResource(if (restore) Res.string.backup_restore_title else Res.string.backup_title),
         onClose = onClose,
         closeIcon = BestIdIcons.ArrowBack,
         closeDescription = stringResource(Res.string.settings_back),
+        bottomAction = if (restore && imported) {
+            { PrimaryButton(text = stringResource(Res.string.backup_continue), onClick = onClose) }
+        } else {
+            null
+        },
     ) {
-        Text(stringResource(Res.string.backup_body), style = BestIdTheme.typography.body)
-        Text(
-            state.lastExport?.let { stringResource(Res.string.backup_last, it.formatLong()) } ?: stringResource(Res.string.backup_never),
-            style = BestIdTheme.typography.bodyStrong,
-        )
-        PrimaryButton(
-            text = stringResource(Res.string.backup_export),
-            onClick = viewModel::exportBackup,
-            loading = state.exporting,
-            enabled = !state.importing,
-            icon = BestIdIcons.Share,
-        )
-        SecondaryButton(
-            text = stringResource(Res.string.backup_import),
-            onClick = filePicker::pick,
-            loading = state.importing,
-            enabled = !state.exporting,
-        )
+        if (restore) {
+            // Teléfono nuevo, sin datos: solo tiene sentido importar.
+            Text(stringResource(Res.string.backup_restore_body), style = BestIdTheme.typography.body)
+            if (!imported) {
+                PrimaryButton(
+                    text = stringResource(Res.string.backup_import),
+                    onClick = filePicker::pick,
+                    loading = state.importing,
+                )
+            }
+        } else {
+            Text(stringResource(Res.string.backup_body), style = BestIdTheme.typography.body)
+            Text(
+                state.lastExport?.let { stringResource(Res.string.backup_last, it.formatLong()) } ?: stringResource(Res.string.backup_never),
+                style = BestIdTheme.typography.bodyStrong,
+            )
+            PrimaryButton(
+                text = stringResource(Res.string.backup_export),
+                onClick = viewModel::exportBackup,
+                loading = state.exporting,
+                enabled = !state.importing,
+                icon = BestIdIcons.Share,
+            )
+            SecondaryButton(
+                text = stringResource(Res.string.backup_import),
+                onClick = filePicker::pick,
+                loading = state.importing,
+                enabled = !state.exporting,
+            )
+        }
         Text(stringResource(Res.string.backup_import_hint), style = BestIdTheme.typography.support, color = BestIdTheme.colors.muted)
         if (state.exporting) LoadingState(text = stringResource(Res.string.backup_exporting))
         if (state.importing) LoadingState(text = stringResource(Res.string.backup_importing))
@@ -207,7 +229,7 @@ fun NavGraphBuilder.settingsFlows(
     composable<SettingsRoute> {
         SettingsScreen(onClose = onClose, onOpenBackup = onOpenBackup, onOpenCatalog = onOpenCatalog, onDeletedAll = onDeletedAll)
     }
-    composable<BackupRoute> { BackupScreen(onClose = onClose) }
+    composable<BackupRoute> { entry -> BackupScreen(onClose = onClose, restore = entry.toRoute<BackupRoute>().restore) }
 }
 
 val settingsModule = module {

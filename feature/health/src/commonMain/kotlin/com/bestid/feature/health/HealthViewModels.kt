@@ -68,6 +68,10 @@ class HealthViewModel(
 ) : ViewModel() {
     private val permission = MutableStateFlow<NotificationPermission?>(null)
     private val deletedWeight = MutableStateFlow<String?>(null)
+    private val _actionFailed = MutableStateFlow(false)
+
+    /** Falló cambiar un aviso o eliminar un peso: se muestra un aviso y el dato queda como estaba. */
+    val actionFailed: StateFlow<Boolean> = _actionFailed.asStateFlow()
 
     private val retryHealthState = Retry()
 
@@ -95,13 +99,19 @@ class HealthViewModel(
     }
 
     fun setReminder(careId: String, enabled: Boolean) {
-        viewModelScope.launch { setCareReminder(careId, enabled) }
+        viewModelScope.launch {
+            _actionFailed.value = attempt { setCareReminder(careId, enabled) }.isFailure
+        }
     }
 
     fun deleteWeight(id: String) {
         viewModelScope.launch {
-            deleteWeight.invoke(id)
-            deletedWeight.value = id
+            attempt { deleteWeight.invoke(id) }
+                .onSuccess {
+                    _actionFailed.value = false
+                    deletedWeight.value = id
+                }
+                .onFailure { _actionFailed.value = true }
         }
     }
 
@@ -124,6 +134,12 @@ data class CareFormState(
     val reminderEnabled: Boolean = true,
     val errors: List<CareError> = emptyList(),
     val saving: Boolean = false,
+    /** Hay cambios sin guardar: cerrar pregunta antes de descartar. */
+    val dirty: Boolean = false,
+    val loadFailed: Boolean = false,
+    /** Se pidió editar un cuidado que ya no existe (por ejemplo, desde un aviso viejo). */
+    val notFound: Boolean = false,
+    val deleteFailed: Boolean = false,
     val done: Boolean = false,
     /** Primer logro: mostrar la pantalla de permiso de avisos (O5) al cerrar. */
     val askPermission: Boolean = false,
@@ -143,32 +159,50 @@ class CareFormViewModel(
     val state: StateFlow<CareFormState> = _state.asStateFlow()
 
     init {
+        load()
+    }
+
+    fun retryLoad() {
+        _state.update { it.copy(loadFailed = false) }
+        load()
+    }
+
+    private fun edit(transform: (CareFormState) -> CareFormState) = _state.update { transform(it).copy(dirty = true) }
+
+    private fun load() {
         viewModelScope.launch {
-            val care = careId?.let { observeCare(it).first() }
-            _state.value = if (care == null) {
-                CareFormState(loaded = true, petId = observeSelectedPet().first()?.id)
-            } else {
-                CareFormState(
-                    loaded = true,
-                    isEdit = true,
-                    petId = care.petId,
-                    kind = care.kind,
-                    title = care.title.orEmpty(),
-                    lastDate = care.lastDate,
-                    intervalText = care.intervalValue?.toString().orEmpty(),
-                    unit = care.intervalUnit ?: IntervalUnit.MONTH,
-                    reminderEnabled = care.reminderEnabled,
-                )
-            }
+            attempt { loadState() }
+                .onSuccess { _state.value = it }
+                .onFailure { _state.update { it.copy(loadFailed = true) } }
         }
     }
 
-    fun onKind(kind: CareKind) = _state.update { it.copy(kind = kind, errors = emptyList()) }
-    fun onTitle(value: String) = _state.update { it.copy(title = value, errors = it.errors - CareError.TITLE_REQUIRED) }
-    fun onLastDate(value: LocalDate) = _state.update { it.copy(lastDate = value, errors = emptyList()) }
-    fun onInterval(value: String) = _state.update { it.copy(intervalText = value.filter(Char::isDigit).take(3), errors = it.errors - CareError.INTERVAL_REQUIRED) }
-    fun onUnit(value: IntervalUnit) = _state.update { it.copy(unit = value) }
-    fun onReminder(value: Boolean) = _state.update { it.copy(reminderEnabled = value, errors = emptyList()) }
+    private suspend fun loadState(): CareFormState {
+        val care = careId?.let { observeCare(it).first() }
+        if (careId != null && care == null) return CareFormState(loaded = true, notFound = true)
+        return if (care == null) {
+            CareFormState(loaded = true, petId = observeSelectedPet().first()?.id)
+        } else {
+            CareFormState(
+                loaded = true,
+                isEdit = true,
+                petId = care.petId,
+                kind = care.kind,
+                title = care.title.orEmpty(),
+                lastDate = care.lastDate,
+                intervalText = care.intervalValue?.toString().orEmpty(),
+                unit = care.intervalUnit ?: IntervalUnit.MONTH,
+                reminderEnabled = care.reminderEnabled,
+            )
+        }
+    }
+
+    fun onKind(kind: CareKind) = edit { it.copy(kind = kind, errors = emptyList()) }
+    fun onTitle(value: String) = edit { it.copy(title = value, errors = it.errors - CareError.TITLE_REQUIRED) }
+    fun onLastDate(value: LocalDate) = edit { it.copy(lastDate = value, errors = emptyList()) }
+    fun onInterval(value: String) = edit { it.copy(intervalText = value.filter(Char::isDigit).take(3), errors = it.errors - CareError.INTERVAL_REQUIRED) }
+    fun onUnit(value: IntervalUnit) = edit { it.copy(unit = value) }
+    fun onReminder(value: Boolean) = edit { it.copy(reminderEnabled = value, errors = emptyList()) }
 
     fun save() {
         val s = _state.value
@@ -204,8 +238,9 @@ class CareFormViewModel(
     fun delete() {
         val id = careId ?: return
         viewModelScope.launch {
-            deleteCare(id)
-            _state.update { it.copy(done = true, deletedId = id) }
+            attempt { deleteCare(id) }
+                .onSuccess { _state.update { it.copy(done = true, deletedId = id, deleteFailed = false) } }
+                .onFailure { _state.update { it.copy(deleteFailed = true) } }
         }
     }
 }
@@ -218,6 +253,9 @@ data class WeightFormState(
     val kgText: String = "",
     val error: WeightError? = null,
     val saving: Boolean = false,
+    /** Ya se buscó la mascota seleccionada (para avisar si no hay ninguna). */
+    val loaded: Boolean = false,
+    val dirty: Boolean = false,
     val done: Boolean = false,
 )
 
@@ -231,11 +269,11 @@ class WeightFormViewModel(
     val state: StateFlow<WeightFormState> = _state.asStateFlow()
 
     init {
-        viewModelScope.launch { _state.update { it.copy(petId = observeSelectedPet().first()?.id) } }
+        viewModelScope.launch { _state.update { it.copy(petId = observeSelectedPet().first()?.id, loaded = true) } }
     }
 
-    fun onDate(value: LocalDate) = _state.update { it.copy(date = value, error = null) }
-    fun onKg(value: String) = _state.update { it.copy(kgText = value.filter { c -> c.isDigit() || c == ',' || c == '.' }.take(7), error = null) }
+    fun onDate(value: LocalDate) = _state.update { it.copy(date = value, error = null, dirty = true) }
+    fun onKg(value: String) = _state.update { it.copy(kgText = value.filter { c -> c.isDigit() || c == ',' || c == '.' }.take(7), error = null, dirty = true) }
 
     fun save() {
         val s = _state.value

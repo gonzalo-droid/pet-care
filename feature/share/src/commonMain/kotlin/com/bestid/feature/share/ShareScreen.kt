@@ -1,5 +1,7 @@
 package com.bestid.feature.share
 
+import com.bestid.core.ui.LoadFailedState
+import com.bestid.core.ui.attempt
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,6 +45,7 @@ import com.bestid.core.ui.avatar
 import com.bestid.core.ui.formatLong
 import com.bestid.core.ui.label
 import com.bestid.feature.share.resources.Res
+import com.bestid.feature.share.resources.pdf_file_fallback
 import com.bestid.feature.share.resources.pdf_file_name
 import com.bestid.feature.share.resources.share_button
 import com.bestid.feature.share.resources.share_card_photos
@@ -79,6 +82,8 @@ data class ShareState(
     val sheet: PetSheet? = null,
     val generating: Boolean = false,
     val failed: Boolean = false,
+    /** No se pudo armar la vista previa. */
+    val loadFailed: Boolean = false,
     /** PDF listo para la hoja de compartir; la pantalla lo consume una vez. */
     val readyPath: String? = null,
 )
@@ -97,11 +102,14 @@ class ShareViewModel(
         refresh()
     }
 
-    private fun refresh() {
+    fun refresh() {
+        _state.update { it.copy(loadFailed = false) }
         viewModelScope.launch {
-            val pet = observeSelectedPet().first()
-            val sheet = pet?.let { buildSheet(it.id, _state.value.options) }
-            _state.update { it.copy(loaded = true, sheet = sheet) }
+            attempt {
+                val pet = observeSelectedPet().first()
+                pet?.let { buildSheet(it.id, _state.value.options) }
+            }.onSuccess { sheet -> _state.update { it.copy(loaded = true, sheet = sheet) } }
+                .onFailure { _state.update { it.copy(loadFailed = true) } }
         }
     }
 
@@ -116,7 +124,7 @@ class ShareViewModel(
         _state.update { it.copy(generating = true, failed = false) }
         viewModelScope.launch {
             val result = runCatching {
-                val target = paths.target(getString(Res.string.pdf_file_name, safeFileName(sheet.pet.name)))
+                val target = paths.target(getString(Res.string.pdf_file_name, safeFileName(sheet.pet.name, getString(Res.string.pdf_file_fallback))))
                 renderer.render(sheet.toPdf(colors, paths::photo), target)
                 target
             }
@@ -161,6 +169,7 @@ fun ShareScreen(onClose: () -> Unit, viewModel: ShareViewModel = koinViewModel()
     ) {
         val sheet = state.sheet
         when {
+            state.loadFailed -> LoadFailedState(onRetry = viewModel::refresh)
             !state.loaded -> LoadingState()
             sheet == null -> AlertCard { Text(stringResource(Res.string.share_no_pet), style = BestIdTheme.typography.body) }
             else -> {

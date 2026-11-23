@@ -11,6 +11,7 @@ import org.jetbrains.compose.resources.DrawableResource
 object BestIdIcons {
     val Home: DrawableResource get() = Res.drawable.ic_home
     val Vaccines: DrawableResource get() = Res.drawable.ic_vaccines
+    val Weight: DrawableResource get() = Res.drawable.ic_weight
     val Health: DrawableResource get() = Res.drawable.ic_health
     val Pets: DrawableResource get() = Res.drawable.ic_pets
     val PetsFilled: DrawableResource get() = Res.drawable.ic_pets_filled

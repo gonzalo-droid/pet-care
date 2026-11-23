@@ -16,7 +16,7 @@
     <string name="settings_privacy">Privacidad</string>
     <string name="settings_privacy_body">Tus datos y fotos se guardan solo en este teléfono: BestID no tiene cuenta ni servidor. Solo salen del teléfono cuando tú compartes una ficha o exportas un respaldo.</string>
     <string name="settings_about">Acerca de</string>
-    <string name="settings_about_body">BestID te ayuda a llevar la cartilla de vacunas de tu mascota. No reemplaza la opinión de tu veterinario.</string>
+    <string name="settings_about_body">BestID te ayuda a llevar la cartilla de vacunas de tu mascota. No reemplaza la opinión de tu veterinaria.</string>
     <string name="settings_version">Versión %1$s</string>
     <string name="settings_delete_all">Borrar todos los datos</string>
     <string name="settings_delete_title">¿Borrar todos los datos?</string>
@@ -66,4 +66,7 @@
     <string name="backup_error_invalid">Ese archivo no es un respaldo de BestID o está dañado.</string>
     <string name="backup_error_too_new">Ese respaldo se hizo con una versión más nueva de BestID. Actualiza la app e inténtalo de nuevo.</string>
     <string name="backup_error_export">No pudimos crear el respaldo. Inténtalo de nuevo.</string>
+    <string name="backup_restore_title">Restaurar respaldo</string>
+    <string name="backup_restore_body">Elige el archivo .zip que exportaste desde BestID en tu otro teléfono. Se agregarán sus mascotas, vacunas, cuidados, pesos y fotos.</string>
+    <string name="backup_continue">Continuar</string>
 </resources>
