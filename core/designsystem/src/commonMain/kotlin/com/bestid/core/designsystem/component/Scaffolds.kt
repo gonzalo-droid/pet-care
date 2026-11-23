@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
@@ -91,17 +92,26 @@ fun BottomBar(
         ) {
             items.forEachIndexed { index, item ->
                 val selected = index == selectedIndex
+                // Sin el efecto de pulsación rectangular (en iOS se ve como un recuadro gris): la
+                // respuesta es el fondo de la pestaña, que aparece con un fundido corto.
+                val pill by animateColorAsState(if (selected) colors.primarySoft else colors.surface)
                 Column(
                     modifier = Modifier
                         .weight(1f)
                         .heightIn(min = BestIdTheme.sizes.minTouch)
-                        .selectable(selected = selected, role = Role.Tab, onClick = { onSelect(index) })
+                        .selectable(
+                            selected = selected,
+                            interactionSource = null,
+                            indication = null,
+                            role = Role.Tab,
+                            onClick = { onSelect(index) },
+                        )
                         .padding(vertical = BestIdTheme.spacing.xxs),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Box(
                         modifier = Modifier
-                            .background(if (selected) colors.primarySoft else colors.surface, BestIdTheme.shapes.pill)
+                            .background(pill, BestIdTheme.shapes.pill)
                             .padding(horizontal = BestIdTheme.spacing.lg, vertical = BestIdTheme.spacing.xxs),
                     ) {
                         Icon(
