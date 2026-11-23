@@ -34,7 +34,7 @@
 	<true/>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>com.bestid.app.refresh</string>
+		<string>com.nekodojo.bestid.refresh</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

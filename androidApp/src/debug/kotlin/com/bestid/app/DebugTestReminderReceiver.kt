@@ -13,7 +13,7 @@ import kotlin.time.Duration.Companion.seconds
 
 /**
  * Solo en debug. Programa el aviso de prueba desde adb para la prueba en el emulador del CI:
- * `adb shell am broadcast -n com.bestid.app/.DebugTestReminderReceiver --el seconds 60`
+ * `adb shell am broadcast -n com.nekodojo.bestid/com.bestid.app.DebugTestReminderReceiver --el seconds 60`
  */
 class DebugTestReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {

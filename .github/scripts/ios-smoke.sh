@@ -16,7 +16,7 @@ echo "Simulador: $DEVICE"
 xcrun simctl boot "$DEVICE" || true
 xcrun simctl bootstatus "$DEVICE" -b
 xcrun simctl install "$DEVICE" "$APP"
-xcrun simctl launch "$DEVICE" com.bestid.app
+xcrun simctl launch "$DEVICE" com.nekodojo.bestid
 sleep 15
 xcrun simctl io "$DEVICE" screenshot "$OUT/arranque.png"
 # Las apps del simulador corren como procesos del Mac.

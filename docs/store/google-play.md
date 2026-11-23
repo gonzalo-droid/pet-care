@@ -7,7 +7,7 @@ Borrador para Google Play Console. Mercado: solo Perú (sección 20). Idioma: es
 | Campo | Valor |
 |---|---|
 | Nombre (máx. 30) | BestID: cartilla de tu mascota |
-| ID de la app | `com.bestid.app` |
+| ID de la app | `com.nekodojo.bestid` |
 | Categoría | Estilo de vida (alternativa: Medicina) |
 | Precio | Gratis, sin anuncios ni compras dentro de la app |
 | Público objetivo | Mayores de 18 años (dueños de mascotas) |
