@@ -6,4 +6,4 @@ APP_NAME=BestID
 
 // Versión visible y número de compilación. Sube CURRENT_PROJECT_VERSION en cada subida a TestFlight.
 MARKETING_VERSION=0.5.0
-CURRENT_PROJECT_VERSION=2
+CURRENT_PROJECT_VERSION=3
