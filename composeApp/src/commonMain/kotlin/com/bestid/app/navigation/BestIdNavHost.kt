@@ -3,6 +3,9 @@ package com.bestid.app.navigation
 import com.bestid.core.designsystem.theme.BestIdTheme
 import com.bestid.core.designsystem.component.UndoSnackbar
 import androidx.compose.ui.Alignment
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.fillMaxSize
@@ -179,6 +182,10 @@ fun BestIdNavHost(navController: NavHostController = rememberNavController()) {
     }
 }
 
+/** Fundido entre pestañas: la anterior sale rápido y la nueva entra después, sin verse las dos a la vez. */
+private val tabExit = fadeOut(tween(durationMillis = 90))
+private val tabEnter = fadeIn(tween(durationMillis = 210, delayMillis = 90))
+
 @Composable
 private fun MainTabs(
     actions: AppActions,
@@ -218,6 +225,12 @@ private fun MainTabs(
             navController = tabsController,
             startDestination = HomeGraph,
             modifier = Modifier.padding(padding),
+            // Las pestañas son hermanas: fundido corto sin desplazamiento. El predeterminado en iOS es el
+            // "push" (desliza desde la derecha y oscurece la anterior), que es para entrar a un detalle.
+            enterTransition = { tabEnter },
+            exitTransition = { tabExit },
+            popEnterTransition = { tabEnter },
+            popExitTransition = { tabExit },
         ) {
             homeGraph(
                 onOpenRecord = actions.openRecord,

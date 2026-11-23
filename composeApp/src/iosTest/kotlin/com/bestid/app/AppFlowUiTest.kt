@@ -133,9 +133,13 @@ class AppFlowUiTest {
             }
         }
 
-        // Sin mascotas: Bienvenida (O1)
+        // Sin mascotas: Bienvenida (O1) en tres páginas; "Siguiente" avanza y "Saltar" va a la última
         waitForText("La cartilla de tu mascota")
         screenshot("01-bienvenida")
+        onNodeWithText("Siguiente").performClick()
+        waitForText("Todo su historial en tu teléfono")
+        onNodeWithText("Saltar").performClick()
+        waitForText("Te avisamos cuándo le toca")
         onNodeWithText("Empezar con su cartilla").performClick()
 
         // Lilith, con foto
@@ -261,7 +265,8 @@ class AppFlowUiTest {
         waitForText("Borrar todos los datos")
         onNodeWithText("Borrar todos los datos").performScrollTo().performClick()
         onNodeWithText("Borrar todo").performClick()
-        waitForText("La cartilla de tu mascota")
+        // La Bienvenida vuelve en la página donde se dejó (la última, con las acciones)
+        waitForText("Te avisamos cuándo le toca")
         check(NSFileManager.defaultManager.contentsOfDirectoryAtPath("$dir/photos", null).orEmpty().isEmpty())
 
         // Teléfono "nuevo": importar el respaldo desde la Bienvenida

@@ -79,7 +79,13 @@ class AccessibilityUiTest {
         }
 
         waitForText("La cartilla de tu mascota")
-        checkScreen("Bienvenida")
+        checkScreen("Bienvenida 1")
+        onNodeWithText("Siguiente").performScrollTo().performClick()
+        waitForText("Todo su historial en tu teléfono")
+        checkScreen("Bienvenida 2")
+        onNodeWithText("Siguiente").performScrollTo().performClick()
+        waitForText("Te avisamos cuándo le toca")
+        checkScreen("Bienvenida 3")
 
         onNodeWithText("Empezar sin cartilla").performScrollTo().performClick()
         waitForText("Nueva mascota")

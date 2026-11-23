@@ -91,7 +91,7 @@ La barra superior muestra el selector de mascota (avatar y nombre, toca para cam
 
 | ID | Pantalla | Ruta | Tipo | Contenido clave |
 |---|---|---|---|---|
-| O1 | Bienvenida | `onboarding/welcome` | Pantalla completa | Propuesta en una frase, ilustración, "Escanear cartilla" (principal), "Empezar sin cartilla" (secundario) |
+| O1 | Bienvenida | `onboarding/welcome` | Pantalla completa | Tres páginas deslizables (D46): qué es, qué guarda y los avisos. La última lleva "Escanear cartilla" (principal), "Empezar sin cartilla" (secundario) y "Tengo un respaldo" |
 | O2 | Captura | `scan/capture` | Flujo modal | Consejos de foto, "Tomar foto" (cámara del sistema), "Elegir de galería" (hasta 4 páginas), miniaturas de las páginas elegidas, "Leer cartilla" |
 | O3 | Leyendo | `scan/reading` | Estado | Progreso, texto "Estamos leyendo la cartilla", cancelar. Errores: sin internet, no se pudo leer |
 | O4 | Revisar lectura | `scan/review` | Flujo modal | Sección Mascota detectada (si es primer uso o no coincide) y lista de registros detectados, cada uno confirmable o descartable. Campos dudosos en durazno con ícono y la palabra "Revisa", resueltos con una pregunta o un campo. Aviso de paneles vacíos ignorados. "Guardar N vacunas" fijo al pie |
