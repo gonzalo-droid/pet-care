@@ -66,6 +66,7 @@ import com.bestid.feature.home.resources.home_greeting_due
 import com.bestid.feature.home.resources.home_greeting_ok
 import com.bestid.feature.home.resources.home_greeting_overdue
 import com.bestid.feature.home.resources.home_greeting_overdue_care
+import com.bestid.feature.home.resources.home_greeting_review
 import com.bestid.feature.home.resources.home_greeting_start
 import com.bestid.feature.home.resources.home_last_vaccine
 import com.bestid.feature.home.resources.home_next
@@ -125,6 +126,7 @@ fun HomeScreen(
                 state.vaccineCount == 0 -> Res.string.home_greeting_start
                 overdue is Upcoming.Vaccine -> Res.string.home_greeting_overdue
                 overdue is Upcoming.Care -> Res.string.home_greeting_overdue_care
+                due is Upcoming.Vaccine && !due.record.nextDateConfirmed -> Res.string.home_greeting_review
                 due != null && due.daysLeft <= 7 -> Res.string.home_greeting_due
                 else -> Res.string.home_greeting_ok
             }
@@ -134,20 +136,23 @@ fun HomeScreen(
                 modifier = Modifier.semantics { heading() },
             )
 
-            val vaccines = pluralStringResource(Res.plurals.home_vaccines_count, state.vaccineCount, state.vaccineCount)
-            Text(
-                if (state.toConfirm > 0) {
-                    stringResource(
-                        Res.string.home_summary,
-                        vaccines,
-                        pluralStringResource(Res.plurals.home_to_confirm_count, state.toConfirm, state.toConfirm),
-                    )
-                } else {
-                    vaccines
-                },
-                style = BestIdTheme.typography.body,
-                color = BestIdTheme.colors.muted,
-            )
+            // Con 0 vacunas el saludo ya pide registrarlas; el contador "0 vacunas" sobraba.
+            if (state.vaccineCount > 0) {
+                val vaccines = pluralStringResource(Res.plurals.home_vaccines_count, state.vaccineCount, state.vaccineCount)
+                Text(
+                    if (state.toConfirm > 0) {
+                        stringResource(
+                            Res.string.home_summary,
+                            vaccines,
+                            pluralStringResource(Res.plurals.home_to_confirm_count, state.toConfirm, state.toConfirm),
+                        )
+                    } else {
+                        vaccines
+                    },
+                    style = BestIdTheme.typography.body,
+                    color = BestIdTheme.colors.muted,
+                )
+            }
 
             if (state.remindersBlocked) {
                 PermissionCard(

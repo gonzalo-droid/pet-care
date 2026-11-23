@@ -103,20 +103,23 @@ fun CartillaScreen(
                     style = BestIdTheme.typography.title,
                     modifier = Modifier.semantics { heading() },
                 )
-                val vaccines = pluralStringResource(Res.plurals.cartilla_vaccines_count, state.records.size, state.records.size)
-                Text(
-                    if (state.toConfirm > 0) {
-                        stringResource(
-                            Res.string.cartilla_summary,
-                            vaccines,
-                            pluralStringResource(Res.plurals.cartilla_to_confirm_count, state.toConfirm, state.toConfirm),
-                        )
-                    } else {
-                        vaccines
-                    },
-                    style = BestIdTheme.typography.body,
-                    color = BestIdTheme.colors.muted,
-                )
+                // Sin registros, el contador "0 vacunas" repetía lo que ya dice el estado vacío.
+                if (state.records.isNotEmpty()) {
+                    val vaccines = pluralStringResource(Res.plurals.cartilla_vaccines_count, state.records.size, state.records.size)
+                    Text(
+                        if (state.toConfirm > 0) {
+                            stringResource(
+                                Res.string.cartilla_summary,
+                                vaccines,
+                                pluralStringResource(Res.plurals.cartilla_to_confirm_count, state.toConfirm, state.toConfirm),
+                            )
+                        } else {
+                            vaccines
+                        },
+                        style = BestIdTheme.typography.body,
+                        color = BestIdTheme.colors.muted,
+                    )
+                }
             }
             if (state.records.isEmpty()) {
                 EmptyState(
