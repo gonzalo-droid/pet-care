@@ -14,9 +14,18 @@
     <string name="permission_footnote">Puedes cambiarlo cuando quieras en los ajustes del teléfono.</string>
     <string name="permission_pet_fallback">tu mascota</string>
 
-    <!-- Bienvenida (O1) -->
+    <!-- Bienvenida (O1): tres páginas, la última con las acciones (D46) -->
     <string name="welcome_title">La cartilla de tu mascota, siempre a la mano</string>
-    <string name="welcome_body">Guarda las fotos de su cartilla, anota sus vacunas y te avisamos cuándo le toca.</string>
+    <string name="welcome_body">Guarda las fotos de su cartilla y anota sus vacunas en un solo lugar.</string>
+    <string name="welcome_history_title">Todo su historial en tu teléfono</string>
+    <string name="welcome_history_body">Vacunas, desparasitaciones y peso de cada mascota. Funciona sin internet y puedes enviar su ficha en PDF a tu veterinaria.</string>
+    <string name="welcome_reminders_title">Te avisamos cuándo le toca</string>
+    <string name="welcome_reminders_body">Una semana antes, un día antes y el mismo día de cada vacuna y desparasitación.</string>
+    <string name="welcome_example_title">Vacuna de Lilith</string>
+    <string name="welcome_example_body">A Lilith le toca su próxima vacuna en 7 días</string>
+    <string name="welcome_next">Siguiente</string>
+    <string name="welcome_skip">Saltar</string>
+    <string name="welcome_page">Página %1$d de %2$d</string>
     <string name="welcome_scan">Empezar con su cartilla</string>
     <string name="welcome_without_card">Empezar sin cartilla</string>
     <string name="welcome_restore">Tengo un respaldo</string>

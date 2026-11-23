@@ -38,6 +38,12 @@ data class BestIdSizes(
     val thumb: Dp = 72.dp,
     /** Ilustraciones de gato y perro de la Bienvenida. */
     val illustration: Dp = 120.dp,
+    /** Íconos grandes de la introducción y su círculo de fondo. */
+    val introIcon: Dp = 32.dp,
+    val introIconCircle: Dp = 72.dp,
+    /** Puntos del indicador de páginas: el activo es más ancho (no solo cambia el color). */
+    val pageDot: Dp = 8.dp,
+    val pageDotActive: Dp = 24.dp,
     val border: Dp = 2.dp,
     val chartHeight: Dp = 200.dp,
     val ring: Dp = 112.dp,

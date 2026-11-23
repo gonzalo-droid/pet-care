@@ -40,6 +40,7 @@ import com.bestid.core.designsystem.component.InfoCard
 import com.bestid.core.designsystem.component.ListRow
 import com.bestid.core.designsystem.component.LoadingState
 import com.bestid.core.designsystem.component.NotificationPreview
+import com.bestid.core.designsystem.component.PageIndicator
 import com.bestid.core.designsystem.component.PermissionCard
 import com.bestid.core.designsystem.component.PetAvatar
 import com.bestid.core.designsystem.component.PetIdCard
@@ -225,6 +226,7 @@ fun ComponentCatalog(title: String, onClose: () -> Unit) {
         SectionTitle("Estados")
         NotificationPreview(PreviewData.NOTIFICATION_TITLE, PreviewData.NOTIFICATION_BODY)
         CelebrationBadge(PreviewData.INFO)
+        PageIndicator(count = 3, current = 1, description = PreviewData.INFO)
         EmptyState(BestIdIcons.Vaccines, PreviewData.EMPTY_TITLE, PreviewData.EMPTY_BODY)
         LoadingState()
         ErrorState(PreviewData.ERROR, onRetry = {})
