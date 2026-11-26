@@ -32,6 +32,7 @@ import com.bestid.core.domain.usecase.ObserveLastBackup
 import com.bestid.core.domain.usecase.ObserveReminderTime
 import com.bestid.core.domain.usecase.SetReminderTime
 import com.bestid.core.domain.usecase.ShowDeveloperTools
+import com.bestid.core.platform.links.rememberExternalActions
 import com.bestid.core.platform.notification.rememberNotificationPermissionRequester
 import com.bestid.core.ui.formatLong
 import com.bestid.feature.settings.resources.Res
@@ -39,6 +40,14 @@ import com.bestid.feature.settings.resources.settings_about
 import com.bestid.feature.settings.resources.settings_about_body
 import com.bestid.feature.settings.resources.settings_am
 import com.bestid.feature.settings.resources.settings_back
+import com.bestid.feature.settings.resources.settings_contact
+import com.bestid.feature.settings.resources.settings_contact_body
+import com.bestid.feature.settings.resources.settings_contact_subject
+import com.bestid.feature.settings.resources.settings_privacy_policy
+import com.bestid.feature.settings.resources.settings_rate
+import com.bestid.feature.settings.resources.settings_share
+import com.bestid.feature.settings.resources.settings_share_text
+import com.bestid.feature.settings.resources.settings_terms
 import com.bestid.feature.settings.resources.settings_backup
 import com.bestid.feature.settings.resources.settings_backup_last
 import com.bestid.feature.settings.resources.settings_backup_never
@@ -130,6 +139,7 @@ fun SettingsScreen(
     val deleteFailed by viewModel.deleteFailed.collectAsStateWithLifecycle()
     var editTime by remember { mutableStateOf(false) }
     var confirmDelete by remember { mutableStateOf(false) }
+    val external = rememberExternalActions()
 
     LaunchedEffect(state.deleted) { if (state.deleted) onDeletedAll() }
 
@@ -158,12 +168,21 @@ fun SettingsScreen(
         PlainCard {
             Eyebrow(stringResource(Res.string.settings_privacy))
             Text(stringResource(Res.string.settings_privacy_body), style = BestIdTheme.typography.body)
+            // AJU-01: páginas de nekodojo.app (NEK-01). Deben responder antes de cerrar la release (PUB-06).
+            TextAction(stringResource(Res.string.settings_privacy_policy), onClick = { external.openUrl(AppLinks.PRIVACY) })
+            TextAction(stringResource(Res.string.settings_terms), onClick = { external.openUrl(AppLinks.TERMS) })
         }
 
         PlainCard {
             Eyebrow(stringResource(Res.string.settings_about))
             Text(stringResource(Res.string.settings_about_body), style = BestIdTheme.typography.body)
             Text(stringResource(Res.string.settings_version, state.version), style = BestIdTheme.typography.support, color = BestIdTheme.colors.muted)
+            val subject = stringResource(Res.string.settings_contact_subject)
+            val body = stringResource(Res.string.settings_contact_body, state.version, external.deviceInfo)
+            TextAction(stringResource(Res.string.settings_contact), onClick = { external.email(AppLinks.SUPPORT_EMAIL, subject, body) })
+            val shareText = stringResource(Res.string.settings_share_text, AppLinks.DOWNLOAD)
+            TextAction(stringResource(Res.string.settings_share), onClick = { external.shareText(shareText) }, icon = BestIdIcons.Share)
+            TextAction(stringResource(Res.string.settings_rate), onClick = external::openStoreReview)
         }
 
         if (deleteFailed) DeleteFailedCard()
