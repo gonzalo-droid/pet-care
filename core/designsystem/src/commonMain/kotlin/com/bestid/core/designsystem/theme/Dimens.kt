@@ -26,6 +26,8 @@ data class BestIdElevation(val card: Dp = 6.dp)
 @Immutable
 data class BestIdSizes(
     val minTouch: Dp = 48.dp,
+    /** Ancho máximo del contenido en tablets e iPad (TAB-01): se centra y el resto es fondo. */
+    val contentMaxWidth: Dp = 720.dp,
     val primaryButton: Dp = 58.dp,
     /** Alto de campos y opciones de selección (prototipo: 52 a 54). */
     val field: Dp = 54.dp,
