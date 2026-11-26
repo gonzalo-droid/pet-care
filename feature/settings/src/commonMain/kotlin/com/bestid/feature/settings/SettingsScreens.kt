@@ -181,7 +181,7 @@ fun SettingsScreen(
             val body = stringResource(Res.string.settings_contact_body, state.version, external.deviceInfo)
             TextAction(stringResource(Res.string.settings_contact), onClick = { external.email(AppLinks.SUPPORT_EMAIL, subject, body) })
             val shareText = stringResource(Res.string.settings_share_text, AppLinks.DOWNLOAD)
-            TextAction(stringResource(Res.string.settings_share), onClick = { external.shareText(shareText) }, icon = BestIdIcons.Share)
+            TextAction(stringResource(Res.string.settings_share), onClick = { external.shareText(shareText) })
             TextAction(stringResource(Res.string.settings_rate), onClick = external::openStoreReview)
         }
 
