@@ -1,4 +1,8 @@
 [versions]
+# Versión de la app (VER-01): la misma en Android e iOS. checkIosVersion compara con Config.xcconfig.
+# Sube app-versionCode en cada subida a TestFlight o Google Play.
+app-versionName = "0.6.0"
+app-versionCode = "4"
 # Versiones estables verificadas el 13/11/2026. Ver docs/DECISIONS.md.
 kotlin = "2.4.21"
 agp = "9.5.1"

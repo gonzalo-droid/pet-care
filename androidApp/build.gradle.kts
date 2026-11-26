@@ -15,6 +15,9 @@ val localProps = Properties().apply {
 }
 fun secret(name: String): String? = localProps.getProperty(name) ?: System.getenv(name)
 val releaseStore = secret("BESTID_UPLOAD_STORE_FILE")?.let { rootProject.file(it) }?.takeIf { it.exists() }
+if (releaseStore == null) {
+    logger.warn("Falta la keystore de subida (BESTID_UPLOAD_*, ver local.properties.example): el release quedará sin firmar.")
+}
 
 android {
     namespace = "com.bestid.app"
@@ -24,9 +27,9 @@ android {
         applicationId = "com.nekodojo.bestid"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        // Sube versionCode en cada subida a Google Play: ./gradlew :androidApp:bundleRelease -Pbestid.versionCode=2
-        versionCode = (findProperty("bestid.versionCode") as String?)?.toInt() ?: 1
-        versionName = "0.5.0"
+        // Una sola fuente de versión (VER-01): gradle/libs.versions.toml.
+        versionCode = libs.versions.app.versionCode.get().toInt()
+        versionName = libs.versions.app.versionName.get()
     }
     signingConfigs {
         if (releaseStore != null) {

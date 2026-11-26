@@ -81,7 +81,7 @@ Reglas de dependencia:
 Requisitos: JDK 21, Android Studio (aporta el Android SDK, que Gradle necesita incluso para compilar iOS) y, para iOS, un Mac con Xcode.
 
 - **Android:** abre el proyecto en Android Studio y corre `androidApp`, o por terminal `./gradlew :androidApp:assembleDebug`.
-- **iOS:** abre `iosApp/iosApp.xcodeproj` en Xcode y corre en un simulador. La primera compilación descarga Kotlin/Native y tarda varios minutos. Para un iPhone real, completa `TEAM_ID` en `iosApp/Configuration/Config.xcconfig`.
+- **iOS:** abre `iosApp/iosApp.xcodeproj` en Xcode y corre en un simulador. La primera compilación descarga Kotlin/Native y tarda varios minutos. Para un iPhone real, copia `iosApp/Configuration/Secrets.xcconfig.example` como `Secrets.xcconfig` y completa `TEAM_ID`.
 - **Reglas del proyecto:** `.github/scripts/check-rules.sh` (colores, tamaños, textos, privacidad, dependencias).
 - **Pruebas:** `./gradlew allTests` (JVM y host de Android). En Mac, también `./gradlew iosSimulatorArm64Test`, que incluye los flujos de M1 a M4 y la prueba de accesibilidad con texto al 200 % en el simulador.
 - **Fotos en Android:** el emulador no tiene cámara real (muestra una escena virtual); para la galería, arrastra imágenes a la ventana del emulador y se guardan en Descargas.
