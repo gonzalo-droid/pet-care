@@ -30,14 +30,17 @@ class ReminderAlarmReceiver : BroadcastReceiver() {
         val pending = goAsync()
         CoroutineScope(SupervisorJob() + Dispatchers.Default).launch {
             try {
-                AndroidNotificationScheduler.ensureChannel(context)
+                AndroidNotificationScheduler.ensureChannels(context)
                 val open = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     putExtra(ReminderTaps.EXTRA_REF_TYPE, intent.getStringExtra(ReminderTaps.EXTRA_REF_TYPE))
                     putExtra(ReminderTaps.EXTRA_REF_ID, intent.getStringExtra(ReminderTaps.EXTRA_REF_ID))
                 }
                 val body = intent.getStringExtra(EXTRA_BODY).orEmpty()
-                val notification = NotificationCompat.Builder(context, AndroidNotificationScheduler.CHANNEL_ID)
+                val notification = NotificationCompat.Builder(
+                    context,
+                    AndroidNotificationScheduler.channelFor(intent.getStringExtra(ReminderTaps.EXTRA_REF_TYPE)),
+                )
                     .setSmallIcon(R.drawable.ic_stat_bestid)
                     .setContentTitle(intent.getStringExtra(EXTRA_TITLE))
                     .setContentText(body)
