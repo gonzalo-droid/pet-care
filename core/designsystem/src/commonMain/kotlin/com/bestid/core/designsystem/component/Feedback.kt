@@ -144,13 +144,23 @@ fun ConfirmSheet(
     destructive: Boolean = false,
     dismissText: String? = null,
 ) {
+    val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val hideThen = rememberHideThen(state)
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        sheetState = state,
         containerColor = BestIdTheme.colors.bg,
         shape = BestIdTheme.shapes.sheet,
     ) {
-        ConfirmContent(title, body, confirmText, destructive, onConfirm, onDismiss, dismissText)
+        ConfirmContent(
+            title,
+            body,
+            confirmText,
+            destructive,
+            onConfirm = { hideThen(onConfirm) },
+            onDismiss = { hideThen(onDismiss) },
+            dismissText = dismissText,
+        )
     }
 }
 
@@ -198,9 +208,11 @@ data class SheetOption(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OptionsSheet(title: String, options: List<SheetOption>, onDismiss: () -> Unit) {
+    val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val hideThen = rememberHideThen(state)
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        sheetState = state,
         containerColor = BestIdTheme.colors.bg,
         shape = BestIdTheme.shapes.sheet,
     ) {
@@ -214,8 +226,10 @@ fun OptionsSheet(title: String, options: List<SheetOption>, onDismiss: () -> Uni
             Text(title, style = BestIdTheme.typography.subtitle, modifier = Modifier.semantics { heading() })
             options.forEach { option ->
                 val onClick = {
-                    onDismiss()
-                    option.onClick()
+                    hideThen {
+                        onDismiss()
+                        option.onClick()
+                    }
                 }
                 if (option.destructive) {
                     TextAction(option.label, onClick = onClick, icon = option.icon, destructive = true, modifier = Modifier.fillMaxWidth())
@@ -223,7 +237,7 @@ fun OptionsSheet(title: String, options: List<SheetOption>, onDismiss: () -> Uni
                     SecondaryButton(option.label, onClick = onClick, icon = option.icon)
                 }
             }
-            SecondaryButton(text = stringResource(Res.string.ds_cancel), onClick = onDismiss)
+            SecondaryButton(text = stringResource(Res.string.ds_cancel), onClick = { hideThen(onDismiss) })
         }
     }
 }

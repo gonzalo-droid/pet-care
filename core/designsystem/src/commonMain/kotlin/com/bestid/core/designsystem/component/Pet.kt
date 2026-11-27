@@ -180,9 +180,11 @@ fun PetSelector(
     }
 
     if (open) {
+        val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        val hideThen = rememberHideThen(state)
         ModalBottomSheet(
             onDismissRequest = { open = false },
-            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            sheetState = state,
             containerColor = colors.bg,
             shape = BestIdTheme.shapes.sheet,
         ) {
@@ -211,8 +213,10 @@ fun PetSelector(
                                     selected = isSelected,
                                     role = Role.RadioButton,
                                     onClick = {
-                                        open = false
-                                        onSelect(pet.id)
+                                        hideThen {
+                                            open = false
+                                            onSelect(pet.id)
+                                        }
                                     },
                                 )
                                 .padding(BestIdTheme.spacing.sm),
@@ -230,8 +234,10 @@ fun PetSelector(
                 DashedButton(
                     text = stringResource(Res.string.ds_add_pet),
                     onClick = {
-                        open = false
-                        onAdd()
+                        hideThen {
+                            open = false
+                            onAdd()
+                        }
                     },
                 )
             }

@@ -1,5 +1,6 @@
 package com.bestid.feature.settings
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,7 +54,7 @@ private fun LicenseCard(title: StringResource, body: StringResource, file: Strin
             text = stringResource(if (expanded) Res.string.licenses_hide_text else Res.string.licenses_show_text),
             onClick = { expanded = !expanded },
         )
-        if (expanded) {
+        AnimatedVisibility(visible = expanded) {
             val text by produceState("", file) { value = Res.readBytes(file).decodeToString() }
             Text(text, style = BestIdTheme.typography.support)
         }
