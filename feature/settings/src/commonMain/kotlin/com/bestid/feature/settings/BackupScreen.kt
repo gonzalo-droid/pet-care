@@ -25,6 +25,7 @@ import com.bestid.core.domain.backup.ImportResult
 import com.bestid.core.domain.port.AppClock
 import com.bestid.core.domain.usecase.ObserveLastBackup
 import com.bestid.core.navigation.BackupRoute
+import com.bestid.core.navigation.LicensesRoute
 import com.bestid.core.navigation.SettingsRoute
 import com.bestid.core.platform.share.MimeTypes
 import com.bestid.core.platform.share.rememberFilePicker
@@ -224,11 +225,19 @@ fun NavGraphBuilder.settingsFlows(
     onClose: () -> Unit,
     onOpenBackup: () -> Unit,
     onOpenCatalog: () -> Unit,
+    onOpenLicenses: () -> Unit,
     onDeletedAll: () -> Unit,
 ) {
     composable<SettingsRoute> {
-        SettingsScreen(onClose = onClose, onOpenBackup = onOpenBackup, onOpenCatalog = onOpenCatalog, onDeletedAll = onDeletedAll)
+        SettingsScreen(
+            onClose = onClose,
+            onOpenBackup = onOpenBackup,
+            onOpenCatalog = onOpenCatalog,
+            onOpenLicenses = onOpenLicenses,
+            onDeletedAll = onDeletedAll,
+        )
     }
+    composable<LicensesRoute> { LicensesScreen(onClose = onClose) }
     composable<BackupRoute> { entry -> BackupScreen(onClose = onClose, restore = entry.toRoute<BackupRoute>().restore) }
 }
 

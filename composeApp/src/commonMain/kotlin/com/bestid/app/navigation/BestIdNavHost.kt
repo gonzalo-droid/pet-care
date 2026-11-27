@@ -47,6 +47,7 @@ import com.bestid.core.navigation.PhotoViewerRoute
 import androidx.navigation.toRoute
 import com.bestid.feature.onboarding.WelcomeScreen
 import com.bestid.core.navigation.ComponentCatalogRoute
+import com.bestid.core.navigation.LicensesRoute
 import com.bestid.core.navigation.NotificationPermissionRoute
 import com.bestid.core.navigation.WeightNewRoute
 import com.bestid.core.platform.notification.ReminderTap
@@ -174,6 +175,7 @@ fun BestIdNavHost(navController: NavHostController = rememberNavController()) {
             onClose = actions.back,
             onOpenBackup = actions.openBackup,
             onOpenCatalog = { navController.navigate(ComponentCatalogRoute) },
+            onOpenLicenses = { navController.navigate(LicensesRoute) },
             onDeletedAll = actions.deletedAll,
         )
         composable<ComponentCatalogRoute> {

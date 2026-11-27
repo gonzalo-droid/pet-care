@@ -28,6 +28,9 @@ sealed interface Route
  */
 @Serializable data class BackupRoute(val restore: Boolean = false) : Route
 
+/** Licencias de la fuente, los íconos y las librerías (AJU-01). */
+@Serializable data object LicensesRoute : Route
+
 /** Compartir ficha en PDF (SH1) de la mascota seleccionada. */
 @Serializable data object ShareRoute : Route
 
