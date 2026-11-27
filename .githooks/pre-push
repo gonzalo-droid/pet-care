@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# CI-01: antes de cada push, las reglas del proyecto y las pruebas de la JVM (lo mismo que el CI, sin iOS).
+# Activarlo una vez por clon: git config core.hooksPath .githooks. Saltarlo en una urgencia: git push --no-verify.
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+echo "pre-push: reglas del proyecto"
+.github/scripts/check-rules.sh
+echo "pre-push: versión iOS = Android y pruebas de la JVM"
+./gradlew -q checkIosVersion testAndroidHostTest jvmTest
