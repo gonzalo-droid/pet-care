@@ -141,7 +141,14 @@ fun BestIdNavHost(navController: NavHostController = rememberNavController()) {
             ReminderTaps.consume()
         }
     }
-    NavHost(navController = navController, startDestination = MainRoute) {
+    NavHost(
+        navController = navController,
+        startDestination = MainRoute,
+        enterTransition = PushTransitions.enter,
+        exitTransition = PushTransitions.exit,
+        popEnterTransition = PushTransitions.popEnter,
+        popExitTransition = PushTransitions.popExit,
+    ) {
         composable<MainRoute> {
             val main by mainViewModel.state.collectAsStateWithLifecycle()
             when {
