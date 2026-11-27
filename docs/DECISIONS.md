@@ -27,6 +27,9 @@ El release de Android pasa a `isMinifyEnabled = true` y `isShrinkResources = tru
 ### D52. Listas en una columna en tablets `[Propuesta]`
 TAB-01 pedía dos columnas si en iPad o tablet las listas se veían vacías. Con el ancho máximo de 720 dp (D49), en la tablet en horizontal la columna se ve completa, así que se quedan en una columna. Se revisa si alguien que lo pruebe lo pide.
 
+### D53. Transiciones al entrar a una pantalla y al cerrar hojas `[Propuesta]`
+Completa D47. En Android, el detalle de vacuna, los formularios y Ajustes entraban con el fundido de 700 ms que trae Navigation, en el que se ven las dos pantallas encimadas; ahora usan el eje horizontal de Material (sale en 90 ms, entra en 210 ms, desplazamiento de 1/12 del ancho). En iOS se mantiene el "push" de Navigation (`PushTransitions`, por plataforma). Las hojas inferiores (confirmar, opciones y mascotas) se cierran con su animación antes de correr la acción del botón; antes desaparecían de golpe. El texto de cada licencia se despliega con animación.
+
 ## 2026-11-23 · Bienvenida en tres páginas y transiciones
 
 ### D46. Bienvenida (O1) en tres páginas `[Decidido por Gonzalo]`
