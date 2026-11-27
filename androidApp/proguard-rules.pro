@@ -1,4 +1,4 @@
-# Reglas para cuando se active R8 (hoy isMinifyEnabled = false). Al activarlo, probar el release entero.
+# Reglas propias de R8 (release). Tras cambiar dependencias, probar el release entero antes de subirlo.
 
 # DataStore Preferences (TRP-01): su protobuf interno lee los campos de GeneratedMessageLite por reflexión.
 # Sin esto, R8 (modo completo) los elimina y la primera lectura de preferencias nunca emite.
