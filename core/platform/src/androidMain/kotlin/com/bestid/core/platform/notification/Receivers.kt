@@ -10,6 +10,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.bestid.core.domain.di.AppScope
 import com.bestid.core.domain.reminder.SyncReminders
 import com.bestid.core.platform.R
 import kotlinx.coroutines.CoroutineScope
@@ -74,7 +75,7 @@ class RescheduleReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val koin = GlobalContext.getOrNull() ?: return
         val pending = goAsync()
-        CoroutineScope(SupervisorJob() + Dispatchers.Default).launch {
+        koin.get<CoroutineScope>(AppScope).launch {
             try {
                 koin.get<SyncReminders>().invoke(force = true)
             } finally {
