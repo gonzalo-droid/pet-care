@@ -12,6 +12,8 @@
     <string name="reminder_subject_deworm_internal">desparasitación interna</string>
     <string name="reminder_subject_deworm_external">desparasitación externa</string>
     <string name="reminder_subject_care">cuidado</string>
-    <string name="reminder_channel_name">Avisos de vacunas y cuidados</string>
-    <string name="reminder_channel_description">Te avisa antes de cada próxima vacuna, desparasitación o cuidado.</string>
+    <string name="reminder_channel_vaccines_name">Vacunas</string>
+    <string name="reminder_channel_vaccines_description">Te avisa antes de cada próxima vacuna.</string>
+    <string name="reminder_channel_care_name">Desparasitación y cuidados</string>
+    <string name="reminder_channel_care_description">Te avisa antes de cada desparasitación o cuidado.</string>
 </resources>

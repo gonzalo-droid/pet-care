@@ -19,6 +19,17 @@ if (releaseStore == null) {
     logger.warn("Falta la keystore de subida (BESTID_UPLOAD_*, ver local.properties.example): el release quedará sin firmar.")
 }
 
+// Crashlytics (D48, CRA-01). google-services.json sale de la consola de Firebase (proyecto bestid-c931a) y no
+// se versiona. Sin él la app compila igual, pero Firebase no arranca y no se reportan crashes.
+if (file("google-services.json").exists()) {
+    apply(plugin = libs.plugins.google.services.get().pluginId)
+    apply(plugin = libs.plugins.firebase.crashlytics.get().pluginId)
+} else {
+    logger.warn("Falta androidApp/google-services.json: el build no tendrá Crashlytics (D48).")
+}
+// Crash de prueba (CRA-04): solo con -PcrashlyticsTestCrash=true al compilar. Ningún build normal lo incluye.
+val crashlyticsTestCrash = providers.gradleProperty("crashlyticsTestCrash").orNull == "true"
+
 android {
     namespace = "com.bestid.app"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -41,10 +52,23 @@ android {
             }
         }
     }
+    buildFeatures {
+        resValues = true
+    }
     buildTypes {
+        debug {
+            // Debug no recolecta (CRA-04).
+            manifestPlaceholders["crashlyticsEnabled"] = false
+            resValue("bool", "crashlytics_test_crash", "false")
+        }
         release {
             // Sin R8 en la beta: Room, Koin y kotlinx.serialization necesitan reglas que se validan aparte.
+            // proguard-rules.pro ya trae las de DataStore y Crashlytics (TRP-01, CRA-02); al activarlo,
+            // probar el release entero en un teléfono. Con el plugin, el mapping se sube solo.
             isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            manifestPlaceholders["crashlyticsEnabled"] = true
+            resValue("bool", "crashlytics_test_crash", crashlyticsTestCrash.toString())
             signingConfig = signingConfigs.findByName("upload")
         }
     }
@@ -70,4 +94,6 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
 }

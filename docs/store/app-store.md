@@ -29,8 +29,8 @@ vacunas,mascota,perro,gato,cartilla,veterinaria,desparasitación,recordatorio,ca
 
 ## Privacidad de la app ("etiquetas de privacidad")
 
-- **¿Recopilas datos de esta app?** No. Los datos no salen del iPhone salvo cuando la persona comparte un PDF o un respaldo por su cuenta.
-- `iosApp/iosApp/PrivacyInfo.xcprivacy` declara que no hay rastreo ni recopilación, y las API que Apple pide justificar.
+- **¿Recopilas datos de esta app?** Sí, solo diagnóstico (D48): **Diagnóstico → Datos de fallos** y **Otros datos de diagnóstico**, más **Identificadores → ID de dispositivo** (ID de instalación de Firebase). Para cada uno: no vinculado a la identidad, sin rastreo, finalidad "Funcionalidad de la app". Los datos de la mascota y las fotos no salen del iPhone salvo cuando la persona comparte un PDF o un respaldo.
+- `iosApp/iosApp/PrivacyInfo.xcprivacy` declara lo mismo, sin rastreo, y las API que Apple pide justificar.
 
 ## Cumplimiento de exportación
 

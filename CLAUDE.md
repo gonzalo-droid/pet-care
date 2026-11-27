@@ -18,8 +18,9 @@ App móvil (Android e iOS) que digitaliza la cartilla de vacunación de mascotas
 - Navigation Compose multiplataforma con rutas tipadas, ViewModel y Lifecycle multiplataforma, StateFlow con flujo unidireccional.
 - Koin para inyección (no Hilt).
 - Room KMP con el driver SQLite empaquetado. DataStore KMP para preferencias.
-- kotlinx-datetime, kotlinx.serialization, Coil 3, Sentry Kotlin Multiplatform.
-- Lectura de cartilla: detrás de la interfaz `CardReader`. **Por ahora sin Firebase** (D4): la tecnología de lectura se decide antes de M3.
+- kotlinx-datetime, kotlinx.serialization, Coil 3.
+- Errores: Firebase Crashlytics con los SDK nativos, solo fatales y solo en release (D48, reemplaza a Sentry). Proyecto de Firebase `bestid-c931a`.
+- Lectura de cartilla: detrás de la interfaz `CardReader`; la tecnología se decide antes de M3 (D4, D29).
 - Ktor client (para la alternativa de servicio propio de la sección 10).
 - Sin backend propio, sin login y sin sincronización en el MVP. Todo se guarda en el teléfono.
 
@@ -50,7 +51,7 @@ Un feature nunca depende de otro feature. `core/designsystem` no depende de `cor
 3. **Textos** en Compose Resources (es-PE), nunca escritos en el código.
 4. **Código de plataforma** solo detrás de las interfaces de la sección 8 (`ImagePicker`, `ImageProcessor`, `NotificationScheduler`, `PdfRenderer`, `ShareSheet`, `FilePicker`, `CardReader`) y `DatePicker` (D14). La lógica de avisos vive en `ReminderEngine`, común y pura.
 5. **La IA propone, la persona confirma:** nada leído de la cartilla se guarda sin confirmación, y un dato ilegible queda vacío, nunca se inventa.
-6. **Privacidad:** sin datos personales en logs, Sentry ni analítica. Sin claves ni secretos en el repositorio. `google-services.json` y `GoogleService-Info.plist` van en `.gitignore`.
+6. **Privacidad:** sin datos personales en logs, Crashlytics ni analítica. Sin claves ni secretos en el repositorio. `google-services.json` y `GoogleService-Info.plist` van en `.gitignore`.
 7. **Datos de prueba:** las fotos reales de cartillas no se suben al repositorio. Ponlas en `testdata/private/`, que va en `.gitignore`.
 8. **Base de datos:** entidades con UUID, `createdAt`, `updatedAt` y `deletedAt`. Cada cambio de esquema trae su migración.
 9. **Pruebas:** dominio, motor de avisos, validaciones y respaldo con pruebas en `commonTest`. Un hito no está terminado sin sus pruebas.

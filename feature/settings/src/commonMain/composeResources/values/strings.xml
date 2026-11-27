@@ -14,8 +14,16 @@
     <string name="settings_reminder_time_dialog">¿A qué hora te avisamos?</string>
     <string name="settings_reminder_time_hint">Los avisos de vacunas y cuidados llegan a esta hora.</string>
     <string name="settings_privacy">Privacidad</string>
-    <string name="settings_privacy_body">Tus datos y fotos se guardan solo en este teléfono: BestID no tiene cuenta ni servidor. Solo salen del teléfono cuando tú compartes una ficha o exportas un respaldo.</string>
+    <string name="settings_privacy_body">Tus datos y fotos se guardan solo en este teléfono: BestID no tiene cuenta ni servidor. Solo salen del teléfono cuando tú compartes una ficha o exportas un respaldo. Si la app se cierra por un error, envía un informe técnico sin tus datos para poder arreglarlo.</string>
+    <string name="settings_privacy_policy">Política de privacidad</string>
+    <string name="settings_terms">Términos de uso</string>
     <string name="settings_about">Acerca de</string>
+    <string name="settings_contact">Escríbenos</string>
+    <string name="settings_contact_subject">BestID: consulta</string>
+    <string name="settings_contact_body">\n\n—\nBestID %1$s · %2$s</string>
+    <string name="settings_share">Recomendar BestID</string>
+    <string name="settings_share_text">Yo llevo la cartilla de vacunas de mi mascota en BestID, y me avisa de las próximas. Descárgala aquí: %1$s</string>
+    <string name="settings_rate">Calificar BestID</string>
     <string name="settings_about_body">BestID te ayuda a llevar la cartilla de vacunas de tu mascota. No reemplaza la opinión de tu veterinaria.</string>
     <string name="settings_version">Versión %1$s</string>
     <string name="settings_delete_all">Borrar todos los datos</string>

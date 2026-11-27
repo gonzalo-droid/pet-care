@@ -26,10 +26,17 @@ Solo cuando tú lo decides:
 - **Respaldo:** exportas un archivo con tus datos y fotos y eliges dónde guardarlo.
 - **Respaldo del sistema:** si lo tienes activado, Android (Google) o iOS (Apple) pueden respaldar los datos de la app según tu configuración de esas cuentas.
 
+## Informes de errores
+
+Si la app se cierra por un error, envía a Firebase Crashlytics (Google) un informe técnico para que podamos
+arreglarlo: la traza del error, el modelo del teléfono, la versión del sistema y de la app, y un identificador
+de instalación de Firebase (no te identifica). **No envía** los datos de tu mascota, tus fotos, tu nombre ni tu
+dirección. El informe viaja cifrado, puede procesarse en servidores de Google en EE. UU. y se conserva 90 días.
+
 ## Lo que la app no hace
 
 - No usa publicidad.
-- No usa analítica ni rastreo.
+- No usa analítica ni rastreo publicitario.
 - No vende ni cede datos a terceros.
 
 ## Permisos

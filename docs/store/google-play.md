@@ -46,8 +46,9 @@ BestID no reemplaza la opinión de tu veterinario.
 
 | Pregunta | Respuesta | Por qué |
 |---|---|---|
-| ¿La app recopila o comparte datos del usuario? | **No** | Todo se guarda en el teléfono. No hay servidor, analítica ni Sentry (D4, D5, D12). Compartir un PDF o un respaldo lo inicia la persona con la hoja del sistema, lo que Google no cuenta como recopilación. |
-| ¿Los datos se cifran en tránsito? | No aplica | La app no envía datos. |
+| ¿La app recopila o comparte datos del usuario? | **Sí, recopila** (no comparte) | Solo los informes de Crashlytics (D48). Los datos de la mascota y las fotos se guardan en el teléfono; compartir un PDF o un respaldo lo inicia la persona con la hoja del sistema, lo que Google no cuenta como recopilación. |
+| Tipos de datos | Información y rendimiento de la app → **Registros de fallos** y **Diagnóstico**; ID de dispositivo u otros → **ID de instalación de Firebase** | Recopilado, no compartido, no efímero, obligatorio, finalidad "Estadísticas de la app". |
+| ¿Los datos se cifran en tránsito? | Sí | Crashlytics envía por HTTPS. |
 | ¿El usuario puede pedir que se borren? | Sí | Ajustes → "Borrar todos los datos". |
 
 Revisar de nuevo cuando se agregue la lectura de la cartilla con un servicio externo (sección 14): las fotos se enviarían para procesarlas.
@@ -58,6 +59,7 @@ Revisar de nuevo cuando se agregue la lectura de la cartilla con un servicio ext
 |---|---|
 | Notificaciones (`POST_NOTIFICATIONS`) | Avisos de vacunas y cuidados. Se pide después de guardar la primera vacuna o cuidado (O5). |
 | Iniciar al encender (`RECEIVE_BOOT_COMPLETED`) | Volver a programar los avisos después de reiniciar. |
+| Internet (`INTERNET`, lo agrega Firebase) | Enviar los informes de errores de Crashlytics (D48). La app funciona sin internet. |
 | Cámara | No se declara: se usa la cámara del sistema. |
 | Fotos | No se pide: se usa el selector de fotos del sistema. |
 
