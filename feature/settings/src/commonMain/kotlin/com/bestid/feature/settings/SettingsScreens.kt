@@ -19,6 +19,7 @@ import com.bestid.core.designsystem.component.Eyebrow
 import com.bestid.core.designsystem.component.FlowScaffold
 import com.bestid.core.designsystem.component.InfoCard
 import com.bestid.core.designsystem.component.ListRow
+import com.bestid.core.designsystem.component.PermissionCard
 import com.bestid.core.designsystem.component.PlainCard
 import com.bestid.core.designsystem.component.SecondaryButton
 import com.bestid.core.designsystem.component.TextAction
@@ -32,6 +33,7 @@ import com.bestid.core.domain.usecase.ObserveLastBackup
 import com.bestid.core.domain.usecase.ObserveReminderTime
 import com.bestid.core.domain.usecase.SetReminderTime
 import com.bestid.core.domain.usecase.ShowDeveloperTools
+import com.bestid.core.platform.links.rememberExternalActions
 import com.bestid.core.platform.notification.rememberNotificationPermissionRequester
 import com.bestid.core.ui.formatLong
 import com.bestid.feature.settings.resources.Res
@@ -39,6 +41,14 @@ import com.bestid.feature.settings.resources.settings_about
 import com.bestid.feature.settings.resources.settings_about_body
 import com.bestid.feature.settings.resources.settings_am
 import com.bestid.feature.settings.resources.settings_back
+import com.bestid.feature.settings.resources.settings_contact
+import com.bestid.feature.settings.resources.settings_contact_body
+import com.bestid.feature.settings.resources.settings_contact_subject
+import com.bestid.feature.settings.resources.settings_privacy_policy
+import com.bestid.feature.settings.resources.settings_rate
+import com.bestid.feature.settings.resources.settings_share
+import com.bestid.feature.settings.resources.settings_share_text
+import com.bestid.feature.settings.resources.settings_terms
 import com.bestid.feature.settings.resources.settings_backup
 import com.bestid.feature.settings.resources.settings_backup_last
 import com.bestid.feature.settings.resources.settings_backup_never
@@ -46,6 +56,7 @@ import com.bestid.feature.settings.resources.settings_delete_all
 import com.bestid.feature.settings.resources.settings_delete_body
 import com.bestid.feature.settings.resources.settings_delete_confirm
 import com.bestid.feature.settings.resources.settings_delete_title
+import com.bestid.feature.settings.resources.settings_licenses
 import com.bestid.feature.settings.resources.settings_open_catalog
 import com.bestid.feature.settings.resources.settings_pm
 import com.bestid.feature.settings.resources.settings_privacy
@@ -56,6 +67,8 @@ import com.bestid.feature.settings.resources.settings_reminder_time_hint
 import com.bestid.feature.settings.resources.settings_reminder_time_value
 import com.bestid.feature.settings.resources.settings_reminders
 import com.bestid.feature.settings.resources.settings_test_reminder
+import com.bestid.feature.settings.resources.settings_test_reminder_denied_body
+import com.bestid.feature.settings.resources.settings_test_reminder_denied_title
 import com.bestid.feature.settings.resources.settings_test_reminder_done
 import com.bestid.feature.settings.resources.settings_title
 import com.bestid.feature.settings.resources.settings_tools
@@ -123,6 +136,7 @@ fun SettingsScreen(
     onClose: () -> Unit,
     onOpenBackup: () -> Unit,
     onOpenCatalog: () -> Unit,
+    onOpenLicenses: () -> Unit,
     onDeletedAll: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel(),
 ) {
@@ -130,6 +144,7 @@ fun SettingsScreen(
     val deleteFailed by viewModel.deleteFailed.collectAsStateWithLifecycle()
     var editTime by remember { mutableStateOf(false) }
     var confirmDelete by remember { mutableStateOf(false) }
+    val external = rememberExternalActions()
 
     LaunchedEffect(state.deleted) { if (state.deleted) onDeletedAll() }
 
@@ -158,12 +173,22 @@ fun SettingsScreen(
         PlainCard {
             Eyebrow(stringResource(Res.string.settings_privacy))
             Text(stringResource(Res.string.settings_privacy_body), style = BestIdTheme.typography.body)
+            // AJU-01: páginas de nekodojo.app (NEK-01). Deben responder antes de cerrar la release (PUB-06).
+            TextAction(stringResource(Res.string.settings_privacy_policy), onClick = { external.openUrl(AppLinks.PRIVACY) })
+            TextAction(stringResource(Res.string.settings_terms), onClick = { external.openUrl(AppLinks.TERMS) })
         }
 
         PlainCard {
             Eyebrow(stringResource(Res.string.settings_about))
             Text(stringResource(Res.string.settings_about_body), style = BestIdTheme.typography.body)
             Text(stringResource(Res.string.settings_version, state.version), style = BestIdTheme.typography.support, color = BestIdTheme.colors.muted)
+            val subject = stringResource(Res.string.settings_contact_subject)
+            val body = stringResource(Res.string.settings_contact_body, state.version, external.deviceInfo)
+            TextAction(stringResource(Res.string.settings_contact), onClick = { external.email(AppLinks.SUPPORT_EMAIL, subject, body) })
+            val shareText = stringResource(Res.string.settings_share_text, AppLinks.DOWNLOAD)
+            TextAction(stringResource(Res.string.settings_share), onClick = { external.shareText(shareText) })
+            TextAction(stringResource(Res.string.settings_rate), onClick = external::openStoreReview)
+            TextAction(stringResource(Res.string.settings_licenses), onClick = onOpenLicenses)
         }
 
         if (deleteFailed) DeleteFailedCard()
@@ -227,7 +252,9 @@ private fun TestReminderButton() {
     val scheduleTest = koinInject<ScheduleTestReminder>()
     val scope = rememberCoroutineScope()
     var scheduled by remember { mutableStateOf(false) }
+    var denied by remember { mutableStateOf(false) }
     val requester = rememberNotificationPermissionRequester { granted ->
+        denied = !granted
         if (granted) {
             scope.launch {
                 scheduleTest()
@@ -244,5 +271,13 @@ private fun TestReminderButton() {
         InfoCard(icon = BestIdIcons.CheckCircle) {
             Text(stringResource(Res.string.settings_test_reminder_done), style = BestIdTheme.typography.body)
         }
+    }
+    // Sin permiso el aviso no puede llegar: se dice en vez de no hacer nada.
+    if (denied) {
+        PermissionCard(
+            title = stringResource(Res.string.settings_test_reminder_denied_title),
+            body = stringResource(Res.string.settings_test_reminder_denied_body),
+            onOpenSettings = requester::openSettings,
+        )
     }
 }

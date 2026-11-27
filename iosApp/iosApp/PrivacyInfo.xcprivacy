@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!-- Manifiesto de privacidad (sección 14). BestID no rastrea ni recolecta datos: todo queda en el
-     teléfono y solo sale cuando la persona comparte un PDF o un respaldo. Se declaran las API que
-     Apple pide justificar y que usan la app o sus librerías (Compose, coroutines, okio, DataStore). -->
+<!-- Manifiesto de privacidad (sección 14). BestID no rastrea. Los datos de la mascota quedan en el
+     teléfono y solo salen cuando la persona comparte un PDF o un respaldo. Lo único que se recolecta son
+     los informes de Crashlytics en Release (D48): datos de fallos, diagnóstico e ID de instalación, sin
+     vincular a la persona. Se declaran las API que Apple pide justificar y que usan la app o sus
+     librerías (Compose, coroutines, okio, DataStore; Firebase trae su propio manifiesto). -->
 <plist version="1.0">
 <dict>
 	<key>NSPrivacyTracking</key>
@@ -10,7 +12,44 @@
 	<key>NSPrivacyTrackingDomains</key>
 	<array/>
 	<key>NSPrivacyCollectedDataTypes</key>
-	<array/>
+	<array>
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeCrashData</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
+		</dict>
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeOtherDiagnosticData</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
+		</dict>
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeDeviceID</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
+		</dict>
+	</array>
 	<key>NSPrivacyAccessedAPITypes</key>
 	<array>
 		<dict>

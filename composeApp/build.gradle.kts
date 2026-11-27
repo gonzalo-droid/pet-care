@@ -62,3 +62,22 @@ compose.resources {
 tasks.withType<org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest>().configureEach {
     environment("SIMCTL_CHILD_BESTID_SCREENSHOTS", layout.buildDirectory.dir("ui-screenshots").get().asFile.absolutePath)
 }
+
+// VER-02: la versión de iOS es una copia de la del catálogo; check falla si se desincroniza.
+val checkIosVersion by tasks.registering {
+    val xcconfig = rootProject.file("iosApp/Configuration/Config.xcconfig")
+    val name = libs.versions.app.versionName.get()
+    val code = libs.versions.app.versionCode.get()
+    inputs.file(xcconfig)
+    doLast {
+        // Compara clave por clave: buscar "MARKETING_VERSION=2.0.2" en el texto aceptaría "2.0.25".
+        val values = xcconfig.readLines().mapNotNull { line ->
+            line.substringBefore("//").split("=", limit = 2).takeIf { it.size == 2 }?.let { it[0].trim() to it[1].trim() }
+        }.toMap()
+        check(values["MARKETING_VERSION"] == name && values["CURRENT_PROJECT_VERSION"] == code) {
+            "Config.xcconfig (${values["MARKETING_VERSION"]} / ${values["CURRENT_PROJECT_VERSION"]}) no coincide con " +
+                "libs.versions.toml ($name / $code)."
+        }
+    }
+}
+tasks.named("check") { dependsOn(checkIosVersion) }

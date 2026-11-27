@@ -81,11 +81,13 @@ Reglas de dependencia:
 Requisitos: JDK 21, Android Studio (aporta el Android SDK, que Gradle necesita incluso para compilar iOS) y, para iOS, un Mac con Xcode.
 
 - **Android:** abre el proyecto en Android Studio y corre `androidApp`, o por terminal `./gradlew :androidApp:assembleDebug`.
-- **iOS:** abre `iosApp/iosApp.xcodeproj` en Xcode y corre en un simulador. La primera compilación descarga Kotlin/Native y tarda varios minutos. Para un iPhone real, completa `TEAM_ID` en `iosApp/Configuration/Config.xcconfig`.
+- **iOS:** abre `iosApp/iosApp.xcodeproj` en Xcode y corre en un simulador. La primera compilación descarga Kotlin/Native y tarda varios minutos. Para un iPhone real, copia `iosApp/Configuration/Secrets.xcconfig.example` como `Secrets.xcconfig` y completa `TEAM_ID`.
 - **Reglas del proyecto:** `.github/scripts/check-rules.sh` (colores, tamaños, textos, privacidad, dependencias).
 - **Pruebas:** `./gradlew allTests` (JVM y host de Android). En Mac, también `./gradlew iosSimulatorArm64Test`, que incluye los flujos de M1 a M4 y la prueba de accesibilidad con texto al 200 % en el simulador.
 - **Fotos en Android:** el emulador no tiene cámara real (muestra una escena virtual); para la galería, arrastra imágenes a la ventana del emulador y se guardan en Descargas.
 - **Procesado de fotos en Android** (con un emulador o teléfono conectado): `./gradlew :core:platform:connectedAndroidDeviceTest`.
+- **Flujo E2E (Maestro, Android o iOS):** con un emulador o simulador abierto, `.github/scripts/e2e.sh android` (o `ios`). Recorre bienvenida, primera mascota, Inicio y Ajustes.
+- **Hook antes de cada push:** `git config core.hooksPath .githooks` una vez por clon. Corre las reglas y las pruebas de la JVM; `git push --no-verify` lo salta.
 - **Avisos en Android de punta a punta** (emulador encendido): `.github/scripts/android-reminders-e2e.sh build/android-e2e`.
 - **Respaldo:** Ajustes → Respaldo → "Exportar respaldo" lo manda a la hoja de compartir. En el otro teléfono, "Importar respaldo" (o "Tengo un respaldo" en la Bienvenida).
 - **Avisos (debug):** Ajustes → "Probar aviso en 1 minuto" programa un aviso de prueba; cierra la app (o reinicia el teléfono) y espera.
@@ -94,4 +96,4 @@ Requisitos: JDK 21, Android Studio (aporta el Android SDK, que Gradle necesita i
 
 ## Licencias de terceros
 
-Fuente Nunito (SIL OFL) e íconos Material Symbols (Apache 2.0): ver [`docs/licenses/`](docs/licenses/).
+Fuente Nunito (SIL OFL) e íconos Material Symbols (Apache 2.0): ver [`feature/settings/src/commonMain/composeResources/files/licenses/`](feature/settings/src/commonMain/composeResources/files/licenses/), y en Ajustes → Licencias.

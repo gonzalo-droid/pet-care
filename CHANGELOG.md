@@ -1,0 +1,50 @@
+# Changelog
+
+Cambios de BestID por versión, para personas (no la lista de commits). Formato basado en
+[Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); versiones con [SemVer](https://semver.org/lang/es/).
+El número de build es el mismo en Android e iOS (`app-versionCode` en `gradle/libs.versions.toml`).
+
+## [0.6.0] - sin publicar (build 4)
+
+Primera versión candidata al App Store y a Google Play (`release/0.6.0`).
+
+### Agregado
+- iPad y tablets: el contenido se centra con un ancho máximo y ya no se estira de borde a borde (D49).
+- Ajustes: enlaces a la política de privacidad y a los términos, "Escríbenos" con la versión y el modelo del
+  teléfono ya escritos, "Recomendar BestID" y "Calificar BestID".
+- Android: canales de avisos separados para vacunas y para desparasitación y cuidados, que se pueden apagar por
+  separado en los ajustes del sistema.
+- Informes de errores con Firebase Crashlytics, solo en las versiones de tienda y sin datos de la mascota ni de
+  la persona (D48).
+
+### Cambiado
+- Android: la versión de tienda pesa menos (de 17 a 7 MB).
+- Android: entrar al detalle de una vacuna, a un formulario o a Ajustes se ve más rápido y limpio, sin las dos
+  pantallas encimadas (D53).
+- Las hojas inferiores se cierran deslizándose al tocar un botón, en lugar de desaparecer de golpe.
+- La política de privacidad, la ficha de las tiendas y el texto de Privacidad en Ajustes cuentan qué envía el
+  informe de errores.
+
+### Para el equipo
+- Una sola fuente de versión; `./gradlew check` falla si iOS y Android no coinciden.
+- `TEAM_ID` pasa a `iosApp/Configuration/Secrets.xcconfig` (no se versiona) y hay `local.properties.example`.
+- Tests de los ViewModels del formulario de vacuna, Inicio y Respaldo; los fakes viven en `:core:testing`.
+- Flujo de ramas `release/X.Y.Z` con tags (D50).
+- Flujo E2E con Maestro para Android e iOS (`.github/scripts/e2e.sh`) y hook `pre-push` con las reglas y las
+  pruebas de la JVM (`git config core.hooksPath .githooks`).
+- R8 activo en el release de Android (D51) y scope de app en Koin para el trabajo en segundo plano.
+- "Probar aviso" (solo en debug) avisa si se negó el permiso.
+
+## [0.5.0] - 2026-11-23 (TestFlight, build 3)
+
+Beta para probar con familia y amigos.
+
+### Agregado
+- Mascotas con foto, carnet y datos del tutor; varias mascotas con selector.
+- Cartilla de vacunas a mano mirando las fotos de la cartilla, ordenada por año con fechas en calendario.
+- Inicio con lo próximo (vacuna o cuidado), cuenta regresiva y aviso cuando una fecha está por confirmar.
+- Salud: desparasitaciones y otros cuidados con intervalo, y peso con gráfico.
+- Avisos una semana antes, un día antes y el mismo día, sin internet, a la hora que elijas.
+- Ficha en PDF para enviar a la veterinaria.
+- Respaldo para pasar los datos a otro teléfono, Android o iPhone.
+- Bienvenida en tres páginas.

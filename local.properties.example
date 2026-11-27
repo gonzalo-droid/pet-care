@@ -1,0 +1,8 @@
+# Copia como local.properties (no se versiona). Android Studio agrega sdk.dir solo.
+sdk.dir=/Users/<tú>/Library/Android/sdk
+
+# Firma del release para Google Play (docs/BETA.md). Sin estas claves el release queda sin firmar.
+BESTID_UPLOAD_STORE_FILE=
+BESTID_UPLOAD_STORE_PASSWORD=
+BESTID_UPLOAD_KEY_ALIAS=
+BESTID_UPLOAD_KEY_PASSWORD=

@@ -47,6 +47,7 @@ import com.bestid.core.navigation.PhotoViewerRoute
 import androidx.navigation.toRoute
 import com.bestid.feature.onboarding.WelcomeScreen
 import com.bestid.core.navigation.ComponentCatalogRoute
+import com.bestid.core.navigation.LicensesRoute
 import com.bestid.core.navigation.NotificationPermissionRoute
 import com.bestid.core.navigation.WeightNewRoute
 import com.bestid.core.platform.notification.ReminderTap
@@ -140,7 +141,14 @@ fun BestIdNavHost(navController: NavHostController = rememberNavController()) {
             ReminderTaps.consume()
         }
     }
-    NavHost(navController = navController, startDestination = MainRoute) {
+    NavHost(
+        navController = navController,
+        startDestination = MainRoute,
+        enterTransition = PushTransitions.enter,
+        exitTransition = PushTransitions.exit,
+        popEnterTransition = PushTransitions.popEnter,
+        popExitTransition = PushTransitions.popExit,
+    ) {
         composable<MainRoute> {
             val main by mainViewModel.state.collectAsStateWithLifecycle()
             when {
@@ -174,6 +182,7 @@ fun BestIdNavHost(navController: NavHostController = rememberNavController()) {
             onClose = actions.back,
             onOpenBackup = actions.openBackup,
             onOpenCatalog = { navController.navigate(ComponentCatalogRoute) },
+            onOpenLicenses = { navController.navigate(LicensesRoute) },
             onDeletedAll = actions.deletedAll,
         )
         composable<ComponentCatalogRoute> {

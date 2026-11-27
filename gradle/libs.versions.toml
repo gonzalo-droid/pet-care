@@ -1,4 +1,8 @@
 [versions]
+# Versión de la app (VER-01): la misma en Android e iOS. checkIosVersion compara con Config.xcconfig.
+# Sube app-versionCode en cada subida a TestFlight o Google Play.
+app-versionName = "0.6.0"
+app-versionCode = "4"
 # Versiones estables verificadas el 13/11/2026. Ver docs/DECISIONS.md.
 kotlin = "2.4.21"
 agp = "9.5.1"
@@ -28,6 +32,10 @@ okio = "3.18.2"
 androidx-exifinterface = "1.4.2"
 androidx-test-runner = "1.7.0"
 androidx-test-ext-junit = "1.3.0"
+# Crashlytics (D48). Verificadas en Google Maven el 26/11/2026.
+firebase-bom = "35.2.0"
+google-services = "4.6.0"
+firebase-crashlytics-plugin = "3.0.8"
 
 [libraries]
 # Compose Multiplatform
@@ -92,6 +100,9 @@ kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", v
 compose-gradle-plugin = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose-multiplatform" }
 compose-compiler-gradle-plugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-kmp-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
@@ -101,6 +112,8 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 androidx-room = { id = "androidx.room", version.ref = "androidx-room" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-plugin" }
 
 # Convenciones propias (build-logic)
 bestid-kmp-library = { id = "bestid.kmp.library" }

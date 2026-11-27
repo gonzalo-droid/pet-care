@@ -10,6 +10,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.bestid.core.domain.di.AppScope
 import com.bestid.core.domain.reminder.SyncReminders
 import com.bestid.core.platform.R
 import kotlinx.coroutines.CoroutineScope
@@ -30,14 +31,17 @@ class ReminderAlarmReceiver : BroadcastReceiver() {
         val pending = goAsync()
         CoroutineScope(SupervisorJob() + Dispatchers.Default).launch {
             try {
-                AndroidNotificationScheduler.ensureChannel(context)
+                AndroidNotificationScheduler.ensureChannels(context)
                 val open = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     putExtra(ReminderTaps.EXTRA_REF_TYPE, intent.getStringExtra(ReminderTaps.EXTRA_REF_TYPE))
                     putExtra(ReminderTaps.EXTRA_REF_ID, intent.getStringExtra(ReminderTaps.EXTRA_REF_ID))
                 }
                 val body = intent.getStringExtra(EXTRA_BODY).orEmpty()
-                val notification = NotificationCompat.Builder(context, AndroidNotificationScheduler.CHANNEL_ID)
+                val notification = NotificationCompat.Builder(
+                    context,
+                    AndroidNotificationScheduler.channelFor(intent.getStringExtra(ReminderTaps.EXTRA_REF_TYPE)),
+                )
                     .setSmallIcon(R.drawable.ic_stat_bestid)
                     .setContentTitle(intent.getStringExtra(EXTRA_TITLE))
                     .setContentText(body)
@@ -71,7 +75,7 @@ class RescheduleReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val koin = GlobalContext.getOrNull() ?: return
         val pending = goAsync()
-        CoroutineScope(SupervisorJob() + Dispatchers.Default).launch {
+        koin.get<CoroutineScope>(AppScope).launch {
             try {
                 koin.get<SyncReminders>().invoke(force = true)
             } finally {

@@ -1,9 +1,11 @@
-// Equipo de Apple Developer: complétalo en tu Mac para firmar (no es un secreto, pero es de tu cuenta).
+// Equipo de Apple Developer: va en Secrets.xcconfig (no se versiona). Copia Secrets.xcconfig.example.
 TEAM_ID=
+#include? "Secrets.xcconfig"
 // Identificador de la app (D45). Debe ser exactamente este en App Store Connect.
 BUNDLE_ID=com.nekodojo.bestid
 APP_NAME=BestID
 
-// Versión visible y número de compilación. Sube CURRENT_PROJECT_VERSION en cada subida a TestFlight.
-MARKETING_VERSION=0.5.0
-CURRENT_PROJECT_VERSION=3
+// Versión visible y número de compilación: copia de app-versionName / app-versionCode de
+// gradle/libs.versions.toml. `./gradlew check` falla si no coinciden (checkIosVersion).
+MARKETING_VERSION=0.6.0
+CURRENT_PROJECT_VERSION=4

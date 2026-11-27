@@ -1,0 +1,30 @@
+# Flujo de humo (TST-08): bienvenida → primera mascota → Inicio → Ajustes → Licencias.
+# Corre igual en Android e iOS (mismo identificador). Uso: .github/scripts/e2e.sh
+appId: com.nekodojo.bestid
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "La cartilla de tu mascota.*"
+    timeout: 30000
+- tapOn: "Saltar"
+- tapOn: "Empezar sin cartilla"
+- assertVisible: "Nueva mascota"
+- tapOn: "Ej. Lilith"
+- inputText: "Toby"
+- hideKeyboard
+- tapOn: "Perro"
+- scrollUntilVisible:
+    element: "Guardar mascota"
+- tapOn: "Guardar mascota"
+- extendedWaitUntil:
+    visible: ".*Toby.*"
+    timeout: 15000
+- tapOn: "Ajustes"
+- assertVisible: "Respaldo"
+- scrollUntilVisible:
+    element: "Licencias"
+- tapOn: "Licencias"
+- assertVisible: "Apache License 2.0"
+- assertVisible: "SIL Open Font License 1.1"
+- takeScreenshot: build/e2e/licencias

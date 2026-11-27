@@ -17,20 +17,23 @@ En tu Mac, con la rama al día:
 
 ## 2. Android: prueba interna de Google Play
 
-1. **Llave de subida** (una sola vez; guárdala fuera del repositorio y con respaldo):
+0. **Versión** (VER-01): en cada subida, sube `app-versionCode` (y `app-versionName` si cambia) en
+   `gradle/libs.versions.toml` y copia los mismos valores en `iosApp/Configuration/Config.xcconfig`.
+   `./gradlew check` falla si no coinciden. Android e iOS usan el mismo número de build.
+1. **Llave de subida** (una sola vez; guárdala fuera del repositorio y con respaldo, ver "Respaldo de llaves"):
    ```
    keytool -genkeypair -keystore ~/bestid-upload.jks -alias bestid -keyalg RSA -keysize 2048 -validity 10000
    ```
-2. En `local.properties` (no se sube al repositorio):
+2. En `local.properties` (no se sube al repositorio; plantilla en `local.properties.example`):
    ```
    BESTID_UPLOAD_STORE_FILE=/Users/<tú>/bestid-upload.jks
    BESTID_UPLOAD_STORE_PASSWORD=...
    BESTID_UPLOAD_KEY_ALIAS=bestid
    BESTID_UPLOAD_KEY_PASSWORD=...
    ```
-3. Generar el paquete, subiendo `versionCode` en cada subida:
+3. Generar el paquete:
    ```
-   ./gradlew :androidApp:bundleRelease -Pbestid.versionCode=1
+   ./gradlew :androidApp:bundleRelease
    ```
    Queda en `androidApp/build/outputs/bundle/release/androidApp-release.aab`.
 4. En Play Console:
@@ -41,10 +44,8 @@ En tu Mac, con la rama al día:
 
 ## 3. iOS: TestFlight
 
-1. En `iosApp/Configuration/Config.xcconfig`:
-   - completar `TEAM_ID`;
-   - subir `CURRENT_PROJECT_VERSION` en cada subida;
-   - `MARKETING_VERSION` es la versión visible.
+1. Copiar `iosApp/Configuration/Secrets.xcconfig.example` como `Secrets.xcconfig` (no se versiona) y poner
+   `TEAM_ID`. La versión ya está en `Config.xcconfig` (paso 0 de la sección 2).
 2. En App Store Connect, crear la app con el bundle `com.nekodojo.bestid` y la ficha de `docs/store/app-store.md`.
 3. En Xcode:
    1. Elegir **Any iOS Device (arm64)**.
@@ -93,3 +94,15 @@ En un Android y un iPhone, sin internet salvo donde se indica:
 **Métricas:** la sección 16 decidió no usar analítica (D5), así que no hay métricas automáticas. Durante la beta se miden a mano con la pregunta final:
 - cuántos activaron los avisos;
 - cuántos siguieron usándola al final de la semana.
+
+## 6. Respaldo de llaves (SEC-04)
+
+Sin estas llaves no se puede publicar una actualización. Anota aquí **dónde** está cada respaldo (nunca la llave
+ni la contraseña):
+
+| Qué | Dónde está el respaldo |
+|---|---|
+| Keystore de subida (`bestid-upload.jks`) y sus contraseñas | `[Pendiente: Gonzalo]` |
+| Cuenta de Apple Developer / App Store Connect (equipo `TEAM_ID`) | `[Pendiente: Gonzalo]` |
+| Proyecto de Firebase `bestid-c931a` (dueños con acceso) | `[Pendiente: Gonzalo]` |
+| Cuenta de Google Play Console | `[Pendiente: Gonzalo]` |

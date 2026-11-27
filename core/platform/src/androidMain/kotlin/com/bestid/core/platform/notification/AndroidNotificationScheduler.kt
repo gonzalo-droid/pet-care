@@ -16,8 +16,11 @@ import com.bestid.core.domain.port.NotificationPermission
 import com.bestid.core.domain.port.NotificationScheduler
 import com.bestid.core.domain.reminder.PlannedReminder
 import com.bestid.core.platform.resources.Res
-import com.bestid.core.platform.resources.reminder_channel_description
-import com.bestid.core.platform.resources.reminder_channel_name
+import com.bestid.core.domain.reminder.ReminderRefType
+import com.bestid.core.platform.resources.reminder_channel_care_description
+import com.bestid.core.platform.resources.reminder_channel_care_name
+import com.bestid.core.platform.resources.reminder_channel_vaccines_description
+import com.bestid.core.platform.resources.reminder_channel_vaccines_name
 import org.jetbrains.compose.resources.getString
 
 /**
@@ -45,7 +48,7 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
     }
 
     override suspend fun schedule(reminders: List<PlannedReminder>) {
-        ensureChannel(context)
+        ensureChannels(context)
         reminders.forEach { reminder ->
             val text = reminder.text()
             val intent = alarmIntent(context, reminder.id)
@@ -84,21 +87,31 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
     }
 
     internal companion object {
-        const val CHANNEL_ID = "bestid_reminders"
+        // PUSH-03: un canal por tipo, para que se puedan apagar por separado en los ajustes del sistema.
+        private const val CHANNEL_VACCINES = "bestid_vaccines"
+        private const val CHANNEL_CARE = "bestid_care"
+        /** Canal único de 0.5.0: se borra al crear los nuevos. */
+        private const val LEGACY_CHANNEL = "bestid_reminders"
+
+        /** Canal según [ReminderTaps.EXTRA_REF_TYPE]: vacunas, o cuidados para todo lo demás. */
+        fun channelFor(refType: String?) = if (refType == ReminderRefType.VACCINE.name) CHANNEL_VACCINES else CHANNEL_CARE
 
         /** El URI hace única cada alarma (las extras no cuentan para distinguir PendingIntents). */
         fun alarmIntent(context: Context, id: String) =
             Intent(context, ReminderAlarmReceiver::class.java).setData("bestid://reminder/$id".toUri())
 
-        suspend fun ensureChannel(context: Context) {
+        suspend fun ensureChannels(context: Context) {
             val manager = context.getSystemService(NotificationManager::class.java)
-            if (manager.getNotificationChannel(CHANNEL_ID) != null) return
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                getString(Res.string.reminder_channel_name),
-                NotificationManager.IMPORTANCE_DEFAULT,
-            ).apply { description = getString(Res.string.reminder_channel_description) }
-            manager.createNotificationChannel(channel)
+            if (manager.getNotificationChannel(CHANNEL_VACCINES) != null && manager.getNotificationChannel(CHANNEL_CARE) != null) return
+            manager.createNotificationChannels(
+                listOf(
+                    NotificationChannel(CHANNEL_VACCINES, getString(Res.string.reminder_channel_vaccines_name), NotificationManager.IMPORTANCE_DEFAULT)
+                        .apply { description = getString(Res.string.reminder_channel_vaccines_description) },
+                    NotificationChannel(CHANNEL_CARE, getString(Res.string.reminder_channel_care_name), NotificationManager.IMPORTANCE_DEFAULT)
+                        .apply { description = getString(Res.string.reminder_channel_care_description) },
+                ),
+            )
+            manager.deleteNotificationChannel(LEGACY_CHANNEL)
         }
     }
 }

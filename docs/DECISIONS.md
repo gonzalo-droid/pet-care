@@ -2,6 +2,34 @@
 
 Registro de decisiones tomadas durante el desarrollo que cambian o precisan `SYSTEM_DESIGN.md`. La más reciente va arriba. Cada una dice quién la tomó y en qué hito.
 
+## 2026-11-26 · Arreglos de la auditoría KMP
+
+Ver `docs/auditorias/2026-11-26-base-kmp.md`.
+
+### D48. Firebase Crashlytics para errores `[Decidido por Gonzalo]`
+Reemplaza a D12 (Sentry) y precisa D4: la app usa Firebase solo para Crashlytics (proyecto `bestid-c931a`). Los datos de la mascota siguen solo en el teléfono; la lectura de la cartilla se sigue decidiendo aparte (D29).
+- Android: firebase-bom 35.2.0 + `firebase-crashlytics` en `androidApp`; plugins `com.google.gms.google-services` 4.6.0 y `com.google.firebase.crashlytics` 3.0.8 (verificados en Google Maven el 26/11/2026, probados con AGP 9.5 en Cazadores). Se aplican solo si existe `androidApp/google-services.json`; si falta, Gradle avisa y compila sin Crashlytics.
+- iOS: `firebase-ios-sdk` 13.2.0 por SPM (producto `FirebaseCrashlytics`), fases "Copy GoogleService-Info.plist" y "Upload dSYM to Crashlytics" (solo Release). Sin el plist, Xcode avisa y la app no arranca Firebase.
+- Debug no recolecta: meta-data `firebase_crashlytics_collection_enabled` en `false` (Android) y sin `FirebaseApp.configure()` con `DEBUG` (iOS). El crash de prueba solo se compila con `-PcrashlyticsTestCrash=true` o `-DCRASHLYTICS_TEST_CRASH` (`docs/CRASHLYTICS.md`).
+- Solo fatales: la app no tiene red ni errores esperados que valga la pena reportar. Si un día hace falta, una interfaz `CrashReporter` en `platformModule` (OBS-01).
+- Límite en iOS: el framework de Kotlin es estático; un crash de Kotlin llega como `SIGABRT` con la pila nativa. `setUnhandledExceptionHook` deja además la traza en el log del sistema (OBS-03).
+- Privacidad: la política, Data safety, la privacidad de App Store, `PrivacyInfo.xcprivacy` y el texto de Ajustes declaran el informe de fallos (sin datos de la mascota ni de la persona).
+
+### D49. iPad y tablets en 0.6.0 `[Decidido por Gonzalo]`
+Se mantiene iPad (`TARGETED_DEVICE_FAMILY = "1,2"`). El contenido de las pantallas, la barra superior, la barra inferior y los botones al pie tienen un ancho máximo de 720 dp centrado (`BestIdSizes.contentMaxWidth`, `Modifier.centeredMaxWidth()` en los scaffolds del design system); en un teléfono no cambia nada. Las listas siguen en una columna. GIT-07 pide que iPad vaya en su propia release: 0.6.0 es la primera que se envía a revisión del App Store, así que no hay una versión publicada sin iPad. Antes de enviarla: prueba en iPad (letra grande, horizontal, Stage Manager) y capturas de iPad 13".
+
+### D50. Ramas `release/X.Y.Z` y tags desde 0.6.0 `[Decidido por Gonzalo]`
+Se adopta el flujo de la base (GIT-01..03): `main` solo recibe releases cerradas, con tag `vX.Y.Z`; la release abierta es `release/0.6.0` (creada desde `main`, su primer commit sube la versión) y las ramas de trabajo hacen PR a ella. El tag `v0.5.0` marca la beta que está en TestFlight (build 3).
+
+### D51. R8 activo en el release de Android `[Propuesta]`
+El release de Android pasa a `isMinifyEnabled = true` y `isShrinkResources = true` (TRP-01). Room, Koin, kotlinx.serialization y Navigation traen sus reglas; DataStore y Crashlytics van en `androidApp/proguard-rules.pro`. El APK baja de 16,9 MB a 7,0 MB. Se probó el release minificado (firmado con la llave de debug solo para instalarlo) en la tablet de prueba en horizontal con `.maestro/smoke.yaml`: bienvenida, primera mascota, Inicio, Ajustes y Licencias. Tras cambiar dependencias hay que repetir esa prueba antes de subir un build.
+
+### D52. Listas en una columna en tablets `[Propuesta]`
+TAB-01 pedía dos columnas si en iPad o tablet las listas se veían vacías. Con el ancho máximo de 720 dp (D49), en la tablet en horizontal la columna se ve completa, así que se quedan en una columna. Se revisa si alguien que lo pruebe lo pide.
+
+### D53. Transiciones al entrar a una pantalla y al cerrar hojas `[Propuesta]`
+Completa D47. En Android, el detalle de vacuna, los formularios y Ajustes entraban con el fundido de 700 ms que trae Navigation, en el que se ven las dos pantallas encimadas; ahora usan el eje horizontal de Material (sale en 90 ms, entra en 210 ms, desplazamiento de 1/12 del ancho). En iOS se mantiene el "push" de Navigation (`PushTransitions`, por plataforma). Las hojas inferiores (confirmar, opciones y mascotas) se cierran con su animación antes de correr la acción del botón; antes desaparecían de golpe. El texto de cada licencia se despliega con animación.
+
 ## 2026-11-23 · Bienvenida en tres páginas y transiciones
 
 ### D46. Bienvenida (O1) en tres páginas `[Decidido por Gonzalo]`
@@ -198,7 +226,7 @@ Puertos y adaptadores: las interfaces de la sección 8 (`ImagePicker`, `Notifica
 ### D3. Ktor incluido `[Decidido por Gonzalo]`
 Ktor queda en el catálogo de versiones (OkHttp en Android, Darwin en iOS) para la alternativa de servicio propio de la sección 10. En M0 no lo usa ningún módulo.
 
-### D4. Solo datos locales y sin Firebase por ahora `[Decidido por Gonzalo]`
+### D4. Solo datos locales y sin Firebase por ahora `[Decidido por Gonzalo]` · precisada por D48 (Crashlytics)
 Los datos viven solo en el teléfono y la app no usa Firebase por ahora: ni Firebase AI Logic ni App Check. Antes de M3 hay que decidir cómo se lee la cartilla (o si el escaneo se pospone); hasta entonces la app funciona con registro a mano. `CardReader` sigue siendo la interfaz que aísla esa decisión.
 
 ### D5. Analítica: no por ahora `[Decidido por Gonzalo]`
@@ -214,15 +242,15 @@ El modelo devuelve `{"id": "custom", "label": "..."}`. Al confirmar en O4 se bus
 `PENDING`, `READING`, `DONE`, `FAILED`, `CANCELLED`.
 
 ### D9. Íconos: Material Symbols Rounded como vectores `[Decidido por Gonzalo]`
-`material-icons-extended` de Compose Multiplatform está congelado en 1.7.3 y no trae Material Symbols. Se importan solo los SVG usados (paquete npm `@material-symbols/svg-400`, estilo rounded, peso 400) convertidos a vector XML en `core/designsystem/composeResources/drawable`. Licencia Apache 2.0 en `docs/licenses/`.
+`material-icons-extended` de Compose Multiplatform está congelado en 1.7.3 y no trae Material Symbols. Se importan solo los SVG usados (paquete npm `@material-symbols/svg-400`, estilo rounded, peso 400) convertidos a vector XML en `core/designsystem/composeResources/drawable`. Licencia Apache 2.0 en `feature/settings/src/commonMain/composeResources/files/licenses/` (se ve en Ajustes → Licencias).
 
 ### D10. Fuente Nunito estática `[Propuesta]`
-Google Fonts publica Nunito solo como fuente variable. Se generaron instancias estáticas 500, 700 y 800 con `fonttools varLib.instancer` para que el peso se vea igual en Android e iOS. Licencia OFL en `docs/licenses/`.
+Google Fonts publica Nunito solo como fuente variable. Se generaron instancias estáticas 500, 700 y 800 con `fonttools varLib.instancer` para que el peso se vea igual en Android e iOS. Licencia OFL en `feature/settings/src/commonMain/composeResources/files/licenses/` (se ve en Ajustes → Licencias).
 
 ### D11. ID de la app `com.bestid.app` `[Decidido por Gonzalo]` · reemplazada por D45
 Android `applicationId` y `BUNDLE_ID` de iOS. Reemplaza el valor por defecto `pe.<dominio>.bestid` de la sección 20.
 
-### D12. Sentry fuera de M0 `[Decidido por Gonzalo]`
+### D12. Sentry fuera de M0 `[Decidido por Gonzalo]` · reemplazada por D48
 Se agrega cuando Gonzalo tenga el DSN. Se leerá de `local.properties` o de un secreto de CI y quedará apagado si falta.
 
 ### D13. Versiones `[Propuesta]`

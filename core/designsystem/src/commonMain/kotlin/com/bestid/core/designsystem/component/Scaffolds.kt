@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.selection.selectable
@@ -87,6 +88,7 @@ fun BottomBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
+                .centeredMaxWidth()
                 .padding(horizontal = BestIdTheme.spacing.xs, vertical = BestIdTheme.spacing.xxs)
                 .selectableGroup(),
         ) {
@@ -162,6 +164,7 @@ fun MainScaffold(
                     .fillMaxWidth()
                     .background(colors.bg)
                     .statusBarsPadding()
+                    .centeredMaxWidth()
                     .padding(horizontal = BestIdTheme.spacing.screen, vertical = BestIdTheme.spacing.xs),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -171,9 +174,19 @@ fun MainScaffold(
         },
         bottomBar = { BottomBar(items = tabs, selectedIndex = selectedTab, onSelect = onSelectTab) },
         snackbarHost = { SnackbarHost(snackbarHostState) { UndoSnackbar(it) } },
-        content = content,
-    )
+    ) { padding ->
+        Box(modifier = Modifier.fillMaxSize().centeredMaxWidth()) { content(padding) }
+    }
 }
+
+/**
+ * Ancho del contenido en tablets e iPad (TAB-01): ocupa todo el ancho hasta
+ * [BestIdSizes.contentMaxWidth][com.bestid.core.designsystem.theme.BestIdSizes.contentMaxWidth] y se centra.
+ * En un teléfono no cambia nada.
+ */
+@Composable
+fun Modifier.centeredMaxWidth(): Modifier =
+    wrapContentWidth(Alignment.CenterHorizontally).widthIn(max = BestIdTheme.sizes.contentMaxWidth).fillMaxWidth()
 
 /**
  * Pantalla con scroll que ocupa al menos todo el alto: [content] arriba y [bottom] (los botones) al
@@ -194,6 +207,7 @@ fun FillScrollColumn(
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
                 .heightIn(min = maxHeight)
+                .centeredMaxWidth()
                 .padding(contentPadding),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
@@ -277,6 +291,7 @@ fun FlowScaffold(
                 modifier = Modifier
                     .fillMaxWidth()
                     .statusBarsPadding()
+                    .centeredMaxWidth()
                     .padding(horizontal = BestIdTheme.spacing.xs, vertical = BestIdTheme.spacing.xxs),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -307,6 +322,7 @@ fun FlowScaffold(
                         .background(colors.bg)
                         .navigationBarsPadding()
                         .imePadding()
+                        .centeredMaxWidth()
                         .padding(horizontal = BestIdTheme.spacing.screen, vertical = BestIdTheme.spacing.sm),
                 ) { bottomAction() }
             }
@@ -318,6 +334,7 @@ fun FlowScaffold(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
+                .centeredMaxWidth()
                 .padding(horizontal = BestIdTheme.spacing.screen, vertical = BestIdTheme.spacing.md),
             verticalArrangement = Arrangement.spacedBy(BestIdTheme.spacing.md),
             content = content,
