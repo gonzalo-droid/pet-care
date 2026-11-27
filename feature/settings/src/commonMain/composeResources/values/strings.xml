@@ -33,6 +33,8 @@
     <string name="settings_tools">Herramientas de prueba</string>
     <string name="settings_open_catalog">Ver catálogo de componentes</string>
     <string name="settings_test_reminder">Probar aviso en 1 minuto</string>
+    <string name="settings_test_reminder_denied_title">Los avisos están desactivados</string>
+    <string name="settings_test_reminder_denied_body">Sin el permiso, el aviso de prueba no puede llegar. Actívalo en los ajustes del teléfono.</string>
     <string name="settings_test_reminder_done">Listo. Cierra la app o reinicia el teléfono: el aviso debería llegar en 1 minuto.</string>
 
     <!-- Respaldo (A2) -->
@@ -77,4 +79,14 @@
     <string name="backup_restore_title">Restaurar respaldo</string>
     <string name="backup_restore_body">Elige el archivo .zip que exportaste desde BestID en tu otro teléfono. Se agregarán sus mascotas, vacunas, cuidados, pesos y fotos.</string>
     <string name="backup_continue">Continuar</string>
+    <string name="settings_licenses">Licencias</string>
+    <string name="licenses_title">Licencias</string>
+    <string name="licenses_intro">BestID usa software de código abierto. Gracias a quienes lo hacen.</string>
+    <string name="licenses_apache_title">Apache License 2.0</string>
+    <string name="licenses_apache_body">Kotlin, Compose Multiplatform, AndroidX (Room, DataStore, Navigation, Lifecycle), Koin, kotlinx (coroutines, serialization, datetime), Ktor, Coil, Okio, Firebase Crashlytics y los íconos Material Symbols.</string>
+    <string name="licenses_ofl_title">SIL Open Font License 1.1</string>
+    <string name="licenses_ofl_body">La fuente Nunito.</string>
+    <string name="licenses_sqlite">SQLite es de dominio público.</string>
+    <string name="licenses_show_text">Ver el texto de la licencia</string>
+    <string name="licenses_hide_text">Ocultar el texto</string>
 </resources>

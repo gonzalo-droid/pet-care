@@ -62,10 +62,11 @@ android {
             resValue("bool", "crashlytics_test_crash", "false")
         }
         release {
-            // Sin R8 en la beta: Room, Koin y kotlinx.serialization necesitan reglas que se validan aparte.
-            // proguard-rules.pro ya trae las de DataStore y Crashlytics (TRP-01, CRA-02); al activarlo,
-            // probar el release entero en un teléfono. Con el plugin, el mapping se sube solo.
-            isMinifyEnabled = false
+            // R8 (TRP-01): Room, Koin, kotlinx.serialization y Navigation traen sus reglas; DataStore y
+            // Crashlytics van en proguard-rules.pro. Con el plugin de Crashlytics el mapping se sube solo (CRA-02).
+            // Cualquier cambio de dependencias: probar el release entero antes de subirlo.
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             manifestPlaceholders["crashlyticsEnabled"] = true
             resValue("bool", "crashlytics_test_crash", crashlyticsTestCrash.toString())

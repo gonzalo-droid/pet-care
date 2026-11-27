@@ -1,13 +1,12 @@
 package com.bestid.app
 
 import com.bestid.app.di.initKoin
+import com.bestid.core.domain.di.AppScope
 import com.bestid.core.domain.reminder.SyncReminders
 import com.bestid.core.platform.notification.IosNotifications
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlin.experimental.ExperimentalNativeApi
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.koin.mp.KoinPlatform
 import platform.BackgroundTasks.BGAppRefreshTask
@@ -19,7 +18,6 @@ import platform.Foundation.dateWithTimeIntervalSinceNow
 
 private const val REFRESH_TASK_ID = "com.nekodojo.bestid.refresh"
 private const val REFRESH_INTERVAL_SECONDS = 12.0 * 60 * 60
-private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
 /**
  * Arranque de iOS: lo llama iOSApp.swift al iniciar. Inicia Koin, instala el delegado de avisos
@@ -39,8 +37,9 @@ fun startApp() {
     IosNotifications.installDelegate()
     BGTaskScheduler.sharedScheduler.registerForTaskWithIdentifier(REFRESH_TASK_ID, usingQueue = null) { task ->
         scheduleRefresh()
-        scope.launch {
-            runCatching { KoinPlatform.getKoin().get<SyncReminders>().invoke() }
+        val koin = KoinPlatform.getKoin()
+        koin.get<CoroutineScope>(AppScope).launch {
+            runCatching { koin.get<SyncReminders>().invoke() }
             (task as? BGAppRefreshTask)?.setTaskCompletedWithSuccess(true)
         }
     }

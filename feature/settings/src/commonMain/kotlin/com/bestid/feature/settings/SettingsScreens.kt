@@ -19,6 +19,7 @@ import com.bestid.core.designsystem.component.Eyebrow
 import com.bestid.core.designsystem.component.FlowScaffold
 import com.bestid.core.designsystem.component.InfoCard
 import com.bestid.core.designsystem.component.ListRow
+import com.bestid.core.designsystem.component.PermissionCard
 import com.bestid.core.designsystem.component.PlainCard
 import com.bestid.core.designsystem.component.SecondaryButton
 import com.bestid.core.designsystem.component.TextAction
@@ -55,6 +56,7 @@ import com.bestid.feature.settings.resources.settings_delete_all
 import com.bestid.feature.settings.resources.settings_delete_body
 import com.bestid.feature.settings.resources.settings_delete_confirm
 import com.bestid.feature.settings.resources.settings_delete_title
+import com.bestid.feature.settings.resources.settings_licenses
 import com.bestid.feature.settings.resources.settings_open_catalog
 import com.bestid.feature.settings.resources.settings_pm
 import com.bestid.feature.settings.resources.settings_privacy
@@ -65,6 +67,8 @@ import com.bestid.feature.settings.resources.settings_reminder_time_hint
 import com.bestid.feature.settings.resources.settings_reminder_time_value
 import com.bestid.feature.settings.resources.settings_reminders
 import com.bestid.feature.settings.resources.settings_test_reminder
+import com.bestid.feature.settings.resources.settings_test_reminder_denied_body
+import com.bestid.feature.settings.resources.settings_test_reminder_denied_title
 import com.bestid.feature.settings.resources.settings_test_reminder_done
 import com.bestid.feature.settings.resources.settings_title
 import com.bestid.feature.settings.resources.settings_tools
@@ -132,6 +136,7 @@ fun SettingsScreen(
     onClose: () -> Unit,
     onOpenBackup: () -> Unit,
     onOpenCatalog: () -> Unit,
+    onOpenLicenses: () -> Unit,
     onDeletedAll: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel(),
 ) {
@@ -183,6 +188,7 @@ fun SettingsScreen(
             val shareText = stringResource(Res.string.settings_share_text, AppLinks.DOWNLOAD)
             TextAction(stringResource(Res.string.settings_share), onClick = { external.shareText(shareText) })
             TextAction(stringResource(Res.string.settings_rate), onClick = external::openStoreReview)
+            TextAction(stringResource(Res.string.settings_licenses), onClick = onOpenLicenses)
         }
 
         if (deleteFailed) DeleteFailedCard()
@@ -246,7 +252,9 @@ private fun TestReminderButton() {
     val scheduleTest = koinInject<ScheduleTestReminder>()
     val scope = rememberCoroutineScope()
     var scheduled by remember { mutableStateOf(false) }
+    var denied by remember { mutableStateOf(false) }
     val requester = rememberNotificationPermissionRequester { granted ->
+        denied = !granted
         if (granted) {
             scope.launch {
                 scheduleTest()
@@ -263,5 +271,13 @@ private fun TestReminderButton() {
         InfoCard(icon = BestIdIcons.CheckCircle) {
             Text(stringResource(Res.string.settings_test_reminder_done), style = BestIdTheme.typography.body)
         }
+    }
+    // Sin permiso el aviso no puede llegar: se dice en vez de no hacer nada.
+    if (denied) {
+        PermissionCard(
+            title = stringResource(Res.string.settings_test_reminder_denied_title),
+            body = stringResource(Res.string.settings_test_reminder_denied_body),
+            onOpenSettings = requester::openSettings,
+        )
     }
 }

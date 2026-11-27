@@ -1,5 +1,9 @@
 package com.bestid.core.domain.di
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import org.koin.core.qualifier.named
 import com.bestid.core.domain.usecase.DeletePet
 import com.bestid.core.domain.usecase.DeleteVaccineRecord
 import com.bestid.core.domain.usecase.GetVet
@@ -49,7 +53,14 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 /** Casos de uso. Dependen solo de los puertos, que aporta `core/data`. */
+/**
+ * ARQ-05: scope de toda la app para trabajo que debe sobrevivir a la pantalla (reprogramar avisos
+ * desde un receptor o la tarea de fondo de iOS). Nunca `GlobalScope`.
+ */
+val AppScope = named("AppScope")
+
 val domainModule = module {
+    single(AppScope) { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
     factoryOf(::ObservePets)
     factoryOf(::ObservePet)
     factoryOf(::ObserveSelectedPet)

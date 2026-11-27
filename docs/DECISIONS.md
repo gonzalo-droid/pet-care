@@ -21,6 +21,12 @@ Se mantiene iPad (`TARGETED_DEVICE_FAMILY = "1,2"`). El contenido de las pantall
 ### D50. Ramas `release/X.Y.Z` y tags desde 0.6.0 `[Decidido por Gonzalo]`
 Se adopta el flujo de la base (GIT-01..03): `main` solo recibe releases cerradas, con tag `vX.Y.Z`; la release abierta es `release/0.6.0` (creada desde `main`, su primer commit sube la versión) y las ramas de trabajo hacen PR a ella. El tag `v0.5.0` marca la beta que está en TestFlight (build 3).
 
+### D51. R8 activo en el release de Android `[Propuesta]`
+El release de Android pasa a `isMinifyEnabled = true` y `isShrinkResources = true` (TRP-01). Room, Koin, kotlinx.serialization y Navigation traen sus reglas; DataStore y Crashlytics van en `androidApp/proguard-rules.pro`. El APK baja de 16,9 MB a 7,0 MB. Se probó el release minificado (firmado con la llave de debug solo para instalarlo) en la tablet de prueba en horizontal con `.maestro/smoke.yaml`: bienvenida, primera mascota, Inicio, Ajustes y Licencias. Tras cambiar dependencias hay que repetir esa prueba antes de subir un build.
+
+### D52. Listas en una columna en tablets `[Propuesta]`
+TAB-01 pedía dos columnas si en iPad o tablet las listas se veían vacías. Con el ancho máximo de 720 dp (D49), en la tablet en horizontal la columna se ve completa, así que se quedan en una columna. Se revisa si alguien que lo pruebe lo pide.
+
 ## 2026-11-23 · Bienvenida en tres páginas y transiciones
 
 ### D46. Bienvenida (O1) en tres páginas `[Decidido por Gonzalo]`
@@ -233,10 +239,10 @@ El modelo devuelve `{"id": "custom", "label": "..."}`. Al confirmar en O4 se bus
 `PENDING`, `READING`, `DONE`, `FAILED`, `CANCELLED`.
 
 ### D9. Íconos: Material Symbols Rounded como vectores `[Decidido por Gonzalo]`
-`material-icons-extended` de Compose Multiplatform está congelado en 1.7.3 y no trae Material Symbols. Se importan solo los SVG usados (paquete npm `@material-symbols/svg-400`, estilo rounded, peso 400) convertidos a vector XML en `core/designsystem/composeResources/drawable`. Licencia Apache 2.0 en `docs/licenses/`.
+`material-icons-extended` de Compose Multiplatform está congelado en 1.7.3 y no trae Material Symbols. Se importan solo los SVG usados (paquete npm `@material-symbols/svg-400`, estilo rounded, peso 400) convertidos a vector XML en `core/designsystem/composeResources/drawable`. Licencia Apache 2.0 en `feature/settings/src/commonMain/composeResources/files/licenses/` (se ve en Ajustes → Licencias).
 
 ### D10. Fuente Nunito estática `[Propuesta]`
-Google Fonts publica Nunito solo como fuente variable. Se generaron instancias estáticas 500, 700 y 800 con `fonttools varLib.instancer` para que el peso se vea igual en Android e iOS. Licencia OFL en `docs/licenses/`.
+Google Fonts publica Nunito solo como fuente variable. Se generaron instancias estáticas 500, 700 y 800 con `fonttools varLib.instancer` para que el peso se vea igual en Android e iOS. Licencia OFL en `feature/settings/src/commonMain/composeResources/files/licenses/` (se ve en Ajustes → Licencias).
 
 ### D11. ID de la app `com.bestid.app` `[Decidido por Gonzalo]` · reemplazada por D45
 Android `applicationId` y `BUNDLE_ID` de iOS. Reemplaza el valor por defecto `pe.<dominio>.bestid` de la sección 20.
