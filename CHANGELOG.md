@@ -18,6 +18,7 @@ Primera versión candidata al App Store y a Google Play (`release/0.6.0`).
   la persona (D48).
 
 ### Cambiado
+- Android: la versión de tienda pesa menos (de 17 a 7 MB).
 - La política de privacidad, la ficha de las tiendas y el texto de Privacidad en Ajustes cuentan qué envía el
   informe de errores.
 
@@ -26,6 +27,10 @@ Primera versión candidata al App Store y a Google Play (`release/0.6.0`).
 - `TEAM_ID` pasa a `iosApp/Configuration/Secrets.xcconfig` (no se versiona) y hay `local.properties.example`.
 - Tests de los ViewModels del formulario de vacuna, Inicio y Respaldo; los fakes viven en `:core:testing`.
 - Flujo de ramas `release/X.Y.Z` con tags (D50).
+- Flujo E2E con Maestro para Android e iOS (`.github/scripts/e2e.sh`) y hook `pre-push` con las reglas y las
+  pruebas de la JVM (`git config core.hooksPath .githooks`).
+- R8 activo en el release de Android (D51) y scope de app en Koin para el trabajo en segundo plano.
+- "Probar aviso" (solo en debug) avisa si se negó el permiso.
 
 ## [0.5.0] - 2026-11-23 (TestFlight, build 3)
 

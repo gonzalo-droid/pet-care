@@ -25,14 +25,13 @@ Release abierta: `release/0.6.0` (D50). No se cierra hasta que estén las de **A
 
 - [ ] **COD-07 — Commits con atribución de IA.** 63 commits (13 y 14 nov.) llevan `Co-Authored-By: Claude`.
   Decidir si se reescribe `main` (repo público, force-push) o se deja anotado.
-- [ ] **AJU-01 — Licencias** en Ajustes (las de `docs/licenses/`).
 - [ ] **AJU-05 en iOS:** cuando haya ficha pública, abrir `itms-apps://…/id<ID>?action=write-review` en lugar
   del aviso nativo (`ExternalActions.ios.kt`).
 - [ ] **Pruebas en dispositivo (una sola sesión):**
-  - Release de Android e iOS en claro, letra grande y modo avión (TST-09, PUB-02).
+  - Release de iOS, y Android en un teléfono real, con letra grande y modo avión (TST-09, PUB-02). El release
+    de Android con R8 ya pasó el flujo de Maestro en la tablet de prueba (D51).
   - TalkBack y VoiceOver por el flujo principal (A11Y-04).
   - Negar cámara, galería y avisos y seguir usando la app (PERM-02).
-  - Tablet de 600 dp o más en horizontal (TIE-04).
   - Instalar el build nuevo encima del anterior con datos (PUB-04): en Android, que los avisos lleguen por los
     canales nuevos y desaparezca el canal viejo.
   - Hojas inferiores con teclado en iPhone (TRP-02).
@@ -45,11 +44,6 @@ Release abierta: `release/0.6.0` (D50). No se cierra hasta que estén las de **A
 
 ## Baja
 
-- [ ] **TAB-01 — Listas en dos columnas** desde ~560 dp, si en iPad se ven vacías.
-- [ ] **ARQ-05 — Scope de app calificado en Koin.**
-- [ ] **TST-08 / CI-01 — Flujo E2E que cubra Android** y hook `pre-push`.
-- [ ] **TRP-01 / CRA-02 — Activar R8:** las reglas ya están en `androidApp/proguard-rules.pro`; probar el release
-  entero antes de subirlo.
-- [ ] **UIS-01 — Esqueleto de carga** si alguna pantalla tarda.
 - [ ] **Revisar animaciones** del detalle de vacuna, Ajustes y hojas inferiores.
-- [ ] **"Probar aviso"** muestra un mensaje en pantalla al dispararse.
+- [ ] **Flujo E2E en el CI:** hoy `.github/scripts/e2e.sh` corre local; en GitHub necesitaría un emulador (macOS
+  o KVM), que gasta más minutos.
