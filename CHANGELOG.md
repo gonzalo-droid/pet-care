@@ -19,6 +19,9 @@ Primera versión candidata al App Store y a Google Play (`release/0.6.0`).
 
 ### Cambiado
 - Android: la versión de tienda pesa menos (de 17 a 7 MB).
+- Android: entrar al detalle de una vacuna, a un formulario o a Ajustes se ve más rápido y limpio, sin las dos
+  pantallas encimadas (D53).
+- Las hojas inferiores se cierran deslizándose al tocar un botón, en lugar de desaparecer de golpe.
 - La política de privacidad, la ficha de las tiendas y el texto de Privacidad en Ajustes cuentan qué envía el
   informe de errores.
 

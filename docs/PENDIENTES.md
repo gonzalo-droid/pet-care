@@ -37,6 +37,7 @@ Release abierta: `release/0.6.0` (D50). No se cierra hasta que estén las de **A
   - Hojas inferiores con teclado en iPhone (TRP-02).
   - Navegación por gestos y con 3 botones (TIE-03).
   - Que un aviso de prueba llegue en 1 minuto en Android.
+  - Ver en un teléfono real las transiciones de D53 (entrar al detalle y a Ajustes, cerrar hojas).
 - [ ] **Consolas de las tiendas:** Play App Signing (SEC-03), Data safety (PUB-10) y privacidad de App Store
   (PUB-12) según `docs/store/` (ahora declaran los informes de Crashlytics).
 - [ ] **TestFlight:** probar el build 3 en el iPhone (pestañas, onboarding, fechas, demora al escribir) e invitar a
@@ -44,6 +45,5 @@ Release abierta: `release/0.6.0` (D50). No se cierra hasta que estén las de **A
 
 ## Baja
 
-- [ ] **Revisar animaciones** del detalle de vacuna, Ajustes y hojas inferiores.
 - [ ] **Flujo E2E en el CI:** hoy `.github/scripts/e2e.sh` corre local; en GitHub necesitaría un emulador (macOS
-  o KVM), que gasta más minutos.
+  o KVM), que gasta muchos minutos en un repo privado. Falta definir la estrategia antes de tocarlo.
